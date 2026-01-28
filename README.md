@@ -1,4 +1,4 @@
-# Grupo5
+# [Nombre Aplicación]
 
 ## 👥 Miembros del Equipo
 | Nombre y Apellidos | Correo URJC | Usuario GitHub |
