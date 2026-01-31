@@ -8,7 +8,7 @@ const app = express();
 
 app.set('views', __dirname + '/../views');
 app.set('view engine', 'html');
-app.engine('html', mustacheExpress(), ".html");
+app.engine('html', mustacheExpress(__dirname + '/../views/partials', '.html'), ".html");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
