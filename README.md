@@ -5,7 +5,7 @@
 |:--- |:--- |:--- |
 | Raúl Tejada Merinero | r.tejada.2023@alumnos.urjc.es | @raultejada24 |
 | Gabriele Antonio Ricucci | ga.ricucci.2025@alumnos.urjc.es | @gabrieleri |
-| [Nombre 3] | [email3]@alumnos.urjc.es | [@User3] |
+| Victor Hugo Oliveira Petroceli | vh.deoliveira.2023@alumnos.urjc.es | @CodVictor |
 | [Nombre 4] | [email4]@alumnos.urjc.es | [@User4] |
 | [Nombre 5] | [email5]@alumnos.urjc.es | [@User5] |
 
@@ -14,66 +14,61 @@
 ## 🎭 **Preparación 1: Definición del Proyecto**
 
 ### **Descripción del Tema**
-[Escribe aquí una descripción breve y concisa de qué trata tu aplicación, el sector al que pertenece y qué valor aporta al usuario].
+Stilnovo es una plataforma de compra/venta de objetos usados enfocada en dar un "nuevo estilo" a artículos de segunda mano. La aplicación permite a los usuarios publicar anuncios, gestionar transacciones seguras y fomentar la economía circular a través de un mercado digital estético y funcional.
 
 ### **Entidades**
 Indicar las entidades principales que gestionará la aplicación y las relaciones entre ellas:
 
-1. **[Entidad 1]**: [Ej: Usuario]
-2. **[Entidad 2]**: [Ej: Producto]
-3. **[Entidad 3]**: [Ej: Pedido]
-4. **[Entidad 4]**: [Ej: Categoría]
+1. **Usuario**: Almacena información personal, roles y avatar.
+2. **Producto**: Artículos para la venta con descripción, precio, categoría y fotos.
+3. **Transacción**: Registra el proceso de compra vinculando a un comprador, un vendedor y un producto.
+4. **Valoración**: Sistema de feedback con comentario y puntuación tras una transacción.
 
 **Relaciones entre entidades:**
-- [Ej: Usuario - Pedido: Un usuario puede tener múltiples pedidos (1:N)]
-- [Ej: Pedido - Producto: Un pedido puede contener múltiples productos y un producto puede estar en múltiples pedidos (N:M)]
-- [Ej: Producto - Categoría: Un producto pertenece a una categoría (N:1)]
-- [Descripción de otras relaciones relevantes]
+- Usuario - Producto: Un usuario puede publicar múltiples productos (propietario). Relación 1:N.
+- Transacción - Usuario/Producto: Una transacción vincula obligatoriamente a un comprador, un vendedor y un único artículo vendido.
+- Valoración - Transacción: Cada valoración está asociada a una transacción completada. Relación 1:1.
+- Producto - Categoría: Los productos se agrupan por categorías para facilitar la búsqueda.
 
 ### **Permisos de los Usuarios**
 Describir los permisos de cada tipo de usuario e indicar de qué entidades es dueño:
 
 * **Usuario Anónimo**: 
-  - Permisos: [Ej: Visualización de catálogo, búsqueda de productos, registro]
+  - Permisos: Navegar por la web, consultar el catálogo de productos y utilizar el buscador. Solo consulta información pública.
   - No es dueño de ninguna entidad
 
 * **Usuario Registrado**: 
-  - Permisos: [Ej: Gestión de perfil, realizar pedidos, crear valoraciones]
-  - Es dueño de: [Ej: Sus propios Pedidos, su Perfil de Usuario, sus Valoraciones]
+  - Permisos: Publicar artículos con fotos, realizar compras, acceder a su historial y gestionar su perfil con avatar.
+  - Es dueño de: Sus propios productos publicados, su perfil de usuario y las valoraciones que emita.
 
 * **Administrador**: 
-  - Permisos: [Ej: Gestión completa de productos (CRUD), visualización de estadísticas, moderación de contenido]
-  - Es dueño de: [Ej: Productos, Categorías, puede gestionar todos los Pedidos y Usuarios]
+  - Permisos: Control total sobre la información. Puede moderar contenido, eliminar productos que infrinjan normas o banear usuarios.
+  - Es dueño de: Gestiona todas las entidades de la plataforma.
 
 ### **Imágenes**
 Indicar qué entidades tendrán asociadas una o varias imágenes:
 
-- **[Entidad con imágenes 1]**: [Ej: Usuario - Una imagen de avatar por usuario]
-- **[Entidad con imágenes 2]**: [Ej: Producto - Múltiples imágenes por producto (galería)]
-- **[Entidad con imágenes 3]**: [Ej: Categoría - Una imagen representativa por categoría]
+- **Usuario**: Una imagen de avatar personalizada.
+- **Producto**: Múltiples fotos descriptivas por cada artículo anunciado.
 
 ### **Gráficos**
 Indicar qué información se mostrará usando gráficos y de qué tipo serán:
 
-- **Gráfico 1**: [Ej: Ventas mensuales - Gráfico de barras]
-- **Gráfico 2**: [Ej: Productos más vendidos - Gráfico de tarta/circular]
-- **Gráfico 3**: [Ej: Evolución de usuarios registrados - Gráfico de líneas]
-- **Gráfico 4**: [Ej: Distribución de pedidos por categoría - Gráfico de barras horizontales]
-
+- **Gráfico 1**: Cantidad de productos vendidos por categoría - Gráfico de barras.
+- **Gráfico 2**: Evolución de ingresos por ventas del usuario en los últimos meses - Gráfico de líneas.
+  
 ### **Tecnología Complementaria**
 Indicar qué tecnología complementaria se empleará:
 
-- [Ej: Envío de correos electrónicos automáticos mediante JavaMailSender]
-- [Ej: Generación de PDFs de facturas usando iText o similar]
-- [Ej: Sistema de autenticación OAuth2 o JWT]
-- [Otras tecnologías externas que se integrarán]
+- Websockets: Para implementar un chat en tiempo real entre compradores y vendedores.
+- Generación de PDFs: Creación automática de recibos de compra o etiquetas de envío tras una transacción.
+- Envío de correos: Notificaciones automáticas con el resumen de la compra en formato PDF.
 
 ### **Algoritmo o Consulta Avanzada**
 Indicar cuál será el algoritmo o consulta avanzada que se implementará:
 
-- **Algoritmo/Consulta**: [Ej: Sistema de recomendaciones basado en el historial de compras del usuario]
-- **Descripción**: [Ej: Analiza los productos comprados previamente y sugiere productos similares o complementarios utilizando filtrado colaborativo]
-- **Alternativa**: [Ej: Consulta compleja que agrupe ventas por categoría, mes y región, con cálculo de tendencias]
+- **Algoritmo/Consulta**: Sistema de Recomendaciones personalizado.
+- **Descripción**: Muestra en la página de inicio "Productos que te pueden interesar" basándose en las categorías que el usuario ha comprado o visitado previamente
 
 ---
 
