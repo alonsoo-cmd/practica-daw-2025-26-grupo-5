@@ -68,7 +68,7 @@ Se han seleccionado tecnologías que extienden las capacidades básicas de la we
 El sistema no se limita a mostrar datos, sino que procesa la actividad del usuario para personalizar su experiencia de navegación.
 
 - **Algoritmo/Consulta**: Sistema de Recomendaciones personalizado.
-- **Descripción**: Muestra en la página de inicio "Productos que te pueden interesar" basándose en las categorías que el usuario ha comprado o visitado previamente
+- **Descripción**: Muestra en la página de inicio "Productos que te pueden interesar" basándose en las categorías que el usuario ha comprado o visitado previamente.
 
 ---
 
@@ -91,25 +91,25 @@ Mapa visual que organiza la navegación por colores (Azul: Todos los Usuarios, A
 #### **1. Página Principal / Home**
 ![Página Principal](templates/images/README-FOTOS/main-photo.png)
 
-**Descripción**
+**Descripción:**
 Punto de entrada principal que presenta la propuesta de valor y permite la navegación hacia el catálogo y los formularios de acceso.
 
 #### **2. Catálogo Público (Featured Treasures) / Home**
 ![Página Principal](templates/images/README-FOTOS/main-photo-2.png)
 
-**Descripción**
+**Descripción:**
 Visualización de la entidad Producto con datos de ejemplo representativos, permitiendo al usuario anónimo consultar el stock disponible.
 
 #### **3. Interfaz de Autenticación**
 ![Interfaz de Autentificacion](templates/images/README-FOTOS/user-login.png)
 
-**Descripción**
+**Descripción:**
 Formulario de acceso gestionado por roles para discriminar entre el panel de usuario y el panel de administración.
 
 #### **4. Registro de Usuarios**
 ![Interfaz de Autentificacion](templates/images/README-FOTOS/user-signup.png)
 
-**Descripción**
+**Descripción:**
 Interfaz que permite la creación de nuevas cuentas en la base de datos para interactuar con el marketplace.
 
 #### **Área Privada (Usuario Registrado)**
@@ -117,75 +117,82 @@ Interfaz que permite la creación de nuevas cuentas en la base de datos para int
 #### **5. Panel de Actividad (Analytics Overview)**
 ![Panel de Actividad](templates/images/README-FOTOS/user-dashboard.png)
 
-**Descripción**
+**Descripción:**
 Vista personalizada que utiliza gráficos para monitorizar los ingresos y las ventas del usuario.
 
 #### **6. Gestión de Inventario Propio**
 ![Inventario Propio](templates/images/README-FOTOS/user-myproducts.png)
 
-**Descripción**
+**Descripción:**
 Listado de la entidad Producto donde el dueño puede visualizar sus anuncios y acceder a las opciones de borrado o edición.
 
 #### **7. Formulario de Publicación**
 ![Formulario de Publicación](templates/images/README-FOTOS/user-create-product.png)
 
-**Descripción**
+**Descripción:**
 Interfaz para la creación de nuevos elementos en la base de datos, incluyendo la subida de imágenes.
 
 #### **8. Detalle de Producto**
 ![Detalle de Producto](templates/images/README-FOTOS/user-moreInfo-product-1.png)
 
-**Descripción**
-ista completa de la entidad con especificaciones técnicas, precio y acceso a la tecnología de contacto por email.
+**Descripción:**
+Vista completa de la entidad con especificaciones técnicas, precio y acceso a la tecnología de contacto por email.
 
-#### **9. Historial de Transacciones**
+#### **9. Detalle Técnico y Motor de Recomendaciones**
+![Detalle Técnico y Motor de Recomendaciones](templates/images/README-FOTOS/user-moreInfo-pro-2.png)
+
+**Descripción:**
+Parte inferior de la ficha de producto que muestra las especificaciones y la descripción del vendedor. Destaca la sección "You may also like", que es la representación visual del Algoritmo Avanzado: el sistema consulta la base de datos para sugerir dinámicamente artículos de categorías afines o complementarias al producto actual.
+
+#### **10. Historial de Transacciones**
 ![Historial de Transacciones](templates/images/README-FOTOS/user-sales-orders.png)
 
-**Descripción**
+**Descripción:**
 Registro de compras y ventas que integra la Tecnología Complementaria de generación de facturas en PDF.
 
-#### **10. Análisis de Datos G1 y G2**
+
+#### **11. Análisis de Datos G1 y G2**
 ![Análisis de Datos G1 y G2](templates/images/README-FOTOS/user-statistics.png)
 
-**Descripción**
+**Descripción:**
 Implementación de gráficos de líneas y tarta para visualizar la evolución de ingresos y ventas por categoría.
 
-#### **11. Gráfico de Interés G3**
+#### **12. Gráfico de Interés G3**
 ![Gráfico de Interés G3](templates/images/README-FOTOS/user-statistics-2.png)
 
-**Descripción**
+**Descripción:**
 Gráfico de barras avanzado que compara visitas frente a interacciones reales por categoría de producto.
 
-#### **12. Perfil y Verificación**
+#### **13. Perfil y Verificación**
 ![Perfil y Verificación](templates/images/README-FOTOS/user-setting-1.png)
 
-**Descripción**
+**Descripción:**
 Gestión de datos personales y visualización de la Digital Seller Card para transacciones seguras.
 
 #### **Administrador**
-#### **13. Monitor Global de la Plataforma**
+#### **14. Monitor Global de la Plataforma**
 ![Monitor Global de la Plataforma](templates/images/README-FOTOS/admin-dashboars.png)
 
-**Descripción**
+**Descripción:**
 Dashboard exclusivo con KPIs de sistema, usuarios reportados y volumen total de anuncios.
 
-#### **14. Gestión de Usuarios**
+#### **15. Gestión de Usuarios**
 ![Gestión de Usuarios](templates/images/README-FOTOS/admin-user-managme.png)
 
-**Descripción**
+**Descripción:**
 Herramienta de moderación que permite al administrador realizar acciones de baneo o purga de datos sobre cualquier perfil.
 
-#### **15. Inventario Global**
+#### **16. Inventario Global**
 ![Inventario Global](templates/images/README-FOTOS/admin-global-invento.png)
 
-**Descripción**
+**Descripción:**
 Registro maestro de todos los productos del marketplace, con permisos para editar o eliminar cualquier anuncio fraudulento.
 
-#### **16. Auditoría Financiera**
+#### **17. Auditoría Financiera**
 ![Auditoría Financiera](templates/images/README-FOTOS/admin-transactions.png)
 
-**Descripción**
-Vista de la entidad Transacción a nivel global para gestionar disputas y reembolsos .
+**Descripción:**
+Vista de la entidad Transacción a nivel global para gestionar disputas y reembolsos.
 
 ---
 
