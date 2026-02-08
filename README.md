@@ -81,18 +81,111 @@ El sistema no se limita a mostrar datos, sino que procesa la actividad del usuar
 ### **Diagrama de Navegación**
 Diagrama que muestra cómo se navega entre las diferentes páginas de la aplicación:
 
-![Diagrama de Navegación](images/navigation-diagram.png)
+![Diagrama de Navegación](templates/images/README-FOTOS/Stilnovo-Diagrama-Navegacion.png)
 
-> [Descripción opcional del flujo de navegación: Ej: "El usuario puede acceder desde la página principal a todas las secciones mediante el menú de navegación. Los usuarios anónimos solo tienen acceso a las páginas públicas, mientras que los registrados pueden acceder a su perfil y panel de usuario."]
+**Descripción del flujo de navegación:**  
+Mapa visual que organiza la navegación por colores (Azul: Todos los Usuarios, Amarillo: Usuario Registrado, Verde: Administrador) y utiliza las miniaturas de las capturas de la siguiente sección como nodos del sistema.
 
 ### **Capturas de Pantalla y Descripción de Páginas**
 
 #### **1. Página Principal / Home**
-![Página Principal](images/home-page.png)
+![Página Principal](templates/images/README-FOTOS/main-photo.png)
 
-> [Descripción breve: Ej: "Página de inicio que muestra los productos destacados, categorías principales y un banner promocional. Incluye barra de navegación y acceso a registro/login para usuarios no autenticados."]
+**Descripción**
+Punto de entrada principal que presenta la propuesta de valor y permite la navegación hacia el catálogo y los formularios de acceso.
 
-#### **AQUÍ AÑADIR EL RESTO DE PÁGINAS**
+#### **2. Catálogo Público (Featured Treasures) / Home**
+![Página Principal](templates/images/README-FOTOS/main-photo-2.png)
+
+**Descripción**
+Visualización de la entidad Producto con datos de ejemplo representativos, permitiendo al usuario anónimo consultar el stock disponible.
+
+#### **3. Interfaz de Autenticación**
+![Interfaz de Autentificacion](templates/images/README-FOTOS/user-login.png)
+
+**Descripción**
+Formulario de acceso gestionado por roles para discriminar entre el panel de usuario y el panel de administración.
+
+#### **4. Registro de Usuarios**
+![Interfaz de Autentificacion](templates/images/README-FOTOS/user-signup.png)
+
+**Descripción**
+Interfaz que permite la creación de nuevas cuentas en la base de datos para interactuar con el marketplace.
+
+#### **Área Privada (Usuario Registrado)**
+
+#### **5. Panel de Actividad (Analytics Overview)**
+![Panel de Actividad](templates/images/README-FOTOS/user-dashboard.png)
+
+**Descripción**
+Vista personalizada que utiliza gráficos para monitorizar los ingresos y las ventas del usuario.
+
+#### **6. Gestión de Inventario Propio**
+![Inventario Propio](templates/images/README-FOTOS/user-myproducts.png)
+
+**Descripción**
+Listado de la entidad Producto donde el dueño puede visualizar sus anuncios y acceder a las opciones de borrado o edición.
+
+#### **7. Formulario de Publicación**
+![Formulario de Publicación](templates/images/README-FOTOS/user-create-product.png)
+
+**Descripción**
+Interfaz para la creación de nuevos elementos en la base de datos, incluyendo la subida de imágenes.
+
+#### **8. Detalle de Producto**
+![Detalle de Producto](templates/images/README-FOTOS/user-moreInfo-product-1.png)
+
+**Descripción**
+ista completa de la entidad con especificaciones técnicas, precio y acceso a la tecnología de contacto por email.
+
+#### **9. Historial de Transacciones**
+![Historial de Transacciones](templates/images/README-FOTOS/user-sales-orders.png)
+
+**Descripción**
+Registro de compras y ventas que integra la Tecnología Complementaria de generación de facturas en PDF.
+
+#### **10. Análisis de Datos G1 y G2**
+![Análisis de Datos G1 y G2](templates/images/README-FOTOS/user-statistics.png)
+
+**Descripción**
+Implementación de gráficos de líneas y tarta para visualizar la evolución de ingresos y ventas por categoría.
+
+#### **11. Gráfico de Interés G3**
+![Gráfico de Interés G3](templates/images/README-FOTOS/user-statistics-2.png)
+
+**Descripción**
+Gráfico de barras avanzado que compara visitas frente a interacciones reales por categoría de producto.
+
+#### **12. Perfil y Verificación**
+![Perfil y Verificación](templates/images/README-FOTOS/user-setting-1.png)
+
+**Descripción**
+Gestión de datos personales y visualización de la Digital Seller Card para transacciones seguras.
+
+#### **Administrador**
+#### **13. Monitor Global de la Plataforma**
+![Monitor Global de la Plataforma](templates/images/README-FOTOS/admin-dashboars.png)
+
+**Descripción**
+Dashboard exclusivo con KPIs de sistema, usuarios reportados y volumen total de anuncios.
+
+#### **14. Gestión de Usuarios**
+![Gestión de Usuarios](templates/images/README-FOTOS/admin-user-managme.png)
+
+**Descripción**
+Herramienta de moderación que permite al administrador realizar acciones de baneo o purga de datos sobre cualquier perfil.
+
+#### **15. Inventario Global**
+![Inventario Global](templates/images/README-FOTOS/admin-global-invento.png)
+
+**Descripción**
+Registro maestro de todos los productos del marketplace, con permisos para editar o eliminar cualquier anuncio fraudulento.
+
+#### **16. Auditoría Financiera**
+![Auditoría Financiera](templates/images/README-FOTOS/admin-transactions.png)
+
+**Descripción**
+Vista de la entidad Transacción a nivel global para gestionar disputas y reembolsos .
 
 ---
 
