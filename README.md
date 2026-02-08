@@ -100,13 +100,25 @@ Punto de entrada principal que presenta la propuesta de valor y permite la naveg
 **Descripción:**
 Visualización de la entidad Producto con datos de ejemplo representativos, permitiendo al usuario anónimo consultar el stock disponible.
 
-#### **3. Interfaz de Autenticación**
+#### **3. Detalle de Producto**
+![Detalle de Producto](templates/images/README-FOTOS/user-moreInfo-product-1.png)
+
+**Descripción:**
+Vista completa de la entidad con especificaciones técnicas, precio y acceso a la tecnología de contacto por email.
+
+#### **4. Detalle Técnico y Motor de Recomendaciones**
+![Detalle Técnico y Motor de Recomendaciones](templates/images/README-FOTOS/user-moreInfo-pro-2.png)
+
+**Descripción:**
+Parte inferior de la ficha de producto que muestra las especificaciones y la descripción del vendedor. Destaca la sección "You may also like", que es la representación visual del Algoritmo Avanzado: el sistema consulta la base de datos para sugerir dinámicamente artículos de categorías afines o complementarias al producto actual.
+
+#### **5. Interfaz de Autenticación**
 ![Interfaz de Autentificacion](templates/images/README-FOTOS/user-login.png)
 
 **Descripción:**
 Formulario de acceso gestionado por roles para discriminar entre el panel de usuario y el panel de administración.
 
-#### **4. Registro de Usuarios**
+#### **6. Registro de Usuarios**
 ![Interfaz de Autentificacion](templates/images/README-FOTOS/user-signup.png)
 
 **Descripción:**
@@ -114,81 +126,81 @@ Interfaz que permite la creación de nuevas cuentas en la base de datos para int
 
 #### **Área Privada (Usuario Registrado)**
 
-#### **5. Panel de Actividad (Analytics Overview)**
+#### **7. Panel de Actividad (Analytics Overview)**
 ![Panel de Actividad](templates/images/README-FOTOS/user-dashboard.png)
 
 **Descripción:**
 Vista personalizada que utiliza gráficos para monitorizar los ingresos y las ventas del usuario.
 
-#### **6. Gestión de Inventario Propio**
+#### **8. Gestión de Inventario Propio**
 ![Inventario Propio](templates/images/README-FOTOS/user-myproducts.png)
 
 **Descripción:**
 Listado de la entidad Producto donde el dueño puede visualizar sus anuncios y acceder a las opciones de borrado o edición.
 
-#### **7. Formulario de Publicación**
+#### **9. Formulario de Publicación**
 ![Formulario de Publicación](templates/images/README-FOTOS/user-create-product.png)
 
 **Descripción:**
 Interfaz para la creación de nuevos elementos en la base de datos, incluyendo la subida de imágenes.
 
-#### **8. Detalle de Producto**
-![Detalle de Producto](templates/images/README-FOTOS/user-moreInfo-product-1.png)
+#### **10. Formulario de Edición**
+![Formulario de Edición](templates/images/README-FOTOS/user-edit.png)
 
 **Descripción:**
-Vista completa de la entidad con especificaciones técnicas, precio y acceso a la tecnología de contacto por email.
+Interfaz para la edición de elementos en la base de datos, incluyendo la cambio de imágenes.
 
-#### **9. Detalle Técnico y Motor de Recomendaciones**
-![Detalle Técnico y Motor de Recomendaciones](templates/images/README-FOTOS/user-moreInfo-pro-2.png)
+#### **11. Productos Favoritos**
+![Productos Favoritos](templates/images/README-FOTOS/user-favs.png)
 
 **Descripción:**
-Parte inferior de la ficha de producto que muestra las especificaciones y la descripción del vendedor. Destaca la sección "You may also like", que es la representación visual del Algoritmo Avanzado: el sistema consulta la base de datos para sugerir dinámicamente artículos de categorías afines o complementarias al producto actual.
+Listado de la entidad Producto donde el dueño podrá visualizar productos agregados como "Favoritos".
 
-#### **10. Historial de Transacciones**
+#### **12. Historial de Transacciones**
 ![Historial de Transacciones](templates/images/README-FOTOS/user-sales-orders.png)
 
 **Descripción:**
 Registro de compras y ventas que integra la Tecnología Complementaria de generación de facturas en PDF.
 
 
-#### **11. Análisis de Datos G1 y G2**
+#### **13. Análisis de Datos G1 y G2**
 ![Análisis de Datos G1 y G2](templates/images/README-FOTOS/user-statistics.png)
 
 **Descripción:**
 Implementación de gráficos de líneas y tarta para visualizar la evolución de ingresos y ventas por categoría.
 
-#### **12. Gráfico de Interés G3**
+#### **14. Gráfico de Interés G3**
 ![Gráfico de Interés G3](templates/images/README-FOTOS/user-statistics-2.png)
 
 **Descripción:**
 Gráfico de barras avanzado que compara visitas frente a interacciones reales por categoría de producto.
 
-#### **13. Perfil y Verificación**
+#### **15. Perfil y Verificación**
 ![Perfil y Verificación](templates/images/README-FOTOS/user-setting-1.png)
 
 **Descripción:**
 Gestión de datos personales y visualización de la Digital Seller Card para transacciones seguras.
 
 #### **Administrador**
-#### **14. Monitor Global de la Plataforma**
+#### **16. Monitor Global de la Plataforma**
 ![Monitor Global de la Plataforma](templates/images/README-FOTOS/admin-dashboars.png)
 
 **Descripción:**
 Dashboard exclusivo con KPIs de sistema, usuarios reportados y volumen total de anuncios.
 
-#### **15. Gestión de Usuarios**
+#### **17. Gestión de Usuarios**
 ![Gestión de Usuarios](templates/images/README-FOTOS/admin-user-managme.png)
 
 **Descripción:**
 Herramienta de moderación que permite al administrador realizar acciones de baneo o purga de datos sobre cualquier perfil.
 
-#### **16. Inventario Global**
+#### **18. Inventario Global**
 ![Inventario Global](templates/images/README-FOTOS/admin-global-invento.png)
 
 **Descripción:**
 Registro maestro de todos los productos del marketplace, con permisos para editar o eliminar cualquier anuncio fraudulento.
 
-#### **17. Auditoría Financiera**
+#### **19. Auditoría Financiera**
 ![Auditoría Financiera](templates/images/README-FOTOS/admin-transactions.png)
 
 **Descripción:**
