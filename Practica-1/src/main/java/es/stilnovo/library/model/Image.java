@@ -8,7 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 
-@Entity
+@Entity(name="ImageTable")
 public class Image {
 
     @Id

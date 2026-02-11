@@ -92,21 +92,23 @@
                         </a>
                     </div>
 
+                    {{#seller}}
                     <div class="seller-card p-3 rounded-4 bg-light-subtle border d-flex align-items-center justify-content-between mb-4">
                         <div class="d-flex align-items-center gap-3">
                             <div class="position-relative">
-                                <img src="/images/profile-photo.png" class="rounded-circle border border-white shadow-sm" width="55" height="55" style="object-fit: cover;">
+                                <img src="/user/{{id}}/profile-photo" class="rounded-circle border border-white shadow-sm" width="55" height="55" style="object-fit: cover;">
                                 <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle"></span>
                             </div>
                             <div>
-                                <p class="fw-800 mb-0 text-dark">Mario G.</p>
+                                <p class="fw-800 mb-0 text-dark">{{name}}</p>
                                 <div class="d-flex align-items-center gap-1 small fw-700 text-muted">
-                                    <i class="fa-solid fa-star text-warning"></i> 4.9 (82 ratings)
+                                    <i class="fa-solid fa-star text-warning"></i> {{rating}} (82 ratings)
                                 </div>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-right opacity-25"></i>
                     </div>
+                    {{/seller}}
 
                     <div class="accordion accordion-flush" id="accordionDetails">
                         <div class="accordion-item bg-transparent">
@@ -118,7 +120,7 @@
                             <div id="flush-collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionDetails">
                                 <div class="accordion-body px-0 text-muted fw-600 small line-height-lg">
                                     <p>{{description}}</p>
-                                    <p class="mb-0"><i class="fa-solid fa-location-dot me-2 opacity-50"></i>Móstoles, Madrid</p>
+                                    <p class="mb-0"><i class="fa-solid fa-location-dot me-2 opacity-50"></i>{{location}}</p>
                                 </div>
                             </div>
                         </div>
@@ -155,6 +157,8 @@
     </main>
     {{/product}} 
     <div class="py-5"></div>
+
+    {{>footer}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -49,7 +49,8 @@ public class WebSecurityConfig {
                 // PRODUCT VIEWS: Public access to the marketplace and details
                 .requestMatchers("/info-product-page/**").permitAll()
                 .requestMatchers("/about-page/**").permitAll()
-
+                .requestMatchers("/user/*/profile-photo").permitAll()
+                
                 // PRIVATE PAGES: Restricted to registered users or admins
 				.requestMatchers("/payment-page/**").hasAnyRole("USER", "ADMIN")
 				.requestMatchers("/contact-seller-page/**").hasAnyRole("USER", "ADMIN")

@@ -2,8 +2,11 @@ package es.stilnovo.library.service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.sql.Blob;
+
 import jakarta.annotation.PostConstruct;
 
+import org.hibernate.engine.jdbc.proxy.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -48,19 +51,32 @@ public class DataBaseInitializer {
     @PostConstruct
     public void init() throws IOException, URISyntaxException {
 
-        // 1. Define sample products for the Stilnovo marketplace
-        Product product1 = new Product("Audi A3 Sporback", "cars", 42500, "Excellent condition, S-Line edition.", "active");
-        Product product2 = new Product("iPhone 17 Pro", "tech", 1399, "Latest Apple smartphone with advanced AI features", "active");
-        Product product3 = new Product("Dell XPS 15 Laptop", "tech", 1899, "High-performance Dell laptop with 4K display", "active");
-        Product product4 = new Product("Leather Winter Coat", "fashion", 349, "Premium black leather coat for winter season", "active");
-        Product product5 = new Product("White Dining Table", "home", 499, "Modern white table made of solid wood", "active");
-        Product product6 = new Product("Modern LED Lamp", "home", 89, "Minimalist LED lamp with adjustable brightness", "active");
-        Product product7 = new Product("Lexus RX 500h", "cars", 68500, "Luxury hybrid SUV with advanced safety features", "active");
-        Product product8 = new Product("Italian Moka Coffee Maker", "home", 45, "Classic Italian stovetop coffee maker", "active");
-        Product product9 = new Product("BMW M3 Competition", "cars", 96500, "High-performance sports sedan with twin-turbo engine", "active");
-        Product product10 = new Product("Adidas", "fashion", 99, "A perfect shoes for daily use", "active");
+        Resource defaultUserImage = new ClassPathResource("static/images/no-profile-picture.png");
+        Blob photoUserBlob = BlobProxy.generateProxy(defaultUserImage.getInputStream(), defaultUserImage.contentLength());
+
+        Resource defaultAdminImage = new ClassPathResource("static/images/admin-profile-picture.png");
+        Blob photoAdminBlob = BlobProxy.generateProxy(defaultAdminImage.getInputStream(), defaultAdminImage.contentLength());
+
+        // 1. Initialize sample users with encrypted passwords and roles
+        User user = new User("user", passwordEncoder.encode("user"), photoUserBlob, 4.7,"USER");
+        User admin = new User("admin", passwordEncoder.encode("admin"), photoAdminBlob, 5.0,"USER", "ADMIN");
+
+        userRepository.save(user);
+        userRepository.save(admin);
         
-        // 2. Associate specific images from /resources/sample-images/images/
+        // 2. Define sample products for the Stilnovo marketplace
+        Product product1 = new Product("Audi A3 Sportback", "cars", 42500, "Audi A3 Sportback in excellent condition, S-Line edition, featuring sporty finishes, a well-maintained interior, and a perfect balance between comfort, performance, and premium design.", "active", user, "Mostoles, Madrid");
+        Product product2 = new Product("iPhone 17 Pro", "tech", 1399, "The latest Apple smartphone, equipped with advanced AI-powered features, a next-generation professional camera system, and outstanding performance for everyday and professional use.", "active", user, "Mostoles, Madrid");
+        Product product3 = new Product("Dell XPS 15 Laptop", "tech", 1899, "High-performance Dell XPS 15 laptop with a stunning 4K display, elegant design, and powerful hardware ideal for demanding tasks such as editing, development, and creative work.", "active", user, "Mostoles, Madrid");
+        Product product4 = new Product("Leather Winter Coat", "fashion", 349, "Premium black leather winter coat designed to deliver elegance, durability, and excellent protection against cold weather during the winter season.", "active", user, "Mostoles, Madrid");
+        Product product5 = new Product("White Dining Table", "home", 499, "Modern white dining table made of solid wood, combining durability and style, perfect for adding brightness and sophistication to any dining space.", "active", user, "Mostoles, Madrid");
+        Product product6 = new Product("Modern LED Lamp", "home", 89, "Modern minimalist LED lamp with adjustable brightness, ideal for creating a comfortable and functional atmosphere in living or working spaces.", "active", user, "Mostoles, Madrid");
+        Product product7 = new Product("Lexus RX 500h", "cars", 68500, "Luxury Lexus RX 500h hybrid SUV featuring advanced technology, premium materials, exceptional comfort, and state-of-the-art safety systems.", "active", user, "Mostoles, Madrid");
+        Product product8 = new Product("Italian Moka Coffee Maker", "home", 45, "Classic Italian stovetop moka coffee maker, crafted for rich and authentic espresso-style coffee, combining traditional design with reliable performance.", "active", user, "Mostoles, Madrid");
+        Product product9 = new Product("BMW M3 Competition", "cars", 96500, "High-performance BMW M3 Competition sports sedan with a twin-turbo engine, aggressive styling, and precision engineering for an exhilarating driving experience.", "active", user, "Mostoles, Madrid");
+        Product product10 = new Product("Adidas Campus", "fashion", 99, "Adidas Campus sneakers designed for everyday wear, offering a timeless design, comfortable fit, and durable materials suitable for daily use.", "active", user, "Mostoles, Madrid");
+        
+        // 3. Associate specific images from /resources/sample-images/images/
         setProductImage(product1, "Audi-a3-1.png");
         setProductImage(product2, "Iphone-17-1.png");
         setProductImage(product3, "ordenador-dell-1.png");
@@ -72,7 +88,7 @@ public class DataBaseInitializer {
         setProductImage(product9, "bmw-1.png");
         setProductImage(product10, "adidas-1.png");
 
-        // 3. Persist all products into the MySQL database (Docker)
+        // 4. Persist all products into the MySQL database (Docker)
         productService.save(product1);
         productService.save(product2);
         productService.save(product3);
@@ -84,8 +100,5 @@ public class DataBaseInitializer {
         productService.save(product9);
         productService.save(product10);
 
-        // 4. Initialize sample users with encrypted passwords and roles
-        userRepository.save(new User("user", passwordEncoder.encode("user"), "USER"));
-        userRepository.save(new User("admin", passwordEncoder.encode("admin"), "USER", "ADMIN"));
     }
 }

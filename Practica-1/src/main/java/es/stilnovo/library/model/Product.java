@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+@Entity(name = "ProductTable")
 public class Product {
 
     @Id
@@ -14,6 +14,7 @@ public class Product {
     private String name;
     private String category;
     private double price;
+    private String location;
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -27,14 +28,20 @@ public class Product {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 
+    @ManyToOne
+    private User seller; // El dueño del producto
+
+
     public Product() {}
 
-    public Product(String name, String category, double price, String description, String status) {
+    public Product(String name, String category, double price, String description, String status, User seller, String location) {
         this.name = name;
         this.category = category;
         this.price = price;
         this.description = description;
         this.status = status;
+        this.seller = seller;
+        this.location = location;
     }
 
     /**
@@ -72,4 +79,11 @@ public class Product {
             this.images = images;
         }
     }
+
+    public User getSeller() { return seller; }
+    public void setSeller(User seller) { this.seller = seller; }
+
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+
 }

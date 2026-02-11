@@ -17,19 +17,18 @@ public class InfoProductController {
     private ProductService productService;
 
     @GetMapping("/info-product-page/{id}")
-    public String showProduct(Model model, @PathVariable Long id) {
-        Optional<Product> product = productService.findById(id);
+public String showProduct(Model model, @PathVariable Long id) {
+    Optional<Product> product = productService.findById(id);
 
         if (product.isPresent()) {
-            model.addAttribute("product", product.get());
+            Product p = product.get();
+            model.addAttribute("product", p);
         
-            // We fetch other products to show in the "You may also like" section
-            // For now, we show all products; later you can filter by category
+            model.addAttribute("seller", p.getSeller()); 
+        
             model.addAttribute("relatedProducts", productService.findAll());
-        
             return "info-product-page";
-        } else {
-            return "redirect:/";
         }
+        return "redirect:/";
     }
 }
