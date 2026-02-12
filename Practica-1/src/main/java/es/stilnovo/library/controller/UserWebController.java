@@ -1,9 +1,13 @@
 package es.stilnovo.library.controller;
 
+import java.io.IOException;
 import java.security.Principal;
+import java.sql.Blob;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
+import org.hibernate.engine.jdbc.proxy.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -13,10 +17,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.ui.Model;
 
+import es.stilnovo.library.model.Image;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
+import es.stilnovo.library.repository.ImageRepository;
 import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.service.ProductService;
@@ -33,6 +41,9 @@ public class UserWebController {
     
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private ImageRepository imageRepository;
 
     // ... other methods like /profile or /edit-profile ...
 
@@ -170,5 +181,86 @@ public class UserWebController {
 
         // 4. Redirect back to the inventory page
         return "redirect:/user-products-page/" + existingProduct.getSeller().getUserId();
-    }   
+    } 
+    
+    
+    // GET method to display the add form 
+    @GetMapping("/add-product-page")
+    public String showAddForm(Model model, HttpServletRequest request) {
+    
+        return "add-product-page"; 
+    }
+
+    @PostMapping("/add-product")
+    public String newProduct(Model model, 
+                            @RequestParam("productPhoto") MultipartFile[] productPhotos, 
+                            @RequestParam String productName,
+                            @RequestParam String category,
+                            @RequestParam String description,
+                            @RequestParam double price,
+                            @RequestParam String location,
+                            @RequestParam String status,
+                            HttpServletRequest request) throws IOException {
+
+        // 1. Filter empty files and validate count (1 to 4)
+        List<MultipartFile> validPhotos = Arrays.stream(productPhotos)
+                                                .filter(f -> !f.isEmpty())
+                                                .toList();
+        
+        if (validPhotos.size() < 1 || validPhotos.size() > 4) {
+            // Add error message
+            model.addAttribute("error", "You must upload between 1 and 4 photos.");
+            
+            // MANTAIN FIELDS: Add the values back to the model
+            model.addAttribute("productName", productName);
+            model.addAttribute("category", category);
+            model.addAttribute("price", price);
+            model.addAttribute("location", location);
+            model.addAttribute("description", description);
+            model.addAttribute("status", status);
+            
+            return "add-product-page"; // Return view name, NOT redirect
+        }
+
+        // 2. Identify authenticated seller
+        Principal principal = request.getUserPrincipal();
+        User seller = userRepository.findByName(principal.getName()).orElseThrow();
+
+        // 3. Create product
+        Product newProduct = new Product(productName, category, price, description, status, seller, location);
+
+        // 4. Link images to product
+        for (MultipartFile photo : validPhotos) {
+            Image img = new Image();
+            img.setImageFile(BlobProxy.generateProxy(photo.getInputStream(), photo.getSize()));
+            newProduct.getImages().add(img); 
+        }
+
+        productRepository.save(newProduct);
+
+        return "redirect:/user-products-page/" + seller.getUserId();
+    }
+
+    // Method to delete a product from the database
+    @PostMapping("/delete-product/{id}")
+    public String deleteProduct(@PathVariable long id, HttpServletRequest request) {
+    
+        // 1. Get current logged-in user
+        Principal principal = request.getUserPrincipal();
+        User user = userRepository.findByName(principal.getName()).orElseThrow();
+    
+        // 2. Find the product in the DB
+        Product product = productRepository.findById(id).orElseThrow();
+    
+        // 3. SECURITY: Verify ownership before deleting
+        if (product.getSeller().getUserId() == user.getUserId()) {
+            // This will also delete associated images due to CascadeType.ALL
+            productRepository.delete(product);
+        }
+    
+        // 4. Redirect back to the inventory page
+        return "redirect:/user-products-page/" + user.getUserId();
+    }
+    
+    
 }

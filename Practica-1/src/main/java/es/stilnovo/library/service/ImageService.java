@@ -68,4 +68,5 @@ public class ImageService {
         imageRepository.deleteById(id);
         return image;
     }
+
 }

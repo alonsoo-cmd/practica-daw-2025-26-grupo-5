@@ -18,23 +18,31 @@ public class MainController {
 
     // Added @RequestParam to capture the search input from the HTML form
     @GetMapping("/")
-    public String index(Model model, @RequestParam(required = false) String query) {
+    public String index(Model model, 
+                    @RequestParam(required = false) String query,
+                    @RequestParam(required = false) String category) { // New parameter
     
-        // 1. Fetch the list of products based on the search query
-        List<Product> products = productService.findByQuery(query);
+        List<Product> products;
 
-        // 2. LOGIC: If exactly ONE product is found during a search, redirect to its info page
-        // We check that query is not null to avoid redirecting on the first page load
-        if (query != null && !query.isEmpty() && products.size() == 1) {
-            long productId = products.get(0).getId();
-            // Redirect to the product detail route (adjust the URL to your actual info path)
-            return "redirect:/info-product-page/" + productId;
+        // 1. Logic: Decide which service method to use
+        if (category != null && !category.isEmpty()) {
+            products = productService.findByQueryCategory(category);
+            model.addAttribute("query", category); // To show what category we are in
+        } else {
+            products = productService.findByQuery(query);
+            model.addAttribute("query", (query != null) ? query : "");
         }
 
-        // 3. Otherwise, show the marketplace list as usual
+        // 2. Reuse your existing logic for single product redirect
+        if (products.size() == 1 && (query != null || category != null)) {
+            return "redirect:/info-product-page/" + products.get(0).getId();
+        }
+
+      // 3. Set the 'searching' flag to hide the Hero section
+        boolean isSearching = (query != null && !query.isEmpty()) || (category != null && !category.isEmpty());
+        model.addAttribute("searching", isSearching);
         model.addAttribute("products", products);
-        model.addAttribute("query", (query != null) ? query : ""); 
-    
+
         return "index";
     }
 }

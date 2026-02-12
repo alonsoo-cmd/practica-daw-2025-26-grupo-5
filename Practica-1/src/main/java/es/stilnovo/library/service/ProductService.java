@@ -50,4 +50,11 @@ public class ProductService {
         return repository.findByNameContainingIgnoreCase(query);
     }
 
+    public List<Product> findByQueryCategory(String query) {
+        if (query == null || query.isEmpty()) {
+            return repository.findAll();
+        }
+        // Make sure this method exists in your ProductRepository!
+        return repository.findByCategoryContainingIgnoreCase(query);
+    }
 }
