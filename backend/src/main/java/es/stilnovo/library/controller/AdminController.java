@@ -20,6 +20,11 @@ public class AdminController {
     @Autowired
     private UserRepository userRepository;
 
+    @GetMapping("/panel")
+    public String showAdminPanel() {
+        return "admin-panel-page";
+    }
+
     @GetMapping("/users")
     public String listUsers(Model model) {
 
@@ -27,6 +32,16 @@ public class AdminController {
         model.addAttribute("users", users);
 
         return "admin-user-managment-page";
+    }
+
+    @GetMapping("/global-inventory")
+    public String showGlobalInventory() {
+        return "admin-global-invent-page";
+    }
+
+    @GetMapping("/transactions")
+    public String showTransactions() {
+        return "admin-global-transac-page";
     }
 
     @PostMapping("/users/delete/{id}")

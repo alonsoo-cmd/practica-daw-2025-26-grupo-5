@@ -22,13 +22,13 @@
             </div>
             
             <nav class="nav flex-column gap-1">
-                <a class="nav-link-stilnovo" href="user-page.html"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-                <a class="nav-link-stilnovo" href="user-products-page.html"><i class="fa-solid fa-box-open"></i> My Products</a>
-                <a class="nav-link-stilnovo" href="favorite-products-page.html"><i class="fa-solid fa-heart"></i> Favorites</a>
-                <a class="nav-link-stilnovo" href="sales-and-orders-page.html"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
+                <a class="nav-link-stilnovo" href="/user-page/{{userId}}"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a class="nav-link-stilnovo" href="/user-products-page/{{userId}}"><i class="fa-solid fa-box-open"></i> My Products</a>
+                <a class="nav-link-stilnovo" href="/favorite-products-page/{{userId}}"><i class="fa-solid fa-heart"></i> Favorites</a>
+                <a class="nav-link-stilnovo" href="/sales-and-orders-page/{{userId}}"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
                 <a class="nav-link-stilnovo active" href="#"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
-                <a class="nav-link-stilnovo" href="user-setting-page.html"><i class="fa-solid fa-user-gear"></i> Settings</a>
-                <a class="nav-link-stilnovo text-muted" href="help-center-page.html"><i class="fa-solid fa-circle-question"></i> Help Center</a>
+                <a class="nav-link-stilnovo" href="/user-setting-page/{{userId}}"><i class="fa-solid fa-user-gear"></i> Settings</a>
+                <a class="nav-link-stilnovo text-muted" href="/help-center-page/{{userId}}"><i class="fa-solid fa-circle-question"></i> Help Center</a>
             </nav>
         
             <div class="mt-auto pt-4 border-top">
@@ -54,7 +54,7 @@
                         <button class="btn-sell py-2 px-3 small" style="height: auto;"><i class="fa-solid fa-file-export me-2"></i> Export PDF</button>
                     </div>
 
-                    <a href="user-setting-page.html" class="text-decoration-none">
+                    <a href="/user-setting-page/{{userId}}" class="text-decoration-none">
                         <img src="images/profile-photo.png" alt="User" class="rounded-circle border border-2 shadow-sm" width="48" height="48" style="object-fit: cover;">
                     </a>
                 </div>

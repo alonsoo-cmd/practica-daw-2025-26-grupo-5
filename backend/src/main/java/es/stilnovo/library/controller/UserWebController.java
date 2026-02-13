@@ -139,6 +139,76 @@ public class UserWebController {
         return "user-products-page";
     }
 
+    @GetMapping("/favorite-products-page/{id}")
+    public String showFavoriteProductsPage(Model model, @PathVariable long id, HttpServletRequest request) {
+
+        User user = userRepository.findById(id).orElseThrow();
+
+        if (request.getUserPrincipal() == null || !request.getUserPrincipal().getName().equals(user.getName())) {
+            return "redirect:/error";
+        }
+
+        model.addAttribute("user", user);
+
+        return "favorite-products-page";
+    }
+
+    @GetMapping("/sales-and-orders-page/{id}")
+    public String showSalesAndOrdersPage(Model model, @PathVariable long id, HttpServletRequest request) {
+
+        User user = userRepository.findById(id).orElseThrow();
+
+        if (request.getUserPrincipal() == null || !request.getUserPrincipal().getName().equals(user.getName())) {
+            return "redirect:/error";
+        }
+
+        model.addAttribute("user", user);
+
+        return "sales-and-orders-page";
+    }
+
+    @GetMapping("/statistics-page/{id}")
+    public String showStatisticsPage(Model model, @PathVariable long id, HttpServletRequest request) {
+
+        User user = userRepository.findById(id).orElseThrow();
+
+        if (request.getUserPrincipal() == null || !request.getUserPrincipal().getName().equals(user.getName())) {
+            return "redirect:/error";
+        }
+
+        model.addAttribute("user", user);
+
+        return "statistics-page";
+    }
+
+    @GetMapping("/user-setting-page/{id}")
+    public String showUserSettingPage(Model model, @PathVariable long id, HttpServletRequest request) {
+
+        User user = userRepository.findById(id).orElseThrow();
+
+        if (request.getUserPrincipal() == null || !request.getUserPrincipal().getName().equals(user.getName())) {
+            return "redirect:/error";
+        }
+
+        model.addAttribute("user", user);
+
+        return "user-setting-page";
+    }
+
+    @GetMapping("/help-center-page/{id}")
+    public String showHelpCenterPage(Model model, @PathVariable long id, HttpServletRequest request) {
+
+        User user = userRepository.findById(id).orElseThrow();
+
+        if (request.getUserPrincipal() == null || !request.getUserPrincipal().getName().equals(user.getName())) {
+            return "redirect:/error";
+        }
+
+        model.addAttribute("user", user);
+
+        return "help-center-page";
+    }
+
 
     // GET method to display the edit form with existing data
     @GetMapping("/edit-product-page/{id}")
