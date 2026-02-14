@@ -68,39 +68,40 @@
                     </div>
 
                     <div class="d-flex flex-column gap-3">
-                        <div class="clay-card p-4 border-start-status-success shadow-sm" style="border: 2px solid var(--brand-blue);">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div>
-                                    <span class="x-small fw-800 opacity-50">ORDER #ST-9921</span>
-                                    <h5 class="fw-800 mb-0">Eames Lounge Chair</h5>
+                        {{#soldProducts}}
+                        <a href="/sales-and-orders-page/{{userId}}?productId={{id}}" class="text-decoration-none text-reset">
+                            <div class="clay-card p-4 border-start-status-success shadow-sm" style="border: 2px solid var(--brand-blue);">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <span class="x-small fw-800 opacity-50">ORDER #{{id}}</span>
+                                        <h5 class="fw-800 mb-0">{{name}}</h5>
+                                    </div>
+                                    <span class="badge rounded-pill bg-success-subtle text-success x-small">{{status}}</span>
                                 </div>
-                                <span class="badge rounded-pill bg-success-subtle text-success x-small">Ready to Ship</span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center mt-4">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="avatar-sm bg-light rounded-circle d-flex align-items-center justify-content-center fw-800 small text-dark" style="width: 35px; height: 35px;">SJ</div>
-                                    <span class="small fw-700">Sarah Jenkins</span>
+                                <div class="d-flex justify-content-between align-items-center mt-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar-sm bg-light rounded-circle d-flex align-items-center justify-content-center fw-800 small text-dark" style="width: 35px; height: 35px;">ST</div>
+                                        <span class="small fw-700">Buyer</span>
+                                    </div>
+                                    <p class="fw-800 mb-0" style="color: var(--brand-blue)">{{price}} €</p>
                                 </div>
-                                <p class="fw-800 mb-0" style="color: var(--brand-blue)">$6,450.00</p>
                             </div>
-                        </div>
+                        </a>
+                        {{/soldProducts}}
 
+                        {{^soldProducts}}
                         <div class="clay-card p-4 border-start-status-warning">
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <div>
-                                    <span class="x-small fw-800 opacity-50">ORDER #ST-9918</span>
-                                    <h5 class="fw-800 mb-0">Arco Floor Lamp</h5>
+                                    <span class="x-small fw-800 opacity-50">No sales yet</span>
+                                    <h5 class="fw-800 mb-0">Your sold items will appear here</h5>
                                 </div>
-                                <span class="badge rounded-pill bg-secondary-subtle text-secondary x-small">Delivered</span>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mt-4">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="avatar-sm bg-light rounded-circle d-flex align-items-center justify-content-center fw-800 small text-dark" style="width: 35px; height: 35px;">MR</div>
-                                    <span class="small fw-700">Michael Ross</span>
-                                </div>
-                                <p class="fw-800 mb-0 opacity-50">$3,200.00</p>
+                                <p class="small fw-700 mb-0 text-muted">Mark items as sold to generate invoices and labels.</p>
                             </div>
                         </div>
+                        {{/soldProducts}}
                     </div>
                 </div>
 
@@ -108,7 +109,9 @@
                     <div class="clay-card p-4 h-100 d-flex flex-column">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h3 class="fw-800 h5 mb-0">Order Details</h3>
-                            <span class="x-small fw-800 opacity-50">#ST-9921</span>
+                            {{#selectedProduct}}
+                            <span class="x-small fw-800 opacity-50">#{{id}}</span>
+                            {{/selectedProduct}}
                         </div>
                         
                         <div class="p-3 bg-light rounded-4 mb-4">
@@ -116,8 +119,10 @@
                                 <i class="fa-solid fa-location-dot text-danger opacity-50"></i>
                                 <span class="x-small fw-800 opacity-50">SHIPPING ADDRESS</span>
                             </div>
-                            <p class="small fw-700 mb-0">Calle de Velázquez, 45, 3ºB</p>
-                            <p class="small fw-600 mb-0 text-muted">28001, Madrid, Spain</p>
+                            <p class="small fw-700 mb-0">{{selectedProductAddress}}</p>
+                            {{#selectedProduct}}
+                            <p class="small fw-600 mb-0 text-muted">{{category}} • {{price}} €</p>
+                            {{/selectedProduct}}
                         </div>
 
                         <div class="shipping-details mb-4">
@@ -141,13 +146,25 @@
                         </div>
 
                         <div class="mt-auto pt-4 border-top d-grid gap-3">
-                            <a class="btn-sell w-100 py-3 d-flex align-items-center justify-content-center gap-2" href="/pdf/shipping-label/{{userId}}">
+                            {{#hasSales}}
+                            {{#selectedProduct}}
+                            <a class="btn-sell w-100 py-3 d-flex align-items-center justify-content-center gap-2" href="/pdf/shipping-label/{{id}}">
                                 <i class="fa-solid fa-print fa-lg"></i> Download Shipping Label
                             </a>
-
+                            {{/selectedProduct}}
                             <a class="btn-about w-100 py-3 d-flex align-items-center justify-content-center gap-2" href="/pdf/invoice/{{userId}}">
                                 <i class="fa-solid fa-file-invoice fa-lg"></i> Download Invoice
                             </a>
+                            {{/hasSales}}
+
+                            {{^hasSales}}
+                            <button class="btn-sell w-100 py-3 d-flex align-items-center justify-content-center gap-2" disabled>
+                                <i class="fa-solid fa-print fa-lg"></i> Download Shipping Label
+                            </button>
+                            <button class="btn-about w-100 py-3 d-flex align-items-center justify-content-center gap-2" disabled>
+                                <i class="fa-solid fa-file-invoice fa-lg"></i> Download Invoice
+                            </button>
+                            {{/hasSales}}
                         </div>
                     </div>
                 </div>

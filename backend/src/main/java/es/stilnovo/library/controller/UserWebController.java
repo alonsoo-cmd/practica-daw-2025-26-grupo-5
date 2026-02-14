@@ -154,7 +154,9 @@ public class UserWebController {
     }
 
     @GetMapping("/sales-and-orders-page/{id}")
-    public String showSalesAndOrdersPage(Model model, @PathVariable long id, HttpServletRequest request) {
+    public String showSalesAndOrdersPage(Model model, @PathVariable long id,
+                                         @RequestParam(required = false) Long productId,
+                                         HttpServletRequest request) {
 
         User user = userRepository.findById(id).orElseThrow();
 
@@ -162,7 +164,34 @@ public class UserWebController {
             return "redirect:/error";
         }
 
+        List<Product> userProducts = productRepository.findBySeller(user);
+        List<Product> soldProducts = userProducts.stream()
+            .filter(product -> product.getStatus() != null
+                && product.getStatus().equalsIgnoreCase("sold"))
+            .toList();
+
+        Product selectedProduct = null;
+        if (productId != null) {
+            selectedProduct = soldProducts.stream()
+                .filter(product -> product.getId() != null && product.getId().equals(productId))
+                .findFirst()
+                .orElse(null);
+        }
+        if (selectedProduct == null && !soldProducts.isEmpty()) {
+            selectedProduct = soldProducts.get(0);
+        }
+
+        String selectedProductAddress = "Address not provided";
+        if (selectedProduct != null && selectedProduct.getLocation() != null
+                && !selectedProduct.getLocation().isBlank()) {
+            selectedProductAddress = selectedProduct.getLocation();
+        }
+
         model.addAttribute("user", user);
+        model.addAttribute("soldProducts", soldProducts);
+        model.addAttribute("selectedProduct", selectedProduct);
+        model.addAttribute("selectedProductAddress", selectedProductAddress);
+        model.addAttribute("hasSales", !soldProducts.isEmpty());
 
         return "sales-and-orders-page";
     }

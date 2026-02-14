@@ -1,5 +1,6 @@
 package es.stilnovo.library.controller;
 
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +11,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.UUID;
 import java.text.DecimalFormat;
 
@@ -50,6 +52,8 @@ public class PdfController {
 
     private static final DateTimeFormatter DATE_ONLY = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     private static final DecimalFormat CURRENCY = new DecimalFormat("#,##0.00");
+    private static final Color BRAND_BLUE = new Color(47, 108, 237);
+    private static final Color BRAND_LIGHT = new Color(236, 241, 254);
 
     @Autowired
     private UserRepository userRepository;
@@ -64,11 +68,11 @@ public class PdfController {
         return buildStatisticsPdf(user);
     }
 
-    @GetMapping("/pdf/shipping-label/{id}")
-    public ResponseEntity<byte[]> exportShippingLabel(@PathVariable long id, Principal principal)
+    @GetMapping("/pdf/shipping-label/{productId}")
+    public ResponseEntity<byte[]> exportShippingLabel(@PathVariable long productId, Principal principal)
             throws DocumentException, IOException {
-        User user = validateUser(id, principal);
-        return buildShippingLabelPdf(user);
+        Product product = validateProduct(productId, principal);
+        return buildShippingLabelPdf(product);
     }
 
     @GetMapping("/pdf/invoice/{id}")
@@ -89,6 +93,24 @@ public class PdfController {
         }
 
         return user;
+    }
+
+    private Product validateProduct(long productId, Principal principal) {
+        if (principal == null) {
+            throw new IllegalStateException("User not authenticated");
+        }
+
+        Product product = productRepository.findById(productId).orElseThrow();
+        User seller = product.getSeller();
+        if (seller == null || !principal.getName().equals(seller.getName())) {
+            throw new IllegalStateException("User mismatch");
+        }
+
+        if (product.getStatus() == null || !product.getStatus().equalsIgnoreCase("sold")) {
+            throw new IllegalStateException("Product is not sold");
+        }
+
+        return product;
     }
 
     private ResponseEntity<byte[]> buildStatisticsPdf(User user) throws DocumentException, IOException {
@@ -160,26 +182,27 @@ public class PdfController {
         }
         document.add(categories);
 
-        document.add(new Paragraph("Latest Listings", sectionFont));
+        document.add(new Paragraph("Recent Activity", sectionFont));
         PdfPTable listings = new PdfPTable(4);
         listings.setWidthPercentage(100);
         listings.setSpacingBefore(8f);
-        listings.addCell(headerCell("Name"));
-        listings.addCell(headerCell("Category"));
+        listings.addCell(headerCell("Reference"));
+        listings.addCell(headerCell("Item"));
         listings.addCell(headerCell("Status"));
-        listings.addCell(headerCell("Price"));
+        listings.addCell(headerCell("Amount"));
 
         products.stream()
                 .sorted(Comparator.comparing(Product::getId).reversed())
                 .limit(8)
                 .forEach(product -> {
+                    String reference = product.getId() == null ? buildReference("ORD") : "ORD-" + product.getId();
+                    listings.addCell(valueCell(reference));
                     listings.addCell(valueCell(product.getName()));
-                    listings.addCell(valueCell(product.getCategory()));
                     listings.addCell(valueCell(product.getStatus()));
                     listings.addCell(valueCell(formatCurrency(product.getPrice())));
                 });
         if (products.isEmpty()) {
-            PdfPCell empty = new PdfPCell(new Phrase("No listings available", bodyFont));
+            PdfPCell empty = new PdfPCell(new Phrase("No activity available", bodyFont));
             empty.setColspan(4);
             empty.setPadding(6f);
             listings.addCell(empty);
@@ -187,6 +210,9 @@ public class PdfController {
         document.add(listings);
 
         document.add(new Paragraph(" "));
+        Paragraph support = new Paragraph("Support: support@stilnovo.com | +34 910 000 000", mutedFont);
+        support.setAlignment(Element.ALIGN_CENTER);
+        document.add(support);
         Paragraph thankYou = new Paragraph("Thanks for using Stilnovo.", mutedFont);
         thankYou.setAlignment(Element.ALIGN_CENTER);
         document.add(thankYou);
@@ -198,9 +224,14 @@ public class PdfController {
 
     private ResponseEntity<byte[]> buildInvoicePdf(User user) throws DocumentException, IOException {
         List<Product> products = productRepository.findBySeller(user);
-        double subtotal = products.stream().mapToDouble(Product::getPrice).sum();
+        List<Product> soldProducts = products.stream()
+            .filter(product -> product.getStatus() != null
+                && product.getStatus().equalsIgnoreCase("sold"))
+            .collect(Collectors.toList());
+        double subtotal = soldProducts.stream().mapToDouble(Product::getPrice).sum();
         double serviceFee = subtotal * 0.05;
-        double total = subtotal + serviceFee;
+        double vat = subtotal * 0.21;
+        double total = subtotal + serviceFee + vat;
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Document document = new Document();
@@ -223,7 +254,10 @@ public class PdfController {
         meta.add(new Phrase(LocalDate.now().format(DATE_ONLY), bodyFont));
         document.add(meta);
         addKeyValueLine(document, "Billed to: ", user.getName() + " (" + user.getEmail() + ")", bodyFont);
-        addKeyValueLine(document, "Status: ", "Pending Payment", mutedFont);
+        addKeyValueLine(document, "Billing address: ", "Not provided", bodyFont);
+        addKeyValueLine(document, "Payment date: ", LocalDate.now().format(DATE_ONLY), bodyFont);
+        addKeyValueLine(document, "Payment method: ", "Card", bodyFont);
+        addKeyValueLine(document, "Status: ", "Paid", mutedFont);
         document.add(new Paragraph(" "));
         document.add(new LineSeparator());
 
@@ -236,13 +270,13 @@ public class PdfController {
         items.addCell(headerCell("Category"));
         items.addCell(headerCell("Status"));
         items.addCell(headerCell("Price"));
-        products.stream().limit(10).forEach(product -> {
+        soldProducts.stream().limit(10).forEach(product -> {
             items.addCell(valueCell(product.getName()));
             items.addCell(valueCell(product.getCategory()));
             items.addCell(valueCell(product.getStatus()));
             items.addCell(valueCell(formatCurrency(product.getPrice())));
         });
-        if (products.isEmpty()) {
+        if (soldProducts.isEmpty()) {
             PdfPCell empty = new PdfPCell(new Phrase("No products available", bodyFont));
             empty.setColspan(4);
             empty.setPadding(6f);
@@ -257,11 +291,16 @@ public class PdfController {
         totals.addCell(valueCell(formatCurrency(subtotal)));
         totals.addCell(labelCell("Service Fee (5%)"));
         totals.addCell(valueCell(formatCurrency(serviceFee)));
+        totals.addCell(labelCell("VAT (21%)"));
+        totals.addCell(valueCell(formatCurrency(vat)));
         totals.addCell(labelCell("Total"));
         totals.addCell(valueCell(formatCurrency(total)));
         document.add(totals);
 
         document.add(new Paragraph(" "));
+        Paragraph support = new Paragraph("Support: support@stilnovo.com | +34 910 000 000", mutedFont);
+        support.setAlignment(Element.ALIGN_CENTER);
+        document.add(support);
         Paragraph thankYou = new Paragraph("Thanks for using Stilnovo.", mutedFont);
         thankYou.setAlignment(Element.ALIGN_CENTER);
         document.add(thankYou);
@@ -271,12 +310,12 @@ public class PdfController {
         return pdfResponse(outputStream, "invoice.pdf");
     }
 
-    private ResponseEntity<byte[]> buildShippingLabelPdf(User user) throws DocumentException, IOException {
-        List<Product> products = productRepository.findBySeller(user);
+    private ResponseEntity<byte[]> buildShippingLabelPdf(Product product) throws DocumentException, IOException {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Document document = new Document();
         byte[] logoBytes = loadLogoBytes();
+        byte[] qrBytes = loadQrBytes();
         PdfWriter writer = PdfWriter.getInstance(document, outputStream);
         writer.setPageEvent(new PdfPageDecorator());
         document.open();
@@ -286,8 +325,14 @@ public class PdfController {
         Font bodyFont = FontFactory.getFont(FontFactory.HELVETICA, 11);
         Font mutedFont = FontFactory.getFont(FontFactory.HELVETICA, 9, new GrayColor(0.4f));
 
+        String trackingId = buildReference("TRK");
+        String trackingUrl = "https://stilnovo.es/track/" + trackingId;
+
         addHeader(document, "Stilnovo Shipping Label", logoBytes);
         addKeyValueLine(document, "Label ID: ", buildReference("LBL"), bodyFont);
+        addKeyValueLine(document, "Shipment ID: ", buildReference("SHP"), bodyFont);
+        addKeyValueLine(document, "Tracking ID: ", trackingId, bodyFont);
+        addKeyValueLine(document, "Tracking URL: ", trackingUrl, mutedFont);
         addKeyValueLine(document, "Generated at: ", LocalDate.now().format(DATE_ONLY), mutedFont);
         document.add(new Paragraph(" "));
         document.add(new LineSeparator());
@@ -298,9 +343,8 @@ public class PdfController {
         document.add(new Paragraph("Madrid, ES 28001", bodyFont));
 
         document.add(new Paragraph("Ship To", sectionFont));
-        document.add(new Paragraph(user.getName(), bodyFont));
-        document.add(new Paragraph(user.getEmail(), bodyFont));
-        document.add(new Paragraph("Address not provided", bodyFont));
+        document.add(new Paragraph("Customer", bodyFont));
+        document.add(new Paragraph(product.getLocation() == null ? "Address not provided" : product.getLocation(), bodyFont));
 
         document.add(new Paragraph("Contents", sectionFont));
         PdfPTable contents = new PdfPTable(3);
@@ -309,23 +353,45 @@ public class PdfController {
         contents.addCell(headerCell("Item"));
         contents.addCell(headerCell("Category"));
         contents.addCell(headerCell("Declared Value"));
-        products.stream().limit(5).forEach(product -> {
-            contents.addCell(valueCell(product.getName()));
-            contents.addCell(valueCell(product.getCategory()));
-            contents.addCell(valueCell(formatCurrency(product.getPrice())));
-        });
-        if (products.isEmpty()) {
-            PdfPCell empty = new PdfPCell(new Phrase("No items listed", bodyFont));
-            empty.setColspan(3);
-            empty.setPadding(6f);
-            contents.addCell(empty);
-        }
+        contents.addCell(valueCell(product.getName()));
+        contents.addCell(valueCell(product.getCategory()));
+        contents.addCell(valueCell(formatCurrency(product.getPrice())));
         document.add(contents);
+
+        document.add(new Paragraph("Tracking", sectionFont));
+        PdfPTable tracking = new PdfPTable(2);
+        tracking.setWidthPercentage(100);
+        tracking.setSpacingBefore(8f);
+        PdfPCell trackingText = new PdfPCell(new Paragraph("Track your shipment:\n" + trackingUrl, bodyFont));
+        trackingText.setPadding(8f);
+        trackingText.setBorder(Rectangle.BOX);
+        tracking.addCell(trackingText);
+        PdfPCell qrCell = new PdfPCell();
+        qrCell.setBorder(Rectangle.BOX);
+        if (qrBytes != null) {
+            try {
+                Image qr = Image.getInstance(qrBytes);
+                qr.scaleToFit(80, 80);
+                qrCell.addElement(qr);
+            } catch (Exception ignored) {
+                qrCell.addElement(new Phrase("QR Code", bodyFont));
+            }
+        } else {
+            qrCell.addElement(new Phrase("QR Code", bodyFont));
+        }
+        qrCell.setFixedHeight(80f);
+        qrCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        qrCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        tracking.addCell(qrCell);
+        document.add(tracking);
 
         document.add(new Paragraph("Handling Instructions", sectionFont));
         document.add(new Paragraph("Keep upright. Handle with care. Signature required.", bodyFont));
 
         document.add(new Paragraph(" "));
+        Paragraph support = new Paragraph("Support: support@stilnovo.com | +34 910 000 000", mutedFont);
+        support.setAlignment(Element.ALIGN_CENTER);
+        document.add(support);
         Paragraph thankYou = new Paragraph("Thanks for using Stilnovo.", mutedFont);
         thankYou.setAlignment(Element.ALIGN_CENTER);
         document.add(thankYou);
@@ -397,6 +463,18 @@ public class PdfController {
         }
     }
 
+    private byte[] loadQrBytes() {
+        try (InputStream stream = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("static/images/qr-stilnovo.png")) {
+            if (stream == null) {
+                return null;
+            }
+            return stream.readAllBytes();
+        } catch (IOException ex) {
+            return null;
+        }
+    }
+
     private void addKeyValueLine(Document document, String label, String value, Font valueFont)
             throws DocumentException {
         Font labelFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, valueFont.getSize());
@@ -407,10 +485,10 @@ public class PdfController {
     }
 
     private PdfPCell headerCell(String text) {
-        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, GrayColor.GRAYBLACK);
+        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, Color.WHITE);
         PdfPCell cell = new PdfPCell(new Phrase(text, font));
         cell.setPadding(6f);
-        cell.setBackgroundColor(new GrayColor(0.93f));
+        cell.setBackgroundColor(BRAND_BLUE);
         return cell;
     }
 
@@ -418,7 +496,7 @@ public class PdfController {
         Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10);
         PdfPCell cell = new PdfPCell(new Phrase(text, font));
         cell.setPadding(6f);
-        cell.setBackgroundColor(new GrayColor(0.97f));
+        cell.setBackgroundColor(BRAND_LIGHT);
         return cell;
     }
 
