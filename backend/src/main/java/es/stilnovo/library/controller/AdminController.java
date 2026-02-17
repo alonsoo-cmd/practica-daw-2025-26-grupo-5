@@ -58,7 +58,7 @@ public class AdminController {
         User user = userRepository.findById(id).orElseThrow();
 
         model.addAttribute("user", user);
-       
+    
         return "admin-panel-page";
     }
     
