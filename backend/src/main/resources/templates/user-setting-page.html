@@ -10,26 +10,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
-    <style>
-        .btn-danger-custom {
-            background: #fff5f5;
-            color: #ff4d4d;
-            border: 2px solid #ff4d4d;
-            border-radius: 50px;
-            font-weight: 800;
-            transition: all 0.3s ease;
-        }
-        .btn-danger-custom:hover {
-            background: #ff4d4d;
-            color: white;
-            box-shadow: 0 10px 20px rgba(255, 77, 77, 0.2);
-            transform: translateY(-2px);
-        }
-        .modal-delete-danger {
-            background: #ff4d4d !important;
-            border: none !important;
-        }
-    </style>
 </head>
 <body class="bg-light">
 
@@ -41,7 +21,7 @@
             </a>
             
             <div class="d-flex align-items-center gap-4">
-                <a href="/user-page/{{user.userId}}" class="btn-about py-2 px-3 small text-decoration-none fw-700">
+                <a href="/user-page" class="btn-about py-2 px-3 small text-decoration-none fw-700">
                     <i class="fa-solid fa-arrow-left me-2"></i>Back to Dashboard
                 </a>
             </div>
@@ -56,14 +36,17 @@
                     <div class="clay-card p-4 p-md-5 settings-card">
                         <h2 class="fw-800 mb-4">Edit Profile</h2>
                         
-                        <form action="/user-settings/edit/{{user.userId}}" method="post" enctype="multipart/form-data">                            
+                        <form action="/user-settings/edit" method="post" enctype="multipart/form-data">            
+
                             <input type="hidden" name="_csrf" value="{{token}}"/>
                             
                             <div class="mb-5 text-center">
                                 <div class="profile-upload-container mx-auto mb-2">
-                                    <img src="/user/{{user.userId}}/profile-photo" id="preview-avatar" class="img-fluid rounded-circle p-1" 
-                                            alt="Profile" onerror="this.src='/images/profile-photo.png'">
-                                    <input type="file" id="profilePic" name="newProfilePhoto" accept="image/*" class="file-input-hidden">
+                                    <img src="/user/me/profile-photo" id="preview-avatar" class="img-fluid rounded-circle p-1" 
+                                            alt="Profile" style="width: 120px; height: 120px; object-fit: cover;"
+                                            onerror="this.src='/images/profile-photo.png'">
+                                    
+                                    <input type="file" id="profilePic" name="newProfilePhoto" accept="image/*" class="file-input-hidden" onchange="previewImage(this)">
                                 </div>
                                 <label for="profilePic" class="form-label fw-700 small cursor-pointer" style="color: var(--brand-blue)">
                                     <i class="fa-solid fa-camera me-1"></i> Change profile picture
@@ -213,7 +196,7 @@
                     <p class="small text-muted">Hi {{user.name}}, are you sure you want to leave us? This action will permanently remove all your products and history.</p>
                 </div>
                 
-                <form action="/user-settings/delete/{{user.userId}}" method="post">
+                <form action="/user-settings/delete" method="post">
                     <input type="hidden" name="_csrf" value="{{token}}"/>
                     
                     <div class="mb-4">
@@ -241,6 +224,18 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // LIVE IMAGE PREVIEW
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview-avatar').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // CVV TOGGLE LOGIC
         const toggleCvv = document.querySelector('#toggleCvv');
         const cvvInput = document.querySelector('#cardCvv');
         toggleCvv.addEventListener('click', function () {

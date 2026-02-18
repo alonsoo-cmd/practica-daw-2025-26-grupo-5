@@ -23,13 +23,13 @@
             </div>
             
             <nav class="nav flex-column gap-1">
-                <a class="nav-link-stilnovo" href="/user-page/{{userId}}"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-                <a class="nav-link-stilnovo" href="/user-products-page/{{userId}}"><i class="fa-solid fa-box-open"></i> My Products</a>
+                <a class="nav-link-stilnovo" href="/user-page"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a class="nav-link-stilnovo" href="/user-products-page"><i class="fa-solid fa-box-open"></i> My Products</a>
                 <a class="nav-link-stilnovo active" href="#"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
-                <a class="nav-link-stilnovo" href="/user-valorations-page/{{userId}}"><i class="fa-solid fa-star"></i> My Valorations</a>
-                <a class="nav-link-stilnovo" href="/statistics-page/{{userId}}"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
-                <a class="nav-link-stilnovo" href="/user-setting-page/{{userId}}"><i class="fa-solid fa-user-gear"></i> Settings</a>      
-                <a class="nav-link-stilnovo text-muted" href="/help-center-page/{{userId}}"><i class="fa-solid fa-circle-question"></i> Help Center</a>
+                <a class="nav-link-stilnovo" href="/user-valorations-page"><i class="fa-solid fa-star"></i> My Valorations</a>
+                <a class="nav-link-stilnovo" href="/statistics-page"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
+                <a class="nav-link-stilnovo" href="/user-setting-page"><i class="fa-solid fa-user-gear"></i> Settings</a>      
+                <a class="nav-link-stilnovo text-muted" href="/help-center-page"><i class="fa-solid fa-circle-question"></i> Help Center</a>
             </nav>
             
             <div class="mt-auto pt-4 border-top">
@@ -53,8 +53,8 @@
                     <p class="text-muted small">Manage your transactions and community reputation.</p>
                 </div>
                 {{#user}}
-                <a href="/user-setting-page/{{userId}}" class="text-decoration-none">
-                    <img src="/user/{{userId}}/profile-photo" alt="User" class="rounded-circle border border-2 shadow-sm" width="48" height="48" style="object-fit: cover;">
+                <a href="/user-setting-page" class="text-decoration-none">
+                    <img src="/user/me/profile-photo" alt="User" class="rounded-circle border border-2 shadow-sm" width="48" height="48" style="object-fit: cover;">
                 </a>
                 {{/user}}
             </header>
@@ -65,7 +65,7 @@
                     <h3 class="fw-800 h5 mb-3"><i class="fa-solid fa-tag me-2"></i>My Sales</h3>
                     <div class="d-flex flex-column gap-3 mb-5">
                         {{#sales}}
-                        <a href="/sales-and-orders-page/{{#user}}{{userId}}{{/user}}?transactionId={{transactionId}}" class="text-decoration-none text-reset">
+                        <a href="/sales-and-orders-page?transactionId={{transactionId}}" class="text-decoration-none text-reset">
                             <div class="clay-card p-4 border-start-status-success shadow-sm">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <div>
@@ -145,8 +145,11 @@
                                         </div>
                                     </div>
 
-                                    <form action="/valoration/save/{{transactionId}}" method="post">
+                                    <form action="/submit-valoration" method="post">
+
                                         <input type="hidden" name="_csrf" value="{{token}}"/>
+                                        <input type="hidden" name="transactionId" value="{{transactionId}}">
+
                                         <div class="mb-3 text-center">
                                             <label class="label-categories mb-3 d-block text-uppercase">Score (1-5)</label>
                                             <input type="number" name="stars" class="form-control form-control-lg rounded-pill bg-light border-0 text-center fw-800" min="1" max="5" value="5" style="color: #2f6ced;" required>

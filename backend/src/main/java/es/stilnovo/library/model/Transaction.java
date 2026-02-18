@@ -16,7 +16,12 @@ public class Transaction {
     @ManyToOne
     private User buyer;
 
-    @OneToOne
+    /**
+    * One product belongs to exactly one transaction.
+    * cascade = CascadeType.MERGE ensures that if the product 
+    * state changes (e.g., becomes 'Sold'), it saves correctly.
+    */
+    @OneToOne(cascade = CascadeType.MERGE)
     private Product product;
 
     private double finalPrice;
@@ -26,6 +31,7 @@ public class Transaction {
     // Rating integration
     // We use @Transient so it's NOT saved in the database, 
     // it's only used for the logic of the view
+    @Transient
     private boolean rated;
     private Integer stars; // 1 to 5
 

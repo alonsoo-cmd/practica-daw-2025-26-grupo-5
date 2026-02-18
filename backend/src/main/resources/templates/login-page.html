@@ -38,6 +38,9 @@
                 <!--LOGIN FORM-->
                 <form action="/login-page" method="post">
 
+                    <!--Adds the hidden CSRF token to prevent cross-site request forgery attacks-->
+                    <input type="hidden" name="_csrf" value="{{token}}" />
+                    
                     <!--NAME INPUT-->
                     <div class="mb-4">
                         <label class="form-label fw-700 small">Username</label>
@@ -58,9 +61,6 @@
 
                     <!--LOGIN BUTTON-->
                     <button type="submit" class="btn-sell w-100 justify-content-center mb-4">Login to My Account</button>
-                    
-                    <!--Adds the hidden CSRF token to prevent cross-site request forgery attacks-->
-                    <input type="hidden" name="_csrf" value="{{token}}" />
 
                     <div class="text-center">
                         <a href="/" class="text-muted small text-decoration-none fw-700">

@@ -1480,3 +1480,21 @@ main.overflow-auto {
 .tip-card-blue:hover {
     transform: translateX(5px);
 }
+.btn-danger-custom {
+    background: #fff5f5;
+    color: #ff4d4d;
+    border: 2px solid #ff4d4d;
+    border-radius: 50px;
+    font-weight: 800;
+    transition: all 0.3s ease;
+}
+.btn-danger-custom:hover {
+    background: #ff4d4d;
+    color: white;
+    box-shadow: 0 10px 20px rgba(255, 77, 77, 0.2);
+    transform: translateY(-2px);
+}
+.modal-delete-danger {
+    background: #ff4d4d !important;
+    border: none !important;
+}

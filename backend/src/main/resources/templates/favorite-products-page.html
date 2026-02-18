@@ -39,7 +39,9 @@
                 </a>
 
                 <form action="/logout" method="post" class="m-0">
+
                     <input type="hidden" name="_csrf" value="{{token}}"/>
+
                     <button type="submit" class="dropdown-item rounded-3 py-2 fw-700 small text-danger border-0 bg-transparent w-100 text-start">Log out</button>
                 </form>
             </div>
@@ -70,7 +72,9 @@
                         <div class="clay-card position-relative h-100">
                             
                             <form action="/remove-favorite/{{id}}" method="post" class="position-absolute" style="top: 15px; right: 15px; z-index: 10;">
+
                                 <input type="hidden" name="_csrf" value="{{token}}"/>
+                                
                                 <button type="submit" class="favorite-btn active-fav border-0 bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;" title="Remove from favorites">
                                     <span class="material-symbols-outlined" style="color: #ff4757; font-size: 20px; font-variation-settings: 'FILL' 1;">favorite</span>
                                 </button>

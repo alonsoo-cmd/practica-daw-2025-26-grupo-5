@@ -28,7 +28,7 @@ public class PaymentController {
     /**
      * Renders the payment page for a specific product.
      * Includes security checks to ensure a valid transaction environment.
-     * * @param id The ID of the product to purchase.
+     * @param id The ID of the product to purchase.
      * @param principal The security principal of the logged-in buyer.
      * @return The payment view or a redirect if validation fails.
      */

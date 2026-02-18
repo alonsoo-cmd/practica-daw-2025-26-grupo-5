@@ -45,7 +45,7 @@ public class DataBaseInitializer {
         Image createdImage = imageService.createImage(imageRes.getInputStream());
     
         // Link the persistent Image entity to the product's internal list
-        product.addImagen(createdImage);
+        product.setImage(createdImage);
     }   
 
     @PostConstruct
@@ -59,6 +59,7 @@ public class DataBaseInitializer {
 
         // 1. Initialize sample users with encrypted passwords and roles
         //ABOUT THE CARD INFORMATION: IT MUST BE ENCODED IN THE FUTURE. FOR NOW ITS JUST TO SEE FUNCIONALITY
+        //We have to encode this
         User user = new User("user", passwordEncoder.encode("user"), "user@stilnovo.es", photoUserBlob, 4.7, "1234 5678 9012 3456", "09/27", "123", 0, 129.10, 1872.87, "I am a default user","ROLE_USER");
         User admin = new User("admin", passwordEncoder.encode("admin"), "admin@stilnovo.es", photoAdminBlob, 5.0, "3456 7890 1234 5678", "07/26", "456", 0, 34.89, 899.76, "I am the administrator of the Stilnovo Ecosistem","ROLE_USER", "ROLE_ADMIN");
 

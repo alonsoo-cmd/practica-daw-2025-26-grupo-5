@@ -13,7 +13,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToMany; // Added import
 import jakarta.persistence.OneToMany;
 
 @Entity(name = "UserTable")
@@ -51,26 +50,14 @@ public class User {
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
 
-    // --- ADDED: Favorite products relationship (Uncommented and fixed) ---
+    /*// --- ADDED: Favorite products relationship (Uncommented and fixed) ---
     @ManyToMany
-    private List<Product> favoriteProducts = new ArrayList<>();
+    private List<Product> favoriteProducts = new ArrayList<>();*/
 
-    public List<Product> getFavoriteProducts() {
-        return favoriteProducts;
-    }
+	@OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Valoration> valorations = new ArrayList<>();
 
-    public void setFavoriteProducts(List<Product> favoriteProducts) {
-        this.favoriteProducts = favoriteProducts;
-    }
-
-    public void addFavorite(Product product) {
-        // if array not contain product then add it
-        if (!this.favoriteProducts.contains(product)) {
-            this.favoriteProducts.add(product);
-        }
-    }
-    // ---------------------------------------------------------------------
-
+	
     public User() {
     }
 
@@ -171,29 +158,56 @@ public class User {
         this.cardCvv = cardCvv;
     }
 
-    public Double getBalance() {
-        return balance;
-    }
-    public void setBalance(Double balance) {
-        this.balance = balance;
-    }
+    
+	public Double getBalance() {
+		return balance;
+	}
+	public void setBalance(Double balance) {
+		this.balance = balance;
+	}
 
-    public Double getTotalRevenue() {
-        return totalRevenue;
-    }
-    public void setTotalRevenue(Double totalRevenue) {
-        this.totalRevenue = totalRevenue;
-    }
+	public Double getTotalRevenue() {
+		return totalRevenue;
+	}
+	public void setTotalRevenue(Double totalRevenue) {
+		this.totalRevenue = totalRevenue;
+	}
 
-    public String getUserDescription() {
-        return userDescription;
-    }
-    public void setUserDescription(String userDescription) {
-        this.userDescription = userDescription;
-    }
+	public String getUserDescription() {
+		return userDescription;
+	}
+	public void setUserDescription(String userDescription) {
+		this.userDescription = userDescription;
+	}
 
-
-    public Long getUserId() {
+	public Long getUserId() {
         return userId;
     }
+
+	public List<Product> getProducts() {
+		return products;
+	}
+
+	/**
+	 * Gets all feedback received by this user as a seller.
+	 * @return List of valorations.
+	 */
+	public List<Valoration> getValorations() {
+		return valorations;
+	}
+
+    /*public List<Product> getFavoriteProducts() {
+        return favoriteProducts;
+    }
+
+    public void setFavoriteProducts(List<Product> favoriteProducts) {
+        this.favoriteProducts = favoriteProducts;
+    }
+
+    public void addFavorite(Product product) {
+        // if array not contain product then add it
+        if (!this.favoriteProducts.contains(product)) {
+            this.favoriteProducts.add(product);
+        }
+    }*/
 }

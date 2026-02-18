@@ -23,15 +23,13 @@
             </div>
             
             <nav class="nav flex-column gap-1">
-                <a class="nav-link-stilnovo" href="/user-page/{{userId}}"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a class="nav-link-stilnovo" href="/user-page"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
                 <a class="nav-link-stilnovo active" href="#"><i class="fa-solid fa-box-open"></i> My Products</a>
-                <!--<a class="nav-link-stilnovo" href="/favorite-products-page/{{userId}}"><i class="fa-solid fa-heart"></i> Favorites</a>-->
-
-                <a class="nav-link-stilnovo" href="/sales-and-orders-page/{{userId}}"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
-                <a class="nav-link-stilnovo" href="/user-valorations-page/{{userId}}"><i class="fa-solid fa-star"></i> My Valorations</a>
-                <a class="nav-link-stilnovo" href="/statistics-page/{{userId}}"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
-                <a class="nav-link-stilnovo" href="/user-setting-page/{{userId}}"><i class="fa-solid fa-user-gear"></i> Settings</a>
-                <a class="nav-link-stilnovo text-muted" href="/help-center-page/{{userId}}"><i class="fa-solid fa-circle-question"></i> Help Center</a>
+                <a class="nav-link-stilnovo" href="/sales-and-orders-page"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
+                <a class="nav-link-stilnovo" href="/user-valorations-page"><i class="fa-solid fa-star"></i> My Valorations</a>
+                <a class="nav-link-stilnovo" href="/statistics-page"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
+                <a class="nav-link-stilnovo" href="/user-setting-page"><i class="fa-solid fa-user-gear"></i> Settings</a>
+                <a class="nav-link-stilnovo text-muted" href="/help-center-page"><i class="fa-solid fa-circle-question"></i> Help Center</a>
             </nav>
         
             <div class="mt-auto pt-4 border-top">
@@ -60,8 +58,8 @@
                         <i class="fa-solid fa-plus me-2"></i>Add Product
                     </a>
 
-                    <a href="/user-setting-page/{{userId}}" class="text-decoration-none border-start ps-3">
-                        <img src="/user/{{userId}}/profile-photo" alt="User" class="rounded-circle border border-2 shadow-sm" width="45" height="45" style="object-fit: cover;">
+                    <a href="/user-setting-page" class="text-decoration-none border-start ps-3">
+                        <img src="/user/me/profile-photo" alt="User" class="rounded-circle border border-2 shadow-sm" width="45" height="45" style="object-fit: cover;" onerror="this.src='/images/profile-photo.png'">
                     </a>
                 </div>
             </header>
@@ -71,20 +69,29 @@
                 <button class="btn btn-sm btn-outline-secondary border-0 bg-white rounded-pill px-4 fw-700 shadow-sm">Active ({{itemsCount}})</button>
             </div>
 
-
-            <!--MY PRODUCTS LIST-->
             <div class="d-flex flex-column gap-3">
                 
                 {{#userProducts}}
                 <div class="clay-card p-3 d-flex align-items-center justify-content-between flex-wrap gap-3">
                     <div class="d-flex align-items-center gap-4">
                         <div class="product-img-preview rounded-4 bg-white d-flex align-items-center justify-content-center overflow-hidden shadow-inner" style="width: 80px; height: 80px; border: 1px solid #f1f4f8;">
-                            <img src="/product-images/{{images.0.id}}" alt="{{name}}" class="img-fluid">
+                            <img src="/product-images/{{id}}" alt="{{name}}" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <div>
                             <h4 class="fw-800 h6 mb-1">{{name}}</h4>
                             <p class="x-small text-muted mb-2">Ref: #ST-0{{id}}</p>
-                            <span class="badge rounded-pill bg-success-subtle text-success x-small px-3">{{status}}</span>
+                            
+                            {{#isActive}}
+                            <span class="badge rounded-pill bg-success-subtle text-success x-small px-3">
+                                <i class="fa-solid fa-circle-check me-1"></i> {{status}}
+                            </span>
+                            {{/isActive}}
+
+                            {{^isActive}}
+                            <span class="badge rounded-pill bg-danger-subtle text-danger x-small px-3">
+                                <i class="fa-solid fa-circle-xmark me-1"></i> {{status}}
+                            </span>
+                            {{/isActive}}
                         </div>
                     </div>
                     
@@ -95,29 +102,50 @@
                         </div>
                         
                         <div class="d-flex gap-2">
+                            {{#isActive}}
                             <a href="/edit-product-page/{{id}}" class="btn-about p-2 rounded-3 text-dark text-decoration-none shadow-sm" title="Edit Item">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
+                            {{/isActive}}
 
-                            <form action="/delete-product/{{id}}" method="post" class="d-inline">
-                                <input type="hidden" name="_csrf" value="{{token}}"/>
-                                
-                                <button type="submit" class="btn-about p-2 rounded-3 text-danger border-0 bg-white shadow-sm" 
-                                        title="Delete" onclick="return confirm('Delete this product permanently?')">
-                                    <i class="fa-solid fa-trash-can"></i>
+                            <button type="button" class="btn-about p-2 rounded-3 text-danger border-0 bg-white shadow-sm" 
+                                    title="Delete" data-bs-toggle="modal" data-bs-target="#deleteProductModal{{id}}">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="deleteProductModal{{id}}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="clay-card modal-content p-4 border-0 shadow-lg text-center">
+                            <div class="bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 60px; height: 60px;">
+                                <i class="fa-solid fa-triangle-exclamation fa-2x"></i>
+                            </div>
+                            <h3 class="fw-800 h5 mb-2 text-danger">Confirm Deletion</h3>
+                            <p class="small text-muted fw-700 mb-4">Are you sure you want to remove <strong>{{name}}</strong>? This action cannot be undone.</p>
+                            
+                            <div class="d-grid gap-2">
+                                <form action="/delete-product/{{id}}" method="post" class="m-0">
+                                    <input type="hidden" name="_csrf" value="{{token}}"/>
+                                    <button type="submit" class="btn btn-danger w-100 py-3 rounded-pill fw-800 shadow-sm border-0">
+                                        Delete Forever
+                                    </button>
+                                </form>
+                                <button type="button" class="btn btn-light w-100 py-3 rounded-pill fw-800 border-0" data-bs-dismiss="modal">
+                                    Cancel
                                 </button>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
                 {{/userProducts}}
 
             </div>
-            <!--END MY PRODUCTS LIST-->
-
             <div class="py-5"></div>
         </main>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

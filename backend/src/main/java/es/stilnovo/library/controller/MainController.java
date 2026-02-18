@@ -11,64 +11,37 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.repository.UserRepository;
-import es.stilnovo.library.service.ProductService;
-import es.stilnovo.library.service.UserService;
 
-import jakarta.servlet.http.HttpServletRequest;
+import es.stilnovo.library.service.MainService;
 
 @Controller
 public class MainController {
 
     @Autowired
-    private ProductService productService;
+    private MainService mainService;
 
-    @Autowired
-    private UserService userService;
-    
-    @Autowired
-    private UserRepository userRepository; 
-
-    /**
-     * Main landing page handler.
-     * Manages product search, category filtering, and UI states.
-     */
     @GetMapping("/")
     public String index(Model model,
                         @RequestParam(required = false) String query,
                         @RequestParam(required = false) String category,
-                        HttpServletRequest request) {
+                        Principal principal) {
 
-        Principal principal = request.getUserPrincipal();
-        User currentUser = null;
-        boolean isAdmin = false; 
+        // 1. Get typed data from Service (NO casting needed = NO errors)
+        List<Product> products = mainService.searchProducts(query, category);
+        User user = mainService.getUserContext(principal != null ? principal.getName() : null);
 
-        // 1. User Identification
-        if (principal != null) {
-            String username = principal.getName();
-            // Look for the user
-            currentUser = userService.findByName(username).orElse(null);
-            
-            if (currentUser != null) {
-                model.addAttribute("logged", true);
-                model.addAttribute("username", currentUser.getName());
-                model.addAttribute("userId", currentUser.getUserId());
-                
-                isAdmin = request.isUserInRole("ADMIN");
-                model.addAttribute("admin", isAdmin);
-                
-                // Add full user object
-                model.addAttribute("user", currentUser); 
-            } else {
-                model.addAttribute("logged", false);
-            }
-        } else {
-            model.addAttribute("logged", false);
-        }
-        
+        // 2. Populate Model
+        boolean logged = (user != null);
+        boolean isAdmin = logged && user.getRoles().contains("ROLE_ADMIN");
+
+        model.addAttribute("products", products);
+        model.addAttribute("user", user);
+        model.addAttribute("logged", logged);
         model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("query", (query != null) ? query : (category != null ? category : ""));
+        model.addAttribute("searching", query != null || category != null);
 
-        // 2. Product Search Logic
+        /*// 2. Product Search Logic
         List<Product> products;
         boolean isSearching = (query != null && !query.isEmpty()) || (category != null && !category.isEmpty());
 
@@ -92,16 +65,21 @@ public class MainController {
         }
 
         // 3. Favorites Logic
-        if (currentUser != null && products != null) {
-             List<Product> userFavs = currentUser.getFavoriteProducts(); 
-             for (Product p : products) {
-                 boolean isFav = userFavs.stream().anyMatch(fav -> fav.getId().equals(p.getId())); 
-                 p.setFavorite(isFav); 
-             }
-        }
+            if (currentUser != null && products != null) {
+                List<Product> userFavs = currentUser.getFavoriteProducts(); 
+                for (Product p : products) {
+                    boolean isFav = userFavs.stream().anyMatch(fav -> fav.getId().equals(p.getId())); 
+                    p.setFavorite(isFav); 
+                }
+            }
 
         model.addAttribute("searching", isSearching);
-        model.addAttribute("products", products);
+        model.addAttribute("products", products);*/
+
+        // 3. Navigation Logic
+        if (products.size() == 1 && (query != null || category != null)) {
+            return "redirect:/info-product-page/" + products.get(0).getId();
+        }
 
         return "index";
     }

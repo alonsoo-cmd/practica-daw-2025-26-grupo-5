@@ -1,10 +1,13 @@
 package es.stilnovo.library.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 // Model Imports
 import es.stilnovo.library.model.Valoration;
@@ -16,6 +19,10 @@ import es.stilnovo.library.repository.ValorationRepository;
 import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.repository.TransactionRepository;
 
+/**
+ * Service responsible for managing user feedback and calculating seller reputation.
+ * It ensures that every review is linked to a valid transaction.
+ */
 @Service
 public class ValorationService {
 
@@ -28,22 +35,57 @@ public class ValorationService {
     @Autowired
     private TransactionRepository transactionRepository;
 
+    /**
+     * Filters transactions that have been completed by the buyer but have no rating yet.
+     * @param buyer The user whose pending reviews are being searched.
+     * @return A list of transactions awaiting feedback.
+     */
+    @Transactional(readOnly = true)
+    public List<Transaction> getPendingTransactions(User buyer) {
+        List<Transaction> allOrders = transactionRepository.findByBuyerUserId(buyer.getUserId());
+        
+        return allOrders.stream()
+                .filter(trans -> !valorationRepository.existsByTransaction(trans))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Creates a new valoration and updates the seller's global rating in one transaction.
+     * This ensures data consistency between reviews and displayed scores.
+     * * @param transactionId The ID of the transaction being rated.
+     * @param stars Score from 1 to 5.
+     * @param comment Qualitative feedback from the buyer.
+     * @param buyer The user submitting the review.
+     */
     @Transactional
     public void saveAndUpdateSellerRating(long transactionId, int stars, String comment, User buyer) {
-        // 1. Logic to find and validate the transaction
-        Transaction transaction = transactionRepository.findById(transactionId).orElseThrow();
+        // 1. Validate Transaction ownership and existence
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+
+        if (!transaction.getBuyer().getUserId().equals(buyer.getUserId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only rate your own purchases");
+        }
+
+        // 2. Prevent duplicate ratings for the same transaction
+        if (valorationRepository.existsByTransaction(transaction)) {
+            throw new IllegalStateException("This transaction has already been rated");
+        }
         
-        // 2. Create and save the new valoration
+        // 3. Persist the new review
         Valoration valoration = new Valoration(transaction, stars, comment);
         valorationRepository.save(valoration);
 
-        // 3. Update Seller Statistics
-        User seller = transaction.getSeller();
-        updateSellerStats(seller);
+        // 4. Trigger statistical update for the seller
+        updateSellerStats(transaction.getSeller());
     }
 
+    /**
+     * Re-calculates the average rating and total review count for a seller.
+     */
     private void updateSellerStats(User seller) {
         List<Valoration> valorations = valorationRepository.findBySeller(seller);
+        
         double average = valorations.stream()
                 .mapToDouble(Valoration::getStars)
                 .average()
@@ -51,6 +93,72 @@ public class ValorationService {
         
         seller.setRating(average);
         seller.setNumRatings(valorations.size());
+        
         userRepository.save(seller);
+    }
+
+    /**
+     * Returns all reviews submitted by a specific user.
+     */
+    public List<Valoration> getBuyerHistory(User buyer) {
+        return valorationRepository.findByBuyer(buyer);
+    }
+
+    /**
+     * Permanently removes a valoration from the database.
+     * This operation triggers a recalculation of the seller's overall rating.
+     * * @param id The unique identifier of the valoration to delete.
+     * @param currentUser The authenticated user requesting the deletion.
+     */
+    @Transactional
+    public void deleteValoration(long id, User currentUser) {
+        // 1. Find the valoration or throw 404
+        Valoration valoration = valorationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Valoration not found"));
+
+        // 2. Security Check: Only the author (buyer) can delete their review
+        if (!valoration.getBuyer().getUserId().equals(currentUser.getUserId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete your own reviews");
+        }
+
+        // 3. Keep a reference to the seller before deletion to update their stats
+        User seller = valoration.getSeller();
+
+        // 4. Perform deletion
+        valorationRepository.delete(valoration);
+
+        // 5. Atomic Update: Recalculate seller's rating and count
+        updateSellerStats(seller);
+    }
+
+    /**
+     * Updates an existing valoration's score and feedback.
+     * After the update, it triggers a recalculation of the seller's average rating.
+     * * @param id The ID of the valoration to edit.
+     * @param stars The new star rating (1-5).
+     * @param comment The updated text feedback.
+     * @param currentUser The authenticated user (must be the author of the review).
+     */
+    @Transactional
+    public void updateValoration(long id, int stars, String comment, User currentUser) {
+        // 1. Fetch the existing valoration or throw 404
+        Valoration valoration = valorationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Valoration not found"));
+
+        // 2. Security Check: Ensure only the original buyer can edit the review
+        if (!valoration.getBuyer().getUserId().equals(currentUser.getUserId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to edit this review");
+        }
+
+        // 3. Update the fields in the managed entity
+        valoration.setStars(stars);
+        valoration.setComment(comment);
+        
+        // Save is implicit due to @Transactional, but calling it for clarity
+        valorationRepository.save(valoration);
+
+        // 4. Critical Step: Recalculate the seller's global score
+        // Since the stars have changed, the average must be updated immediately.
+        updateSellerStats(valoration.getSeller());
     }
 }

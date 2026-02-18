@@ -36,21 +36,25 @@
                     <p class="hero-subtitle small">Create your profile to start trading</p>
                 </div>
 
-                
                 {{#error}}
                     <div class="alert alert-danger py-2 small fw-700 rounded-3 mb-4">
                     <i class="fa-solid fa-triangle-exclamation me-2"></i> {{error}}
                     </div>
                 {{/error}}
 
-                <!--SIGNUP FORM-->
                 <form action="/signup-page" method="post" enctype="multipart/form-data">
+                    
+                    <input type="hidden" name="_csrf" value="{{token}}">
+
                     <div class="text-center mb-3">
-                        <div class="profile-upload-container mx-auto">
-                            <i class="fa-solid fa-user-plus text-muted"></i>
+                        <div class="profile-upload-container mx-auto" style="position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                            <i id="upload-icon" class="fa-solid fa-user-plus text-muted"></i>
+                            
+                            <img id="image-preview" src="#" alt="preview" style="display: none; width: 100%; height: 100%; object-fit: cover; position: absolute;">
+                            
                             <input type="file" id="profilePicture" name="profilePicture" accept="image/*" class="file-input-hidden">
                         </div>
-                        <label for="profilePic" class="form-label fw-700 x-small mt-1 d-block cursor-pointer" style="color: var(--brand-blue)">
+                        <label for="profilePicture" class="form-label fw-700 x-small mt-1 d-block cursor-pointer" style="color: var(--brand-blue)">
                             Upload Avatar
                         </label>
                     </div>
@@ -86,8 +90,6 @@
                         </div>
                     </div>
 
-                    <input type="hidden" name="_csrf" value="{{token}}">
-
                     <button type="submit" class="btn-sell w-100 justify-content-center mb-3">
                         Create Account
                     </button>
@@ -98,13 +100,25 @@
                         </a>
                     </div>
                 </form>
-                <!--END SIGNUP FORM-->
-
-            </div>
+                </div>
         </div>
     </div>
 
     {{>footer}}
+
+    <script>
+        document.getElementById('profilePicture').onchange = function (evt) {
+            const [file] = this.files;
+            if (file) {
+                const preview = document.getElementById('image-preview');
+                const icon = document.getElementById('upload-icon');
+                
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
+                icon.style.display = 'none';
+            }
+        }
+    </script>
 
 </body>
 </html>

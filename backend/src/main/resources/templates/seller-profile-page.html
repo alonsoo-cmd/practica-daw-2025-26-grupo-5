@@ -32,7 +32,7 @@
                     </div>
         
                     <div class="position-relative">
-                        <img src="/user/{{userId}}/profile-photo" 
+                        <img src="/user/me/profile-photo" 
                             class="rounded-circle border border-2 border-white shadow-sm profile-nav-img" 
                             width="42" height="42" 
                             style="object-fit: cover;"
@@ -42,15 +42,17 @@
                 </div>
     
                 <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mt-3 animate slideIn">
-                    <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/user-page/{{userId}}">View Profile</a></li>
-                    <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/user-products-page/{{userId}}">My Inventory</a></li>
+                    <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/user-page">View Profile</a></li>
+                    <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/user-products-page">My Inventory</a></li>
                     {{#isAdmin}}
                     <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/admin/{{userId}}">Administration</a></li>
                     {{/isAdmin}}
                     <li><hr class="dropdown-divider opacity-50"></li>
                     <li>
                         <form action="/logout" method="post" class="m-0">
+
                             <input type="hidden" name="_csrf" value="{{token}}"/>
+                            
                             <button type="submit" class="dropdown-item rounded-3 py-2 fw-700 small text-danger border-0 bg-transparent w-100 text-start">Log out</button>
                         </form>
                     </li>
@@ -128,7 +130,7 @@
                         <a href="/info-product-page/{{id}}" class="text-decoration-none">
                             <div class="clay-card p-2 h-100 shadow-sm border-0 bg-white hover-up">
                                 <div class="rounded-4 overflow-hidden mb-3" style="height: 180px; background: #f8fafc;">
-                                    <img src="/product-images/{{images.0.id}}" class="img-fluid w-100 h-100" style="object-fit: cover;">
+                                    <img src="/product-images/{{id}}" class="img-fluid w-100 h-100" style="object-fit: cover;">
                                 </div>
                                 <div class="px-2 pb-2 text-center">
                                     <p class="fw-800 h5 mb-1 text-dark">{{price}}€</p>

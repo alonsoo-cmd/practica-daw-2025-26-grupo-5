@@ -1,115 +1,110 @@
 package es.stilnovo.library.controller;
 
 import java.security.Principal;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
-
-import org.springframework.ui.Model;
-import es.stilnovo.library.model.Valoration;
-import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.repository.ValorationRepository;
-import es.stilnovo.library.repository.TransactionRepository;
-import es.stilnovo.library.repository.UserRepository;
+import es.stilnovo.library.model.Transaction;
+import es.stilnovo.library.service.ValorationService;
+import es.stilnovo.library.service.UserService;
 
+/**
+ * Handles user interactions regarding reviews and feedback.
+ * All private routes use the Principal to ensure secure access.
+ */
 @Controller
 public class ValorationController {
 
     @Autowired
-    private ValorationRepository valorationRepository;
+    private ValorationService valorationService;
 
     @Autowired
-    private TransactionRepository transactionRepository;
+    private UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
-    
-    @GetMapping("/user-valorations-page/{id}")
-    public String showValoration(Model model, @PathVariable long id) {
-
-        // 1. Retrieve the user to maintain UI consistency in sidebar and header
-        User user = userRepository.findById(id).orElseThrow();
+    /**
+     * Displays the central dashboard for user reviews.
+     * Shows pending transactions and the history of submitted ratings.
+     */
+    @GetMapping("/user-valorations-page")
+    public String showValorationDashboard(Model model, Principal principal) {
+        
+        // 1. Identity Verification via Session
+        User user = userService.getFullUserProfile(principal.getName());
         model.addAttribute("user", user);
 
-        // 2. Filter pending transactions that have not been rated yet
-        List<Transaction> allOrders = transactionRepository.findByBuyerUserId(id);
-        List<Transaction> pending = new ArrayList<>();
-
-        for (Transaction trans : allOrders) {
-            // Ensure the 'rated' transient field is updated before checking
-            // Or check existence directly via the repository: valorationRepository.existsByTransaction(trans)
-            if (!trans.isRated()) {
-                pending.add(trans);
-            }
-        }
+        // 2. Fetch processed data from Service
+        List<Transaction> pending = valorationService.getPendingTransactions(user);
         
-        // 3. Add the list and a counter for the UI filter badges
+        // 3. Populate Model for UI badges and lists
         model.addAttribute("pendingValorations", pending);
         model.addAttribute("pendingCount", pending.size());
-
-        // 4. Fetch all valorations already submitted by this buyer
-        model.addAttribute("myValorations", valorationRepository.findByBuyer(user));
+        model.addAttribute("myValorations", valorationService.getBuyerHistory(user));
 
         return "user-valorations-page"; 
     }
-    
+
     /**
-     * Handles the submission of a new rating.
-     * Validates transaction status and updates seller reputation.
+     * Processes the submission of a new product review.
+     * Redirects back to the dashboard upon successful persistence.
      */
-    @PostMapping("/valoration/save/{transactionId}")
-    public String saveValoration(@PathVariable long transactionId, 
+    @PostMapping("/submit-valoration")
+    public String submitValoration(Principal principal,
+                                    @RequestParam long transactionId,
+                                    @RequestParam int stars,
+                                    @RequestParam String comment) {
+
+        // 1. Identify current buyer
+        User buyer = userService.getFullUserProfile(principal.getName());
+
+        // 2. Delegate secure storage and rating update to the Service
+        valorationService.saveAndUpdateSellerRating(transactionId, stars, comment, buyer);
+
+        // 3. Secure Redirect: No ID leak in URL
+        return "redirect:/user-valorations-page";
+    }
+
+    /**
+     * Handles the deletion of a specific review.
+     * Uses @PathVariable to identify the resource, following REST conventions.
+     */
+    @PostMapping("/valoration/delete/{id}")
+    public String deleteValoration(@PathVariable long id, Principal principal) {
+        
+        // 1. Identify the authenticated user
+        User user = userService.getFullUserProfile(principal.getName());
+
+        // 2. Execute deletion via Service
+        valorationService.deleteValoration(id, user);
+
+        // 3. Redirect back to the dashboard
+        return "redirect:/user-valorations-page";
+    }
+
+    /**
+     * Processes the update request for a specific valoration.
+     * Uses @PathVariable for the ID and @RequestParam for the form data.
+     */
+    @PostMapping("/valoration/edit/{id}")
+    public String editValoration(@PathVariable long id, 
                                 @RequestParam int stars, 
                                 @RequestParam String comment, 
                                 Principal principal) {
         
-        // 1. Get the transaction and the current buyer
-        Transaction transaction = transactionRepository.findById(transactionId).orElseThrow();
-        User buyer = userRepository.findByName(principal.getName()).orElseThrow();
+        // 1. Identify the user through the Security Context
+        User user = userService.getFullUserProfile(principal.getName());
 
-        // 2. Create and save the new valoration
-        Valoration valoration = new Valoration(transaction, stars, comment);
-        valorationRepository.save(valoration);
-
-        // 3. IMPORTANT: Update the transaction status and persist
-        transaction.setRated(true); 
-        transactionRepository.save(transaction); 
-
-        // 4. Update seller's global rating
-        updateSellerRating(transaction.getSeller());
-
-        // 5. Redirect back to the valoration page (the pending list will now be shorter)
-        return "redirect:/user-valorations-page/" + buyer.getUserId();
-    }
-
-    /**
-     * Recalculates and persists the seller's global rating and review count.
-     * This ensures the Seller Profile always reflects real-time data.
-     */
-    private void updateSellerRating(User seller) {
-        // 1. Fetch all valorations associated with this seller
-        List<Valoration> valorations = valorationRepository.findBySeller(seller);
+        // 2. Delegate the update logic to the Service Layer
+        valorationService.updateValoration(id, stars, comment, user);
         
-        // 2. Calculate the average score using Java Streams
-        double average = valorations.stream()
-                .mapToDouble(Valoration::getStars)
-                .average()
-                .orElse(0.0); // Default to 0.0 if no valorations exist
-        
-        // 3. Update the seller entity fields
-        // Use Math.round or similar if you want to limit decimal places (e.g., 4.5)
-        seller.setRating(Math.round(average * 10.0) / 10.0); 
-        seller.setNumRatings(valorations.size());
-        
-        // 4. Persist the updated seller data
-        userRepository.save(seller);
+        // 3. Success redirect to the dashboard
+        return "redirect:/user-valorations-page";
     }
 }
