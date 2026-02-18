@@ -3,6 +3,7 @@ package es.stilnovo.library.controller;
 import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLException;
+import java.util.ArrayList; 
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,17 +14,16 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.ui.Model;
 
 import es.stilnovo.library.model.Image;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.repository.ImageRepository;
 import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.service.ProductService;
@@ -40,12 +40,6 @@ public class UserWebController {
     
     @Autowired
     private ProductService productService;
-
-    @Autowired
-    private ImageRepository imageRepository;
-
-    // ... other methods like /profile or /edit-profile ...
-
     /**
      * Endpoint to retrieve a specific user's profile photo from the database.
      * It fetches the Blob content and returns it as a streaming image resource.
@@ -154,8 +148,8 @@ public class UserWebController {
 
     @GetMapping("/sales-and-orders-page/{id}")
     public String showSalesAndOrdersPage(Model model, @PathVariable long id,
-                                        @RequestParam(required = false) Long productId,
-                                        HttpServletRequest request) {
+                                         @RequestParam(required = false) Long productId,
+                                         HttpServletRequest request) {
 
         User user = userRepository.findById(id).orElseThrow();
 
@@ -289,8 +283,8 @@ public class UserWebController {
 
         // 1. Filter empty files and validate count (1 to 4)
         List<MultipartFile> validPhotos = Arrays.stream(productPhotos)
-                                                .filter(f -> !f.isEmpty())
-                                                .toList();
+                                                        .filter(f -> !f.isEmpty())
+                                                        .toList();
         
         if (validPhotos.size() < 1 || validPhotos.size() > 4) {
             // Add error message
@@ -315,9 +309,17 @@ public class UserWebController {
         Product newProduct = new Product(productName, category, price, description, status, seller, location);
 
         // 4. Link images to product
+        // AGGIUNTA: Inizializza la lista se null per evitare NullPointerException
+        if (newProduct.getImages() == null) {
+            newProduct.setImages(new ArrayList<>());
+        }
+
         for (MultipartFile photo : validPhotos) {
             Image img = new Image();
             img.setImageFile(BlobProxy.generateProxy(photo.getInputStream(), photo.getSize()));
+            
+            img.setProduct(newProduct); 
+            
             newProduct.getImages().add(img); 
         }
 
@@ -386,7 +388,7 @@ public class UserWebController {
         }
 
         User loggedInUser = userRepository.findByName(principal.getName()).orElseThrow();
-        // 3. SECURITY CHECK: Ensure the user can only access their own settings [cite: 383]
+        // 3. SECURITY CHECK: Ensure the user can only access their own settings
         if (loggedInUser.getUserId() != id) {
             return "redirect:/error"; // Or access denied page
         }
