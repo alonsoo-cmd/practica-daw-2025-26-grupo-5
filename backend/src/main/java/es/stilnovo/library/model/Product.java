@@ -32,6 +32,19 @@ public class Product {
     @ManyToOne
     private User seller; // product owner
 
+    // --- ADDED: Transient field for UI Logic (Uncommented) ---
+    // Transient means this field is NOT saved to the database
+    @Transient
+    private boolean favorite; // Temporary flag for the view
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
+    }
+    // ---------------------------------------------------------
 
     public Product() {}
 
@@ -45,18 +58,6 @@ public class Product {
         this.location = location;
     }
 
-    //Transient is to not save the variable to the db
-    /*@Transient
-    private boolean favorite; // Temporary flag for the view
-
-    public boolean isFavorite() {
-        return favorite;
-    }
-
-    public void setFavorite(boolean favorite) {
-        this.favorite = favorite;
-    }*/
-    
     /**
      * Method to add an Image entity to the product's gallery.
      * Renamed to 'addImagen' to match your DataBaseInitializer call.

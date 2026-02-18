@@ -1,14 +1,8 @@
 package es.stilnovo.library.service;
 
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import es.stilnovo.library.model.User;
-import es.stilnovo.library.repository.UserRepository;
 import java.io.IOException;
 import java.sql.Blob;
+import java.util.Optional;
 
 import org.hibernate.engine.jdbc.proxy.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +27,6 @@ public class UserService {
         return userRepository.findByName(name);
     }
 
-
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
@@ -49,7 +42,8 @@ public class UserService {
     public boolean existsEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
-}
+
+
     @Transactional
     public void updateUserSettings(Long userId, MultipartFile newProfilePhoto, String email, String cardNumber, String cardCvv, String cardExpiringDate, String description) throws IOException {
         // 1. Fetch the user by ID
@@ -61,7 +55,7 @@ public class UserService {
                 newProfilePhoto.getInputStream(), 
                 newProfilePhoto.getSize()
             );
-            user.setProfileImage(imageBlob); // Asegúrate de que el setter se llame así en User.java
+            user.setProfileImage(imageBlob); 
         }
 
         // 2. Partial update for allowed fields only
@@ -87,7 +81,7 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long userId){
-        
         userRepository.deleteById(userId);
     }
-    
+
+}
