@@ -32,9 +32,16 @@
             </nav>
         
             <div class="mt-auto pt-4 border-top">
-                <a href="/" class="nav-link-stilnovo logout-link text-danger">
-                    <i class="fa-solid fa-power-off"></i> Secure Logout
+                <a href="/" class="btn-sell w-100 d-flex align-items-center justify-content-center gap-2 text-decoration-none shadow-sm mb-3" style="height: 45px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-shop"></i> Browse Market
                 </a>
+
+                <form action="/logout" method="post" class="m-0">
+                    <input type="hidden" name="_csrf" value="{{token}}"/>
+                    <button type="submit" class="nav-link-stilnovo logout-link border-0 bg-transparent w-100 text-start">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                    </button>
+                </form>
             </div>
         </aside>
 
@@ -90,85 +97,85 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="ps-4">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <img src="/images/login-background.png" class="rounded-circle border" width="45" height="45" style="object-fit: cover;">
-                                        <div>
-                                            <p class="fw-800 text-dark mb-0">Sarah Jenkins</p>
-                                            <p class="x-small text-muted mb-0">sarah.j@example.com</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="user-id-mono">#USR-8821</span></td>
-                                <td><span class="badge bg-light text-dark border fw-700">User</span></td>
-                                <td><span class="text-muted small">Oct 24, 10:30 AM</span></td>
-                                <td><span class="status-active"><i class="fa-solid fa-circle x-small"></i> Active</span></td>
-                                <td class="text-end pe-4">
-                                    <button class="btn-action-admin btn-edit me-1" title="Edit Role"><i class="fa-solid fa-user-pen"></i></button>
-                                    <button class="btn-action-admin btn-ban me-1" title="Ban User"><i class="fa-solid fa-ban"></i></button>
-                                    <button class="btn-action-admin btn-delete" title="Delete Account"><i class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
+                        {{#users}}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="/images/no-profile-picture.png"
+                                        class="rounded-circle border"
+                                        width="45"
+                                        height="45"
+                                        style="object-fit: cover;">
 
-                            <tr>
-                                <td class="ps-4">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="avatar-sm bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center fw-800" style="width: 45px; height: 45px;">DR</div>
-                                        <div>
-                                            <p class="fw-800 text-dark mb-0">David Ross</p>
-                                            <p class="x-small text-muted mb-0">david.r88@test.com</p>
-                                        </div>
+                                    <div>
+                                        <p class="fw-800 text-dark mb-0">{{name}}</p>
+                                        <p class="x-small text-muted mb-0">{{email}}</p>
                                     </div>
-                                </td>
-                                <td><span class="user-id-mono">#USR-9902</span></td>
-                                <td><span class="badge bg-light text-dark border fw-700">User</span></td>
-                                <td><span class="text-muted small">Oct 22, 09:15 PM</span></td>
-                                <td><span class="status-reported"><i class="fa-solid fa-triangle-exclamation x-small"></i> Reported</span></td>
-                                <td class="text-end pe-4">
-                                    <button class="btn-action-admin btn-edit me-1"><i class="fa-solid fa-user-pen"></i></button>
-                                    <button class="btn-action-admin btn-ban me-1"><i class="fa-solid fa-ban"></i></button>
-                                    <button class="btn-action-admin btn-delete"><i class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
+                                </div>
+                            </td>
 
-                            <tr>
-                                <td class="ps-4">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="avatar-sm bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-800" style="width: 45px; height: 45px;">AD</div>
-                                        <div>
-                                            <p class="fw-800 text-dark mb-0">System Admin</p>
-                                            <p class="x-small text-muted mb-0">admin@stilnovo.com</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="user-id-mono">#ADM-0001</span></td>
-                                <td><span class="badge bg-dark text-white fw-700">Admin</span></td>
-                                <td><span class="text-success small fw-700">Online Now</span></td>
-                                <td><span class="status-active"><i class="fa-solid fa-shield-halved x-small"></i> Secure</span></td>
-                                <td class="text-end pe-4">
-                                    <span class="x-small text-muted fw-700">Protected</span>
-                                </td>
-                            </tr>
+                            <td>
+                                <span class="user-id-mono">#{{userId}}</span>
+                            </td>
 
-                            <tr class="bg-light opacity-75">
-                                <td class="ps-4">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <img src="/images/coche.png" class="rounded-circle border grayscale" width="45" height="45" style="object-fit: cover; filter: grayscale(100%);">
-                                        <div>
-                                            <p class="fw-800 text-muted mb-0 text-decoration-line-through">Spam Bot 99</p>
-                                            <p class="x-small text-muted mb-0">bot@spam.net</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="user-id-mono text-decoration-line-through">#USR-1102</span></td>
-                                <td><span class="badge bg-light text-muted border fw-700">User</span></td>
-                                <td><span class="text-muted small">Oct 10, 2023</span></td>
-                                <td><span class="status-banned"><i class="fa-solid fa-ban x-small"></i> Banned</span></td>
-                                <td class="text-end pe-4">
-                                    <button class="btn-action-admin btn-delete w-100 justify-content-center"><i class="fa-solid fa-trash me-2"></i> Purge Data</button>
-                                </td>
-                            </tr>
+                            <td>
+                                {{#roles}}
+                                    <span class="badge bg-light text-dark border fw-700">{{.}}</span>
+                                {{/roles}}
+                            </td>
+
+                            <!-- LAST ACTIVITY (de momento mock visual) -->
+                            <td>
+                                <span class="text-muted small">—</span>
+                            </td>
+
+                            <!-- STATUS (mock visual) -->
+                            <td>
+
+                                {{#banned}}
+                                <span class="status-banned">
+                                    <i class="fa-solid fa-ban x-small"></i> Banned
+                                </span>
+                                {{/banned}}
+
+                                {{^banned}}
+                                <span class="status-active">
+                                    <i class="fa-solid fa-circle x-small"></i> Active
+                                </span>
+                                {{/banned}}
+
+                            </td>
+
+
+                            <td class="text-end pe-4">
+                                <button class="btn-action-admin btn-edit me-1">
+                                    <i class="fa-solid fa-user-pen"></i>
+                                </button>
+
+                                <form action="/admin/users/ban/{{userId}}" method="post" style="display:inline;">
+                                    {{#_csrf}}
+                                    <input type="hidden" name="{{parameterName}}" value="{{token}}">
+                                    {{/_csrf}}
+                                    <button class="btn-action-admin btn-ban me-1" type="submit">
+                                        <i class="fa-solid fa-ban"></i>
+                                    </button>
+                                </form>
+
+                                <!-- DELETE: trigger modal (single modal placed at page bottom). 
+                                     data-user-roles carries roles array string to detect admin -->
+                                <button type="button"
+                                        class="btn-action-admin btn-delete"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#confirmDeleteModal"
+                                        data-user-id="{{userId}}"
+                                        data-user-roles="{{roles}}"
+                                        data-user-name="{{name}}">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+
+                            </td>
+                        </tr>
+                        {{/users}}
                         </tbody>
                     </table>
                 </div>
@@ -193,6 +200,69 @@
             <div class="py-5"></div>
         </main>
     </div>
+
+
+
+<!-- Confirm Delete Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm action</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmDeleteMessage" class="mb-0"></p>
+      </div>
+      <div class="modal-footer">
+        <!-- single form used to perform deletion; CSRF token is included from model -->
+        <form id="confirmDeleteForm" method="post" action="">
+            {{#_csrf}}
+            <input type="hidden" name="{{parameterName}}" value="{{token}}">
+            {{/_csrf}}
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            <button type="submit" id="confirmDeleteYes" class="btn btn-danger">Yes, delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    // Bootstrap modal show event handler
+    (function () {
+        var confirmModalEl = document.getElementById('confirmDeleteModal');
+        if (!confirmModalEl) return;
+
+        confirmModalEl.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var userId = button.getAttribute('data-user-id');
+            var roles = button.getAttribute('data-user-roles') || '';
+            var name = button.getAttribute('data-user-name') || '';
+            var form = document.getElementById('confirmDeleteForm');
+            var messageEl = document.getElementById('confirmDeleteMessage');
+            var yesBtn = document.getElementById('confirmDeleteYes');
+
+            // roles is a string like: [ROLE_USER, ROLE_ADMIN] or something similar depending on Mustache rendering.
+            // Check for presence of ROLE_ADMIN substring to decide admin-ness.
+            var isAdmin = (roles.indexOf('ROLE_ADMIN') !== -1);
+
+            if (isAdmin) {
+                messageEl.textContent = "You can't delete an admin user.";
+                yesBtn.style.display = 'none';
+            } else {
+                messageEl.textContent = "Are you sure you want to delete this user? This action cannot be undone.";
+                yesBtn.style.display = '';
+            }
+
+            // Set the form action to point to the correct delete endpoint
+            form.action = '/admin/users/delete/' + userId;
+        });
+    })();
+</script>
+
+<!-- Bootstrap JS bundle for modal functionality -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

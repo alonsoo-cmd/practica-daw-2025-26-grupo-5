@@ -17,103 +17,116 @@ import jakarta.persistence.ManyToMany;
 @Entity(name = "UserTable")
 public class User {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long userId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long userId;
 
-	public Long getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-	private String name;
+    private String name;
 
-	private String encodedPassword;
+    private String encodedPassword;
 
-	@ElementCollection(fetch = FetchType.EAGER)
-	private List<String> roles;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles;
 
-	@Lob
-	private Blob profileImage; 	
+    @Lob
+    private Blob profileImage;     
 
-	private Double rating;
-	
-	@Column(unique = true, nullable = false) 
-	private String email;
+    private Double rating;
 
-	public User() {
-	}
+    @Column(unique = true, nullable = false) 
+    private String email;
 
-	public User(String name, String encodedPassword, String email, Blob profileImage, Double rating, String... roles) {
-		this.name = name;
-		this.encodedPassword = encodedPassword;
-		this.email = email;
-		this.profileImage = profileImage;
-		this.rating = rating;
-		this.roles = List.of(roles);
-	}
+    //banned status for users
+    @Column(nullable = false)
+    private boolean banned = false;
 
-	public String getName() {
-		return name;
-	}
+    public boolean isBanned() {
+        return banned;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setBanned(boolean banned) {
+        this.banned = banned;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public User() {}
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public User(String name, String encodedPassword, String email, Blob profileImage, Double rating, String... roles) {
+        this.name = name;
+        this.encodedPassword = encodedPassword;
+        this.email = email;
+        this.profileImage = profileImage;
+        this.rating = rating;
+        this.roles = List.of(roles);
+    }
 
-	
-	public String getEncodedPassword() {
-		return encodedPassword;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setEncodedPassword(String encodedPassword) {
-		this.encodedPassword = encodedPassword;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public List<String> getRoles() {
-		return roles;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setRoles(List<String> roles) {
-		this.roles = roles;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public Blob getProfileImage() { 
-		return profileImage; 
-	}
+    public String getEncodedPassword() {
+        return encodedPassword;
+    }
 
-	public void setProfileImage(Blob profileImage) { 
-		this.profileImage = profileImage; 
-	}
+    public void setEncodedPassword(String encodedPassword) {
+        this.encodedPassword = encodedPassword;
+    }
 
-	public Double getRating() { 
-		return rating; 
-	}
+    public List<String> getRoles() {
+        return roles;
+    }
 
-	public void setRating(Double rating) { 
-		this.rating = rating; 
-	}
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
 
-	//Favorite products
-	@ManyToMany
-	private List<Product> favoriteProducts = new ArrayList<>();
+    public Blob getProfileImage() { 
+        return profileImage; 
+    }
 
-	public List<Product> getFavoriteProducts() {
-    	return favoriteProducts;
-	}
+    public void setProfileImage(Blob profileImage) { 
+        this.profileImage = profileImage; 
+    }
 
-	public void addFavorite(Product product) {
-		//if array not contain product then add it
-    	if (!this.favoriteProducts.contains(product)) {
-        	this.favoriteProducts.add(product);
-    	}
-	}
+    public Double getRating() { 
+        return rating; 
+    }
+
+    public void setRating(Double rating) { 
+        this.rating = rating; 
+    }
+
+    // Favorite products
+    @ManyToMany
+    private List<Product> favoriteProducts = new ArrayList<>();
+
+    public List<Product> getFavoriteProducts() {
+        return favoriteProducts;
+    }
+
+    public void addFavorite(Product product) {
+        if (!this.favoriteProducts.contains(product)) {
+            this.favoriteProducts.add(product);
+        }
+    }
+
+	public boolean isAdmin() {
+    return roles != null && roles.contains("ROLE_ADMIN");
+}
 
 }

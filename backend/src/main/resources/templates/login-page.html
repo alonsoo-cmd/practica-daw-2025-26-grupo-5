@@ -38,6 +38,13 @@
                 <!--LOGIN FORM-->
                 <form action="/login-page" method="post">
 
+                    {{#loginError}}
+                    <div class="alert alert-danger text-center fw-700 mb-4">
+                        Wrong username or password
+                    </div>
+                    {{/loginError}}
+
+
                     <!--NAME INPUT-->
                     <div class="mb-4">
                         <label class="form-label fw-700 small">Username</label>

@@ -14,73 +14,82 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-	@Autowired
-	RepositoryUserDetailsService userDetailsService;
+    @Autowired
+    private CustomAuthenticationFailureHandler failureHandler;
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Autowired
+    RepositoryUserDetailsService userDetailsService;
 
-	@Bean
-	public DaoAuthenticationProvider authenticationProvider() {
-		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-		authProvider.setPasswordEncoder(passwordEncoder());
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-		return authProvider;
-	}
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
 
-	@Bean
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.authenticationProvider(authenticationProvider());
 
+        // Keep CSRF enabled (default)
+
         http
             .authorizeHttpRequests(authorize -> authorize
-                // PUBLIC PAGES: Essential for the index to load correctly
-                .requestMatchers("/", "/error").permitAll() 
+                // PUBLIC PAGES
+                .requestMatchers("/", "/error").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                
-                // AUTHENTICATION PAGES: Login and Signup flows
-                .requestMatchers("/login-page", "/error").permitAll()
+                .requestMatchers("/banned").permitAll()
+
+                // AUTH
+                .requestMatchers("/login-page", "/login-error").permitAll()
                 .requestMatchers("/signup-page").permitAll()
-                
-				.requestMatchers("/product-images/**").permitAll()
-                // PRODUCT VIEWS: Public access to the marketplace and details
+
+                .requestMatchers("/product-images/**").permitAll()
                 .requestMatchers("/info-product-page/**").permitAll()
                 .requestMatchers("/about-page/**").permitAll()
                 .requestMatchers("/user/*/profile-photo").permitAll()
-                
-                // PRIVATE PAGES: Restricted to registered users or admins
-				.requestMatchers("/payment-page/**").hasAnyRole("USER", "ADMIN")
-				.requestMatchers("/contact-seller-page/**").hasAnyRole("USER", "ADMIN")
+
+                // PRIVATE
+                .requestMatchers("/payment-page/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/contact-seller-page/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/add-product-page/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/edit-product-page/**").hasAnyRole("USER", "ADMIN")
-				.requestMatchers("/sales-and-orders-page/**").hasAnyRole("USER", "ADMIN")
-				.requestMatchers("/statistics-page/**").hasAnyRole("USER", "ADMIN")
-				.requestMatchers("/user-page/**").hasAnyRole("USER", "ADMIN")
-				.requestMatchers("/user-products-page/**").hasAnyRole("USER", "ADMIN")
-				.requestMatchers("/user-setting-page/**").hasAnyRole("USER", "ADMIN")
-				.requestMatchers("/favorite-products-page/**").hasAnyRole("USER", "ADMIN")
-				.requestMatchers("/help-center-page/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/sales-and-orders-page/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/statistics-page/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/user-page/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/user-products-page/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/user-setting-page/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/favorite-products-page/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/help-center-page/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/pdf/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/v1/notifications/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/admin/admin-panel-page/**").hasAnyRole("ADMIN")
-				.requestMatchers("/admin/**").hasRole("ADMIN") //fix admin access
 
-				
+                // ADMIN
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/users/ban/**").hasRole("ADMIN")
+
                 .anyRequest().authenticated()
             )
             .formLogin(formLogin -> formLogin
                 .loginPage("/login-page")
-                .failureUrl("/login-error-page")
+                .failureUrl("/login-error")              // moved to failureHandler to keep banned logic
+                .failureHandler(failureHandler)          // mantiene lógica de baneados
                 .defaultSuccessUrl("/")
-                .permitAll())
+                .permitAll()
+            )
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
-                .permitAll());
+                .permitAll()
+            );
 
         return http.build();
     }
 }
+

@@ -32,9 +32,16 @@
             </nav>
         
             <div class="mt-auto pt-4 border-top">
-                <a href="/" class="nav-link-stilnovo logout-link text-danger">
-                    <i class="fa-solid fa-power-off"></i> Secure Logout
+                <a href="/" class="btn-sell w-100 d-flex align-items-center justify-content-center gap-2 text-decoration-none shadow-sm mb-3" style="height: 45px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-shop"></i> Browse Market
                 </a>
+
+                <form action="/logout" method="post" class="m-0">
+                    <input type="hidden" name="_csrf" value="{{token}}"/>
+                    <button type="submit" class="nav-link-stilnovo logout-link border-0 bg-transparent w-100 text-start">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                    </button>
+                </form>
             </div>
         </aside>
 

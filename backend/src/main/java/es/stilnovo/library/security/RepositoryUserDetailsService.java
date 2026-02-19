@@ -17,22 +17,28 @@ import es.stilnovo.library.repository.UserRepository;
 @Service
 public class RepositoryUserDetailsService implements UserDetailsService {
 
-	@Autowired
-	private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-		User user = userRepository.findByName(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-		List<GrantedAuthority> roles = new ArrayList<>();
-		for (String role : user.getRoles()) {
-			roles.add(new SimpleGrantedAuthority(role));
-		}
+        // BLOCK BANNED USERS
+        if (user.isBanned()) {
+            throw new UsernameNotFoundException("User is banned");
+        }
 
-		return new org.springframework.security.core.userdetails.User(user.getName(), 
-				user.getEncodedPassword(), roles);
+        List<GrantedAuthority> roles = new ArrayList<>();
+        for (String role : user.getRoles()) {
+            roles.add(new SimpleGrantedAuthority(role));
+        }
 
-	}
+        return new org.springframework.security.core.userdetails.User(
+                user.getName(),
+                user.getEncodedPassword(),
+                roles);
+    }
 }
