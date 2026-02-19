@@ -23,6 +23,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findTop8ByOrderByIdDesc();
     
+    /* ask teacher if its good implementation */
     @Query(value = """
         SELECT p.* FROM product p
         JOIN (

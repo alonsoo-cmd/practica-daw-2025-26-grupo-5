@@ -11,69 +11,75 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.repository.UserRepository;
-import es.stilnovo.library.service.ProductService;
-import jakarta.servlet.http.HttpServletRequest;
+
+import es.stilnovo.library.service.MainService;
 
 @Controller
 public class MainController {
 
     @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private UserRepository userRepository;
+    private MainService mainService;
 
     @GetMapping("/")
     public String index(Model model,
                         @RequestParam(required = false) String query,
                         @RequestParam(required = false) String category,
-                        HttpServletRequest request) {
+                        Principal principal) {
 
+        // 1. Get typed data from Service (NO casting needed = NO errors)
+        List<Product> products = mainService.searchProducts(query, category);
+        User user = mainService.getUserContext(principal != null ? principal.getName() : null);
+
+        // 2. Populate Model
+        boolean logged = (user != null);
+        boolean isAdmin = logged && user.getRoles().contains("ROLE_ADMIN");
+
+        model.addAttribute("products", products);
+        model.addAttribute("user", user);
+        model.addAttribute("logged", logged);
+        model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("query", (query != null) ? query : (category != null ? category : ""));
+        model.addAttribute("searching", query != null || category != null);
+
+        /*// 2. Product Search Logic
         List<Product> products;
+        boolean isSearching = (query != null && !query.isEmpty()) || (category != null && !category.isEmpty());
 
-        if (category != null && !category.isEmpty()) {
-            products = productService.findByQueryCategory(category);
-            model.addAttribute("query", category);
-        } else {
-            products = productService.findByQuery(query);
-            model.addAttribute("query", (query != null) ? query : "");
-        }
-
-        Principal principal = request.getUserPrincipal();
-
-        boolean isAdmin = false;
-
-        if (principal != null) {
-
-            User user = userRepository.findByName(principal.getName()).orElseThrow();
-
-            
-            List<Product> userFavs = user.getFavoriteProducts();
-            for (Product p : products) {
-                p.setFavorite(userFavs.contains(p));
+        if (isSearching) {
+            if (category != null && !category.isEmpty()) {
+                products = productService.findByQueryCategory(category);
+                model.addAttribute("query", category);
+            } else {
+                products = productService.findByQuery(query);
+                model.addAttribute("query", query);
             }
 
-            // -------- ADMIN CHECK --------
-            isAdmin = user.getRoles().contains("ROLE_ADMIN");
+            // Redirect if unique result
+            if (products.size() == 1) {
+                return "redirect:/info-product-page/" + products.get(0).getId();
+            }
 
-            model.addAttribute("userId", user.getUserId());
-            model.addAttribute("username", user.getName());
-            model.addAttribute("logged", true);
+        } else {
+            // Recommendation Algorithm
+            products = productService.getRecommendations(currentUser);
         }
 
-        model.addAttribute("isAdmin", isAdmin);
+        // 3. Favorites Logic
+            if (currentUser != null && products != null) {
+                List<Product> userFavs = currentUser.getFavoriteProducts(); 
+                for (Product p : products) {
+                    boolean isFav = userFavs.stream().anyMatch(fav -> fav.getId().equals(p.getId())); 
+                    p.setFavorite(isFav); 
+                }
+            }
 
+        model.addAttribute("searching", isSearching);
+        model.addAttribute("products", products);*/
+
+        // 3. Navigation Logic
         if (products.size() == 1 && (query != null || category != null)) {
             return "redirect:/info-product-page/" + products.get(0).getId();
         }
-
-        boolean isSearching =
-                (query != null && !query.isEmpty()) ||
-                (category != null && !category.isEmpty());
-
-        model.addAttribute("searching", isSearching);
-        model.addAttribute("products", products);
 
         return "index";
     }

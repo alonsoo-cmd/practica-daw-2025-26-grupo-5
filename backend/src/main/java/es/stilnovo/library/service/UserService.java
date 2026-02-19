@@ -1,5 +1,239 @@
 package es.stilnovo.library.service;
 
+import java.io.IOException;
+import java.util.Optional;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.hibernate.engine.jdbc.proxy.BlobProxy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
+import es.stilnovo.library.model.User;
+import es.stilnovo.library.repository.TransactionRepository;
+import es.stilnovo.library.repository.UserRepository;
+import es.stilnovo.library.repository.ValorationRepository;
+
+import org.springframework.core.io.Resource;
+import es.stilnovo.library.model.Transaction;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
 public class UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    public Optional<User> findByName(String name) {
+        return userRepository.findByName(name);
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public Optional<User> findById(long id) {
+        return userRepository.findById(id);
+    }
     
+    public boolean existsUser(String name) {
+        return userRepository.findByName(name).isPresent();
+    }
+
+    public boolean existsEmail(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    @Autowired
+    private ValorationRepository valorationRepository;
+
+    /**
+     * Updates the profile settings and billing information for the authenticated user.
+     * This method handles optional profile picture uploads and performs partial updates.
+     * * @param username The name of the authenticated user from the Security Context.
+     * @param newProfilePhoto Optional MultipartFile containing the new avatar.
+     * @param email New email address (if provided).
+     * @param cardNumber New credit card number for billing.
+     * @param cardCvv New CVV security code.
+     * @param cardExpiringDate New expiration date (MM/YY).
+     * @param description New profile description.
+     * @throws IOException If there is an error processing the image stream.
+     */
+    @Transactional
+    public void updateUserSettings(String username, MultipartFile newProfilePhoto, String email, 
+                                String cardNumber, String cardCvv, String cardExpiringDate, 
+                                String description) throws IOException {
+
+        // 1. Domain Logic: Fetch the managed entity from the database
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // 2. Image Processing: Update profile photo if a new one is provided
+        if (newProfilePhoto != null && !newProfilePhoto.isEmpty()) {
+            user.setProfileImage(BlobProxy.generateProxy(
+                newProfilePhoto.getInputStream(), 
+                newProfilePhoto.getSize()
+            )); 
+        }
+
+        // 3. Conditional Updates: Only update fields that are not empty
+        if (email != null && !email.trim().isEmpty()) user.setEmail(email);
+        if (cardNumber != null && !cardNumber.trim().isEmpty()) user.setCardNumber(cardNumber);
+        if (cardCvv != null && !cardCvv.trim().isEmpty()) user.setCardCvv(cardCvv);
+        if (cardExpiringDate != null && !cardExpiringDate.trim().isEmpty()) user.setCardExpiringDate(cardExpiringDate);
+        if (description != null && !description.trim().isEmpty()) user.setUserDescription(description);
+
+        // 4. Persistence: The @Transactional annotation will automatically flush changes to the DB
+        userRepository.save(user);
+    }
+
+    /**
+     * Deletes the authenticated user from the system.
+     * Due to the 'CascadeType.ALL' configuration on the User entity, this operation 
+     * will automatically remove all associated products and images.
+     * @param username The unique name of the user to be deleted.
+     */
+    @Transactional
+    public void deleteUser(String username) {
+        
+        // 1. Fetch the user entity to retrieve the internal ID
+        User currentUser = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        
+        // 2. Perform the deletion. JPA handles the cascading of related records.
+        userRepository.deleteById(currentUser.getUserId());
+    }
+
+    /**
+     * Retrieves the full profile of the authenticated user.
+     * This is used to populate settings and profile views with complete JPA entity data.
+     * @param username The unique identity string from the Principal object.
+     * @return The complete User entity including billing and profile details.
+     */
+    public User getFullUserProfile(String username) {
+        // We fetch the full entity to ensure fields like email, description, and balance are available 
+        return userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User profile not found"));
+    }
+    
+    /**
+     * Retrieves the profile photo of a user as a Resource using their username.
+     * This method is @Transactional to allow the Blob binary stream to be read from the database.
+     * * @param username The unique name of the user whose photo is requested.
+     * @return A Resource containing the image bytes or a default "no-profile-picture" placeholder.
+     * @throws SQLException If there's an error reading the Blob stream from the database.
+     */
+    @Transactional(readOnly = true)
+    public Resource getProfilePhotoResourceByUsername(String username) throws SQLException {
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        return getResourceFromUser(user);
+    }
+
+    /**
+     * Fetches the profile photo resource using the internal User ID.
+     * Ideal for public profiles where the internal identifier is used in the URL.
+     * * @param id The internal database ID of the user.
+     * @return A Resource containing the image bytes or a default "no-profile-picture" placeholder.
+     * @throws SQLException If there's an error reading the Blob stream from the database.
+     */
+    @Transactional(readOnly = true)
+    public Resource getProfilePhotoResourceById(Long id) throws SQLException {
+        User user = userRepository.findById(id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        
+        return getResourceFromUser(user);
+    }
+
+    /**
+     * Internal helper to convert a User's profile image Blob into a Spring Resource.
+     * If the image is null, it provides a consistent fallback to the default avatar.
+     * * @param user The managed User entity.
+     * @return A streamable InputStreamResource or a ClassPathResource for the fallback.
+     * @throws SQLException If the Blob binary stream cannot be accessed.
+     */
+    private Resource getResourceFromUser(User user) throws SQLException {
+        if (user.getProfileImage() != null) {
+            return new InputStreamResource(user.getProfileImage().getBinaryStream());
+        }
+
+        // FALLBACK: Uniform path for users without a profile picture
+        return new ClassPathResource("static/images/no-profile-picture.png");
+    }
+
+    /**
+     * Retrieves a user's public profile data by their unique ID.
+     *
+     * @param id The database ID of the user.
+     * @return The User entity if found.
+     * @throws ResponseStatusException 404 if the user does not exist.
+     */
+    public User getPublicProfileById(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seller not found"));
+    }
+
+    /**
+     * Processes and aggregates all sales and orders data for the authenticated user.
+     * It dynamically checks if each purchase has been rated to update the UI buttons.
+     * * @param username The name of the authenticated user from the Security Context.
+     * @param transactionId Optional ID of the transaction to display in the detail view.
+     * @return A Map containing lists of transactions and UI state flags.
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Object> getSalesAndOrdersDashboard(String username, Long transactionId) {
+        Map<String, Object> data = new HashMap<>();
+        
+        // 1. Context: Fetch the user and their specific history
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        
+        List<Transaction> sales = transactionRepository.findBySellerUserId(user.getUserId());
+        List<Transaction> orders = transactionRepository.findByBuyerUserId(user.getUserId());
+
+        // 2. DYNAMIC UI CHECK: Check if each order already has a valoration
+        // This is the key to making {{#rated}} work in your Mustache template.
+        for (Transaction t : orders) {
+            t.setRated(valorationRepository.existsByTransaction(t));
+        }
+
+        // 3. Detail View Logic: Determine which transaction is currently selected
+        Transaction selected = null;
+        if (transactionId != null) {
+            selected = transactionRepository.findById(transactionId)
+                    .filter(t -> t.getSeller().getName().equals(username) || t.getBuyer().getName().equals(username))
+                    .orElse(null);
+        }
+        
+        // Default to the most recent sale if no specific transaction is selected
+        if (selected == null && !sales.isEmpty()) {
+            selected = sales.get(0);
+        }
+
+        // 4. Populate Model Data for Mustache
+        data.put("sales", sales);
+        data.put("orders", orders);
+        data.put("selectedTransaction", selected);
+        data.put("hasSales", !sales.isEmpty());
+        data.put("hasOrders", !orders.isEmpty());
+        data.put("shippingAddress", (selected != null) ? selected.getProduct().getLocation() : "No shipping data available");
+
+        return data;
+    } 
+
 }

@@ -3,30 +3,26 @@ package es.stilnovo.library.controller;
 import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 
-import org.hibernate.engine.jdbc.proxy.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.ui.Model;
 
-import es.stilnovo.library.model.Image;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.repository.ImageRepository;
-import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.service.ProductService;
+import es.stilnovo.library.service.UserService;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
@@ -36,177 +32,123 @@ public class UserWebController {
     private UserRepository userRepository;
 
     @Autowired
-    private ProductRepository productRepository;
-    
-    @Autowired
     private ProductService productService;
 
     @Autowired
-    private ImageRepository imageRepository;
-
-    // ... other methods like /profile or /edit-profile ...
+    private UserService userService;
 
     /**
-     * Endpoint to retrieve a specific user's profile photo from the database.
-     * It fetches the Blob content and returns it as a streaming image resource.
+     * GET method to retrieve the profile photo of the currently authenticated user.
+     * Uses 'me' in the URL to hide the ID and rely on the session Principal.
+     */
+    @GetMapping("/user/me/profile-photo")
+    public ResponseEntity<Resource> getMyProfilePhoto(Principal principal) throws SQLException {
+        return fetchPhotoResponse(principal.getName());
+    }
+
+    /**
+     * GET method to retrieve any user's profile photo by their ID.
+     * This is used for public views, such as viewing a seller's photo on a product page.
      */
     @GetMapping("/user/{id}/profile-photo")
-    public ResponseEntity<Object> getProfilePhoto(@PathVariable long id) throws SQLException {
+    public ResponseEntity<Resource> getPublicProfilePhoto(@PathVariable Long id) throws SQLException {
+        // We delegate the search by ID to the service
+        Resource image = userService.getProfilePhotoResourceById(id);
         
-        // Find the user in the database; throws an exception if the ID doesn't exist
-        User user = userRepository.findById(id).orElseThrow();
-        
-        // Check if the user has a profile image (stored as a Blob)
-        if (user.getProfileImage() != null) {
-            Resource file = new InputStreamResource(user.getProfileImage().getBinaryStream());
-            
-            return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG) // Adjust the media type if necessary
-                .body(file);
-        }
-        
-        // Return a 404 Not Found if the user exists but has no image
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG) 
+                .body(image);
+    }
+
+    /**
+     * Internal helper to standardize the photo response logic.
+     */
+    private ResponseEntity<Resource> fetchPhotoResponse(String username) throws SQLException {
+        Resource image = userService.getProfilePhotoResourceByUsername(username);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(image);
     }
 
 
+    /**
+     * GET method to display a specific seller's public profile using their ID.
+     * This allows users to browse different sellers in the marketplace.
+     *
+     * @param id The internal ID of the seller to display.
+     * @param model UI model to pass seller data to the template.
+     * @param principal The current logged-in user (optional, used for ownership checks).
+     */
     @GetMapping("/seller-profile/{id}")
-    public String showSellerProfile(Model model, @PathVariable long id) {
-        // 1. Find the seller by ID. If not found, Spring will show the error page we created.
-        User seller = userRepository.findById(id).orElseThrow();
-    
-        // 2. Add the seller object to the model
-        model.addAttribute("seller", seller);
-
-        // 3. Fetch ONLY the products belonging to this seller
-        List<Product> sellerProducts = productRepository.findBySeller(seller);
-        model.addAttribute("sellerProducts", sellerProducts);
-    
-        // 4. Logic for stars (optional: you could pass a list of booleans for the star icons)
-        model.addAttribute("fullStars", Math.floor(seller.getRating()));
+    public String showPublicSellerProfile(@PathVariable long id, Model model, Principal principal) {
         
-        // 5. Num of products
-        long itemsCount = productService.getProductCount(seller);
-        model.addAttribute("itemsCount", itemsCount);
+        // 1. Fetch the specific seller data using the ID
+        User seller = userService.getPublicProfileById(id);
+        
+        // 2. Populate the model with seller information
+        model.addAttribute("seller", seller);
+        model.addAttribute("sellerValorations", seller.getValorations());
+        model.addAttribute("sellerProducts", seller.getProducts());
+        model.addAttribute("itemsCount", seller.getProducts().size());
+        model.addAttribute("fullStars", productService.calculateFullStars(seller));
+
+        // 3. Security logic: Check if the viewer is the owner to show/hide edit buttons
+        boolean isOwner = (principal != null && principal.getName().equals(seller.getName()));
+        model.addAttribute("isOwner", isOwner);
 
         return "seller-profile-page";
     }
 
 
-    @GetMapping("/user-page/{id}")
-    public String showUserPage(Model model, @PathVariable long id, HttpServletRequest request) {
-    
-        // 1. Buscamos al usuario por su ID
-        User user = userRepository.findById(id).orElseThrow();
-    
-        // 2. Pasamos los datos del usuario a la plantilla user-page.html
-        model.addAttribute("user", user);
-    
-        // 3. Comprobamos si el que mira la página es el dueño del perfil
-        Principal principal = request.getUserPrincipal();
-        if (principal != null && principal.getName().equals(user.getName())) {
-        model.addAttribute("isOwner", true);
+    /**
+     * Displays the personal profile page of the authenticated user.
+     * This route is used as a private dashboard where the user can see their own public-facing info.
+     * By using the Principal instead of a PathVariable ID, we prevent unauthorized access 
+     * to other users' profile data.
+     * * @param model UI model to pass user data to the mustache template.
+     * @param principal The security context of the logged-in user.
+     * @return The user profile view template.
+     */
+    @GetMapping("/user-page")
+    public String showUserPage(Model model, Principal principal) {
+        
+        // 1. Safety Check: If the user session is lost, redirect to login
+        if (principal == null) {
+            return "redirect:/login-page";
         }
+
+        // 2. Data Retrieval: Fetch the full user entity using the secure Principal name
+        User user = userService.getFullUserProfile(principal.getName());
+
+        // 3. Model Population: Add the user object to the view
+        model.addAttribute("user", user);
+
+        // 4. Ownership Logic: Since this route is ID-less and bound to the Principal,
+        // the visitor is ALWAYS the owner of this specific page.
+        model.addAttribute("isOwner", true);
 
         return "user-page"; 
     }
-
-
-    //user-products-page.html
-    @GetMapping("/user-products-page/{id}")
-    public String userProducts(Model model, @PathVariable long id, HttpServletRequest request) {
-
-        // 1. Fetch the user who owns the profile from the database
-        User user = userRepository.findById(id).orElseThrow();
-
-        // 2. SECURITY CHECK: Verify if the currently logged-in user is the owner of this inventory
-        // We use the request's principal name (username/email) to validate access
-        if (request.getUserPrincipal() == null || !request.getUserPrincipal().getName().equals(user.getName())) {
-            // Unauthorized access: redirect to an error or access-denied page
-            return "redirect:/error"; 
-        }
-
-        // 3. Retrieve the products. We must use 'findBySeller' because that is the field name 
-        // defined in the Product entity class
-        List<Product> userProducts = productRepository.findBySeller(user);
     
-        // 4. Populate the model for the Mustache template
-        model.addAttribute("userProducts", userProducts);
-        model.addAttribute("user", user); 
-        model.addAttribute("itemsCount", userProducts.size());
 
-        return "user-products-page";
-    }
+    /**
+     * GET method for the sales and orders dashboard.
+     * Uses the session Principal to ensure users can only see their own private financial history.
+     *
+     */
+    @GetMapping("/sales-and-orders-page")
+    public String showSalesAndOrders(Model model, Principal principal,
+                                    @RequestParam(required = false) Long transactionId) {
 
-    @GetMapping("/favorite-products-page/{id}")
-    public String showFavoriteProductsPage(Model model, @PathVariable long id, HttpServletRequest request) {
-
-        User user = userRepository.findById(id).orElseThrow();
-
-        if (request.getUserPrincipal() == null || !request.getUserPrincipal().getName().equals(user.getName())) {
-            return "redirect:/error";
-        }
-
+        // 1. Get the full profile for the sidebar/header
+        User user = userService.getFullUserProfile(principal.getName());
         model.addAttribute("user", user);
 
-        return "favorite-products-page";
-    }
-
-    @GetMapping("/sales-and-orders-page/{id}")
-    public String showSalesAndOrdersPage(Model model, @PathVariable long id,
-                                        @RequestParam(required = false) Long productId,
-                                        HttpServletRequest request) {
-
-        User user = userRepository.findById(id).orElseThrow();
-
-        if (request.getUserPrincipal() == null || !request.getUserPrincipal().getName().equals(user.getName())) {
-            return "redirect:/error";
-        }
-
-        List<Product> userProducts = productRepository.findBySeller(user);
-        List<Product> soldProducts = userProducts.stream()
-            .filter(product -> product.getStatus() != null
-                && product.getStatus().equalsIgnoreCase("sold"))
-            .toList();
-
-        Product selectedProduct = null;
-        if (productId != null) {
-            selectedProduct = soldProducts.stream()
-                .filter(product -> product.getId() != null && product.getId().equals(productId))
-                .findFirst()
-                .orElse(null);
-        }
-        if (selectedProduct == null && !soldProducts.isEmpty()) {
-            selectedProduct = soldProducts.get(0);
-        }
-
-        String selectedProductAddress = "Address not provided";
-        if (selectedProduct != null && selectedProduct.getLocation() != null
-                && !selectedProduct.getLocation().isBlank()) {
-            selectedProductAddress = selectedProduct.getLocation();
-        }
-
-        model.addAttribute("user", user);
-        model.addAttribute("soldProducts", soldProducts);
-        model.addAttribute("selectedProduct", selectedProduct);
-        model.addAttribute("selectedProductAddress", selectedProductAddress);
-        model.addAttribute("hasSales", !soldProducts.isEmpty());
+        // 2. Delegate business logic to the OrderService
+        Map<String, Object> dashboardData = userService.getSalesAndOrdersDashboard(principal.getName(), transactionId);
+        model.addAllAttributes(dashboardData);
 
         return "sales-and-orders-page";
-    }
-
-    @GetMapping("/statistics-page/{id}")
-    public String showStatisticsPage(Model model, @PathVariable long id, HttpServletRequest request) {
-
-        User user = userRepository.findById(id).orElseThrow();
-
-        if (request.getUserPrincipal() == null || !request.getUserPrincipal().getName().equals(user.getName())) {
-            return "redirect:/error";
-        }
-
-        model.addAttribute("user", user);
-
-        return "statistics-page";
     }
 
 
@@ -225,78 +167,83 @@ public class UserWebController {
     }
 
 
+    /*USER PRODUCT PAGE*/
+    /**
+     * Displays the authenticated user's personal product inventory.
+     * Following REST best practices: The User ID is hidden from the URL to prevent enumeration attacks.
+     */
+    @GetMapping("/user-products-page")
+    public String userProducts(Model model, Principal principal) {
+
+        // 1. Delegate data retrieval to the Service Layer using the secure Principal name [cite: 744, 942]
+        User user = productService.getAuthenticatedUserWithProducts(principal.getName());
+
+        // 2. Populate the model with user data and their 1:N related products
+        // The 'userProducts' list is accessed directly via the bidirectional JPA relationship
+        model.addAttribute("user", user); 
+        model.addAttribute("userProducts", user.getProducts());
+        model.addAttribute("itemsCount", user.getProducts().size());
+
+        // 3. Return the specific view template without exposing sensitive ID parameters in the address bar
+        return "user-products-page";
+    }
+
+    /*-- Edit product --*/
     // GET method to display the edit form with existing data
     @GetMapping("/edit-product-page/{id}")
-    public String showEditForm(Model model, @PathVariable long id, HttpServletRequest request) {
+    public String showEditForm(Model model, @PathVariable long id, Principal principal) {
     
-        // 1. Find the product by its ID
-        Product product = productRepository.findById(id).orElseThrow();
-
-        // 2. SECURITY CHECK: Ensure the logged-in user is the owner (the seller)
-        if (request.getUserPrincipal() == null || !request.getUserPrincipal().getName().equals(product.getSeller().getName())) {
-            return "redirect:/error-403";
-        }
+        // 1. Find the product by its ID using the service
+        Product product = productService.getProductForEditing(id, principal.getName());
 
         // 3. Add the product to the model so the form fields can be pre-filled
         model.addAttribute("product", product);
     
         return "edit-product-page"; 
     }
-
-
-    // POST method to handle the form submission and update the DB
-    @PostMapping("/edit-product/{id}")
-    public String updateProduct(@PathVariable long id, Product updatedProduct, HttpServletRequest request) {
     
-        Product existingProduct = productRepository.findById(id).orElseThrow();
+    @PostMapping("/edit-product/{id}")
+    public String updateProduct(@PathVariable long id,Product updatedProduct, Principal principal, @RequestParam MultipartFile newProfilePhoto) throws IOException {
+    
+        //Delegate: Send the base product and the product with changes
+        productService.updateProductSafely(id, updatedProduct, principal.getName(), newProfilePhoto);
 
-        // 1. SECURITY CHECK (Mandatory again for the POST request)
-        if (request.getUserPrincipal() == null || !request.getUserPrincipal().getName().equals(existingProduct.getSeller().getName())) {
-            return "redirect:/error-403";
-        }
-
-        // 2. Update fields
-        existingProduct.setName(updatedProduct.getName());
-        existingProduct.setPrice(updatedProduct.getPrice());
-        existingProduct.setDescription(updatedProduct.getDescription());
-        // ... update other fields ...
-
-        // 3. Save to database
-        productRepository.save(existingProduct);
-
-        // 4. Redirect back to the inventory page
-        return "redirect:/user-products-page/" + existingProduct.getSeller().getUserId();
+        //Redirect back to the inventory page
+        return "redirect:/user-products-page";
     } 
     
-    
-    // GET method to display the add form 
+    /**
+     * GET method to display the product creation form.
+     * Ensures the authenticated user data is available for the sidebar/navbar.
+     */
     @GetMapping("/add-product-page")
-    public String showAddForm(Model model, HttpServletRequest request) {
-    
+    public String showAddForm(Model model, Principal principal) {
+        
+        // 1. Identity Check: If logged in, provide user data to the template
+        if (principal != null) {
+            // Reuse your service to get the full profile (avatar, balance, etc.)
+            User user = userService.getFullUserProfile(principal.getName());
+            model.addAttribute("user", user);
+        }
+        
         return "add-product-page"; 
     }
 
+
     @PostMapping("/add-product")
-    public String newProduct(Model model, 
-                            @RequestParam("productPhoto") MultipartFile[] productPhotos, 
+    public String newProduct(Model model, Principal principal, 
+                            @RequestParam("productPhoto") MultipartFile productPhoto, 
                             @RequestParam String productName,
                             @RequestParam String category,
                             @RequestParam String description,
                             @RequestParam double price,
                             @RequestParam String location,
-                            @RequestParam String status,
-                            HttpServletRequest request) throws IOException {
+                            @RequestParam String status) throws IOException {
 
-        // 1. Filter empty files and validate count (1 to 4)
-        List<MultipartFile> validPhotos = Arrays.stream(productPhotos)
-                                                .filter(f -> !f.isEmpty())
-                                                .toList();
-        
-        if (validPhotos.size() < 1 || validPhotos.size() > 4) {
-            // Add error message
-            model.addAttribute("error", "You must upload between 1 and 4 photos.");
-            
-            // MANTAIN FIELDS: Add the values back to the model
+        // 1. Initial UI Validation: Ensure at least one photo is uploaded
+        if (productPhoto == null || productPhoto.isEmpty()) {
+            // ERROR HANDLING: Return to the form and preserve user input to improve UX
+            model.addAttribute("error", "You must upload a product photo.");
             model.addAttribute("productName", productName);
             model.addAttribute("category", category);
             model.addAttribute("price", price);
@@ -304,98 +251,93 @@ public class UserWebController {
             model.addAttribute("description", description);
             model.addAttribute("status", status);
             
-            return "add-product-page"; // Return view name, NOT redirect
+            return "add-product-page"; 
         }
 
-        // 2. Identify authenticated seller
-        Principal principal = request.getUserPrincipal();
-        User seller = userRepository.findByName(principal.getName()).orElseThrow();
+        // 2. Service Delegation: Transfer execution to the Service Layer
+        // Now passing a single MultipartFile instead of an array.
+        productService.addProduct(principal, productPhoto, productName, category, description, price, location, status);
 
-        // 3. Create product
-        Product newProduct = new Product(productName, category, price, description, status, seller, location);
-
-        // 4. Link images to product
-        for (MultipartFile photo : validPhotos) {
-            Image img = new Image();
-            img.setImageFile(BlobProxy.generateProxy(photo.getInputStream(), photo.getSize()));
-            newProduct.getImages().add(img); 
-        }
-
-        productRepository.save(newProduct);
-
-        return "redirect:/user-products-page/" + seller.getUserId();
+        // 3. SECURE REDIRECT: Redirect back to the inventory page
+        return "redirect:/user-products-page";
     }
 
-    // Method to delete a product from the database
+    
+    /**
+     * Processes the deletion request for a specific product.
+     * After a successful deletion, it redirects the user to the clean inventory page. [cite: 488]
+     */
     @PostMapping("/delete-product/{id}")
-    public String deleteProduct(@PathVariable long id, HttpServletRequest request) {
-    
-        // 1. Get current logged-in user
-        Principal principal = request.getUserPrincipal();
-        User user = userRepository.findByName(principal.getName()).orElseThrow();
-    
-        // 2. Find the product in the DB
-        Product product = productRepository.findById(id).orElseThrow();
-    
-        // 3. SECURITY: Verify ownership before deleting
-        if (product.getSeller().getUserId() == user.getUserId()) {
-            // This will also delete associated images due to CascadeType.ALL
-            productRepository.delete(product);
-        }
-    
-        // 4. Redirect back to the inventory page
-        return "redirect:/user-products-page/" + user.getUserId();
-    }
-    
-
-    /**To be implemented in the future
-    @GetMapping("/favorite-products-page/{id}")
-    public String showFavorites(@PathVariable long id, Model model) {
-        User user = userRepository.findById(id).orElseThrow();
-    
-        // We pass the list of favorites to the template 
-        model.addAttribute("favoriteProducts", user.getFavoriteProducts());
-        model.addAttribute("userId", id);
-    
-        return "favorite-products-page"; // Name of your .html file
-    }
-
-    @PostMapping("/add-favorite/{id}")
-    public String addFavorite(@PathVariable long id, HttpServletRequest request){
-
-        Principal principal = request.getUserPrincipal();
-        if (principal == null) return "redirect:/login-page";
-
-        User user = userRepository.findByName(principal.getName()).orElseThrow();
-
-        Product product = productRepository.findById(id).orElseThrow();
+    public String deleteProduct(@PathVariable long id, Principal principal) {
         
-        user.addFavorite(product);
-        //update user
-        userRepository.save(user);
+        // 1. Execute deletion via Service Layer using the secure Principal name [cite: 650]
+        productService.deleteProduct(id, principal.getName());
 
-        return "redirect:/";
-    }**/
+        // 2. SECURE REDIRECT: Returns to the inventory view without exposing User IDs [cite: 124, 157]
+        return "redirect:/user-products-page";
+    }
+    
+    /*USER SETTING PAGE (PERSONAL INFORMATION)*/
 
-    @GetMapping("/user-setting-page/{id}")
-    public String showUserettings(Model model, @PathVariable long id, HttpServletRequest request){
+    /**
+     * GET method to display the account settings page.
+     * Identity is resolved via Spring Security's Principal to prevent ID spoofing. 
+     */
+    @GetMapping("/user-setting-page")
+    public String showUserSettings(Model model, Principal principal) {
 
-        Principal principal = request.getUserPrincipal();
+        // 1. Safety check: Redirect to login if the session has expired [cite: 410]
         if (principal == null) {
             return "redirect:/login-page";
         }
 
-        User loggedInUser = userRepository.findByName(principal.getName()).orElseThrow();
-        // 3. SECURITY CHECK: Ensure the user can only access their own settings [cite: 383]
-        if (loggedInUser.getUserId() != id) {
-            return "redirect:/error"; // Or access denied page
-        }
+        // 2. Fetch the full User entity from the Service (NOT just the Principal)
+        // The Principal only provides the name; we need the full JPA entity for the view 
+        User loggedInUser = userService.getFullUserProfile(principal.getName());
 
-        //we add all the user object 
+        // 3. Add the complete User object to the model for the Mustache template
         model.addAttribute("user", loggedInUser);
 
-        return "/user-setting-page";
-
+        return "user-setting-page";
     }
-    
+
+    /**
+     * Processes the profile update form submission.
+     * Uses the Principal object to identify the user, ensuring no ID spoofing is possible.
+     */
+    @PostMapping("/user-settings/edit") 
+    public String updateSettings(Principal principal, 
+                                @RequestParam(required = false) MultipartFile newProfilePhoto,
+                                @RequestParam(required = false) String newEmail,
+                                @RequestParam(required = false) String newCardNumber,
+                                @RequestParam(required = false) String newCardCvv,
+                                @RequestParam(required = false) String newCardExpiringDate, 
+                                @RequestParam(required = false) String newDescription) throws IOException {
+        
+        // 1. Delegate everything to the Service Layer using the secure session identity
+        userService.updateUserSettings(principal.getName(), newProfilePhoto, newEmail, 
+                                    newCardNumber, newCardCvv, newCardExpiringDate, newDescription);
+
+        // 2. Redirect to the settings page (the clean GET route we created before)
+        return "redirect:/user-setting-page";
+    }
+
+    /**
+     * Processes the account deletion request.
+     * After deleting the data, it invalidates the session to log out the user.
+     */
+    @PostMapping("/user-settings/delete")
+    public String deleteUserInSettings(Principal principal, HttpServletRequest request) throws ServletException {
+        
+        // 1. Delete the user from the database via the service layer
+        userService.deleteUser(principal.getName());
+
+        // 2. request.logout() invalidates the session and 
+        // clears the SecurityContext in Spring Security.
+        request.logout();
+
+        // 3. Redirect to the home page as an anonymous guest
+        return "redirect:/";
+    }
+
 }

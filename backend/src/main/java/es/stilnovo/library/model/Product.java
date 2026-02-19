@@ -1,8 +1,8 @@
 package es.stilnovo.library.model;
 
-import jakarta.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.*;
 
 @Entity(name = "ProductTable")
 public class Product {
@@ -20,17 +20,31 @@ public class Product {
     private String description;
 
     private String status; // active, inactive
+    
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Image image;
 
-    /**
-     * One-to-Many relationship with the Image entity.
-     * We use CascadeType.ALL to save images automatically when saving the product.
-     */
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Image> images = new ArrayList<>();
+    /* To be implemented 
+    //1 Product = N Images
+    @OneToMany(cascade  = CascadeType.ALL)
+    private List<Image> images;*/
+
 
     @ManyToOne
     private User seller; // product owner
 
+    // --- ADDED: Transient field for UI Logic (Uncommented) ---
+    // Transient means this field is NOT saved to the database
+    @Transient
+    private boolean favorite; // Temporary flag for the view
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
+    }
 
     public Product() {}
 
@@ -44,27 +58,6 @@ public class Product {
         this.location = location;
     }
 
-    //Transient is to not save the variable to the db
-    @Transient
-    private boolean favorite; // Temporary flag for the view
-
-    public boolean isFavorite() {
-        return favorite;
-    }
-
-    public void setFavorite(boolean favorite) {
-        this.favorite = favorite;
-    }
-    
-    /**
-     * Method to add an Image entity to the product's gallery.
-     * Renamed to 'addImagen' to match your DataBaseInitializer call.
-     */
-    public void addImagen(Image image) {
-        if (this.images.size() < 4) {
-            this.images.add(image);
-        }
-    }
 
     // --- GETTERS AND SETTERS ---
     public Long getId() { return id; }
@@ -85,17 +78,25 @@ public class Product {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public List<Image> getImages() { return images; }
-    public void setImages(List<Image> images) {
-        if (images.size() <= 4) {
-            this.images = images;
-        }
-    }
+    public Image getImage() {return image;}
+    public void setImage(Image image){this.image = image;}
+
+    /* To be implemented 
+    public List<Image> getImages() {return images;}
+    public void setImages(List<Image> images){this.images = images;} */
 
     public User getSeller() { return seller; }
     public void setSeller(User seller) { this.seller = seller; }
 
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
+    
+    /**
+     * Helper method for UI logic. 
+     * Mustache interprets this as the 'isActive' boolean property.
+     */
+    public boolean isActive() {
+        return "Active".equalsIgnoreCase(this.status);
+    }
 
-}
+}   

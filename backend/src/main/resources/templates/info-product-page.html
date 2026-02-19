@@ -32,16 +32,20 @@
         <div class="row g-5 align-items-start">
             
             <div class="col-lg-7">
-                <div class="product-image-frame clay-card p-2 mb-4 bg-white d-flex align-items-center justify-content-center">
-                    <img src="/product-images/{{images.0.id}}" alt="{{name}}" class="main-product-image img-fluid rounded-4">
-                </div>
-                
-                <div class="d-flex gap-3 mb-5 justify-content-start">
-                    {{#images}}
-                    <div class="thumb-frame clay-card p-1" style="width: 80px; height: 80px; cursor: pointer;">
-                        <img src="/product-images/{{id}}" class="img-fluid rounded-3 w-100 h-100" style="object-fit: cover;" alt="view">
+                <div class="product-image-frame clay-card p-2 mb-4 bg-white d-flex align-items-center justify-content-center position-relative">
+                    
+                    {{^isActive}}
+                    <div class="position-absolute top-50 start-50 translate-middle w-100 text-center" style="z-index: 10; pointer-events: none;">
+                        <span class="badge rounded-pill bg-danger px-5 py-3 shadow-lg fw-800 border border-white border-4" 
+                              style="font-size: 2rem; transform: rotate(-15deg); display: inline-block;">
+                            SOLD OUT
+                        </span>
                     </div>
-                    {{/images}}
+                    {{/isActive}}
+                    
+                    <img src="/product-images/{{id}}" alt="{{name}}" 
+                         class="main-product-image img-fluid rounded-4 {{^isActive}}opacity-25 grayscale{{/isActive}}"
+                         style="max-height: 500px; object-fit: contain;">
                 </div>
 
                 <div class="clay-card p-4 bg-white mt-4">
@@ -53,69 +57,81 @@
                         </div>
                         <div class="col-6 col-md-4">
                             <p class="x-small fw-800 text-muted mb-1">Status</p>
-                            <p class="small fw-700 text-uppercase">{{status}}</p>
+                            <p class="small fw-800 text-uppercase {{#isActive}}text-success{{/isActive}}{{^isActive}}text-danger{{/isActive}}">
+                                {{status}}
+                            </p>
                         </div>
                         <div class="col-6 col-md-4">
                             <p class="x-small fw-800 text-muted mb-1">Reference</p>
                             <p class="small fw-700">ST-{{id}}</p>
                         </div>
-                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="col-lg-5 sticky-lg-top" style="top: 100px; z-index: 1;">
-                <div class="clay-card p-4 p-md-5 bg-white shadow-sm">
+                <div class="clay-card p-4 p-md-5 {{#isActive}}bg-white{{/isActive}}{{^isActive}}bg-danger-subtle border border-danger{{/isActive}} shadow-sm">
                     
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <h1 class="fw-800 h3 mb-0 lh-sm">{{name}}</h1>
-                        <button class="btn btn-icon-circle bg-light-subtle text-danger shadow-sm border-0" style="width: 45px; height: 45px; border-radius: 50%;">
-                            <i class="fa-regular fa-heart fa-lg"></i>
-                        </button>
                     </div>
 
                     <div class="mb-4">
-                        <h2 class="display-5 fw-800 mb-0" style="color: var(--brand-blue)">{{price}} €</h2>
-                        <p class="small text-muted fw-700">Ref: ST-{{id}} • Live Treasure</p>
+                        <h2 class="display-5 fw-800 mb-0 {{#isActive}}text-primary{{/isActive}}{{^isActive}}text-danger{{/isActive}}">
+                            {{price}} €
+                        </h2>
+                        <p class="small text-muted fw-700">Ref: ST-{{id}} • Verified Treasure</p>
                     </div>
                     
                     <div class="d-flex flex-wrap gap-2 mb-5">
-                        <span class="badge-attribute"><i class="fa-solid fa-check-circle text-success me-1"></i> {{status}}</span>
+                        <span class="badge-attribute">
+                            <i class="fa-solid {{#isActive}}fa-check-circle text-success{{/isActive}}{{^isActive}}fa-circle-xmark text-danger{{/isActive}} me-1"></i> 
+                            {{status}}
+                        </span>
                         <span class="badge-attribute text-uppercase"><i class="fa-solid fa-tag me-1 opacity-50"></i> {{category}}</span>
                     </div>
 
+                    {{#isActive}}
                     <div class="d-grid gap-3 mb-5">
-                        <a href="/payment-page" class="btn-sell py-3 fw-800 shadow-lg rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style="font-size: 1.1rem;">
+                        <a href="/payment-page/{{id}}" class="btn-sell py-3 fw-800 shadow-lg rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style="font-size: 1.1rem;">
                             <i class="fa-solid fa-bag-shopping"></i> Buy Now
                         </a>
-                        <a href="/contact-seller-page/{{id}}" class="btn btn-outline-primary py-3 fw-800 rounded-pill border-2 d-flex align-items-center justify-content-center gap-2 text-decoration-none">
+                        <a href="/contact-seller-page" class="btn btn-outline-primary py-3 fw-800 rounded-pill border-2 d-flex align-items-center justify-content-center gap-2 text-decoration-none">
                             <i class="fa-regular fa-comment-dots fa-lg"></i> Send Message to Seller
                         </a>
                     </div>
+                    {{/isActive}}
 
-        <!--SELLER PROFILE ACCESS (ONLY FOR REGIS. USERS)-->
-        {{#seller}}
-        <a href="/seller-profile/{{userId}}" class="text-decoration-none">
-            <div class="seller-card p-3 rounded-4 bg-light-subtle border d-flex align-items-center justify-content-between mb-4 shadow-sm hover-card">
-                <div class="d-flex align-items-center gap-3">
-                <div class="position-relative">
-                        <img src="/user/{{userId}}/profile-photo" 
-                            class="rounded-circle border border-white shadow-sm" 
-                            width="55" height="55" 
-                            style="object-fit: cover;"
-                            onerror="this.src='/images/no-profile-picture.png'">
-                        <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle"></span>
+                    {{^isActive}}
+                    <div class="alert alert-danger rounded-4 py-4 mb-5 text-center shadow-sm border-0 bg-white">
+                        <i class="fa-solid fa-handshake-slash fa-2x mb-2 text-danger"></i>
+                        <p class="fw-800 mb-0 text-dark">This item has been sold.</p>
+                        <p class="x-small mb-0 opacity-75">Explore more history below.</p>
                     </div>
-                    <div>
-                        <p class="fw-800 mb-0 text-dark">{{name}}</p>
-                        <div class="d-flex align-items-center gap-1 small fw-700 text-muted">
-                            <i class="fa-solid fa-star text-warning"></i> {{rating}} (82 ratings)
+                    {{/isActive}}
+
+                    {{#seller}}
+                    <a href="/seller-profile/{{userId}}" class="text-decoration-none">
+                        <div class="seller-card p-3 rounded-4 bg-light border d-flex align-items-center justify-content-between mb-4 shadow-sm hover-card">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="position-relative">
+                                    <img src="/user/{{userId}}/profile-photo" 
+                                        class="rounded-circle border border-white shadow-sm" 
+                                        width="55" height="55" 
+                                        style="object-fit: cover;"
+                                        onerror="this.src='/images/no-profile-picture.png'">
+                                </div>
+                                <div>
+                                    <p class="fw-800 mb-0 text-dark">{{name}}</p>
+                                    <div class="d-flex align-items-center gap-1 small fw-700 text-muted">
+                                        <i class="fa-solid fa-star text-warning"></i> {{rating}} Verified
+                                    </div>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right opacity-25 text-dark"></i>
                         </div>
-                    </div>
-                </div>
-                <i class="fa-solid fa-chevron-right opacity-25 text-dark"></i>
-            </div>
-        </a>
-        {{/seller}}
+                    </a>
+                    {{/seller}}
 
                     <div class="accordion accordion-flush" id="accordionDetails">
                         <div class="accordion-item bg-transparent">
@@ -124,7 +140,7 @@
                                     Product Description
                                 </button>
                             </h2>
-                            <div id="flush-collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionDetails">
+                            <div id="flush-collapseOne" class="accordion-collapse collapse show">
                                 <div class="accordion-body px-0 text-muted fw-600 small line-height-lg">
                                     <p>{{description}}</p>
                                     <p class="mb-0"><i class="fa-solid fa-location-dot me-2 opacity-50"></i>{{location}}</p>
@@ -145,11 +161,12 @@
             </div>
             
             <div class="row g-4">
-                {{#relatedProducts}} <div class="col-6 col-md-3">
+                {{#relatedProducts}} 
+                <div class="col-6 col-md-3">
                     <a href="/info-product-page/{{id}}" class="text-decoration-none text-dark">
                         <div class="clay-card p-2 h-100 shadow-sm border-0">
                             <div class="rounded-3 overflow-hidden mb-3" style="height: 180px; background: #f8fafc;">
-                                <img src="/product-images/{{images.0.id}}" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="{{name}}">
+                                <img src="/product-images/{{id}}" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="{{name}}">
                             </div>
                             <div class="px-2 pb-2">
                                 <p class="fw-800 mb-1 text-dark">{{price}}€</p>
@@ -163,9 +180,8 @@
         </section>
     </main>
     {{/product}} 
-    <div class="py-5"></div>
 
-    {{>footer}}
+    <div class="py-5"></div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
