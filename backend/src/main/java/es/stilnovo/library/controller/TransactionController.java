@@ -2,7 +2,10 @@ package es.stilnovo.library.controller;
 
 import java.security.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.MailException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +17,7 @@ import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.service.MailService;
 import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
+import jakarta.mail.MessagingException;
 
 @Controller
 public class TransactionController {
@@ -29,6 +33,9 @@ public class TransactionController {
 
     @Autowired
     private MailService mailService;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     /**
      * Finalizes the purchase of a product.
@@ -55,9 +62,29 @@ public class TransactionController {
             // 3. Execution: Delegate database updates to the Service Layer
             transactionService.executePurchase(product, buyer);
 
-            // 4. Notification: Send the confirmation email
-            String body = "<h1>Purchase Successful!</h1><p>You have bought: " + product.getName() + "</p>";
-            mailService.sendHtml(buyer.getEmail(), "Stilnovo: Purchase Confirmation", body);
+            // 4. Notification: Send professional confirmation email with logo
+            Resource logoResource = resourceLoader.getResource("classpath:static/images/logo.png");
+            String logoCid = "stilnovoLogo";
+            String htmlBody = createPurchaseConfirmationEmail(
+                product.getName(), 
+                product.getPrice(), 
+                product.getSeller().getName(),
+                buyer.getName(),
+                logoCid
+            );
+            
+            try {
+                mailService.sendHtmlWithInline(
+                    buyer.getEmail(), 
+                    "Stilnovo: Purchase Confirmation - " + product.getName(), 
+                    htmlBody, 
+                    logoCid, 
+                    logoResource
+                );
+            } catch (MailException | MessagingException ex) {
+                // Log error but don't fail the transaction
+                System.err.println("Failed to send confirmation email: " + ex.getMessage());
+            }
 
             // 5. Clean Redirect: No IDs in the URL for the user's dashboard
             return "redirect:/sales-and-orders-page";
@@ -66,5 +93,68 @@ public class TransactionController {
             // Handle business logic errors (e.g., product already sold or insufficient funds)
             return "redirect:/info-product-page/" + productId + "?error=" + e.getMessage();
         }
+    }
+
+    /**
+     * Creates a professional HTML email template for purchase confirmation.
+     * Similar in style to the inquiry email template.
+     */
+    private String createPurchaseConfirmationEmail(String productName, Double price, 
+                                                   String sellerName, String buyerName, String logoCid) {
+        return """
+            <!DOCTYPE html>
+            <html>
+            <body style="margin: 0; padding: 0; background-color: #f4f7f6;">
+                <div style="font-family: Arial, sans-serif; color: #1a1f2e; max-width: 600px; margin: 20px auto; border: 1px solid #e6e9f2; border-radius: 16px; background-color: #ffffff; overflow: hidden;">
+                    <div style="background-color: #ffffff; padding: 30px; text-align: center; border-bottom: 1px solid #f0f0f0;">
+                        <img src="cid:%s" alt="Stilnovo" width="60" style="display: block; margin: 0 auto;">
+                        <h1 style="color: #2f6ced; margin: 15px 0 0; font-size: 24px;">Purchase Successful!</h1>
+                    </div>
+                    <div style="padding: 30px;">
+                        <p style="font-size: 16px;">Congratulations %s! Your purchase has been confirmed.</p>
+                        <h2 style="margin: 10px 0; font-size: 20px; color: #1a1f2e;">%s</h2>
+                        
+                        <div style="background-color: #eef4ff; padding: 20px; border-radius: 12px; margin: 25px 0;">
+                            <p style="margin: 0 0 10px 0; font-weight: bold; color: #2f6ced;">Purchase Details:</p>
+                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.8;">
+                                <li><strong>Price:</strong> €%.2f</li>
+                                <li><strong>Seller:</strong> %s</li>
+                                <li><strong>Status:</strong> Completed</li>
+                            </ul>
+                        </div>
+
+                        <div style="background: #ffffff; border-left: 4px solid #2f6ced; padding: 15px; border-radius: 4px; margin: 20px 0; background-color: #f9fbff;">
+                            <p style="margin: 0; font-size: 14px; color: #555;">
+                                Your payment has been processed successfully. The seller has been notified and will contact you shortly to arrange delivery or pickup.
+                            </p>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 35px;">
+                            <a href="https://localhost:8443/sales-and-orders-page" 
+                                style="background-color: #2f6ced; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block;">
+                                View Your Orders
+                            </a>
+                        </div>
+                    </div>
+                    <div style="padding: 20px; text-align: center; font-size: 12px; color: #888; background-color: #fafafa; border-top: 1px solid #f0f0f0;">
+                        <p>© 2026 Stilnovo Marketplace • Giving design a second life.</p>
+                        <p>Thank you for choosing sustainable shopping!</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """.formatted(logoCid, escape(buyerName), escape(productName), price, escape(sellerName));
+    }
+
+    /**
+     * Escapes HTML special characters to prevent XSS and rendering issues.
+     */
+    private String escape(String value) {
+        if (value == null) return "";
+        return value.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&#39;");
     }
 }
