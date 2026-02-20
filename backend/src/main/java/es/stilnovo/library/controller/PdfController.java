@@ -15,7 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.lowagie.text.*;
 import com.lowagie.text.Image;
@@ -23,7 +23,8 @@ import com.lowagie.text.pdf.*;
 import com.lowagie.text.pdf.draw.LineSeparator;
 
 import es.stilnovo.library.model.Transaction;
-import es.stilnovo.library.repository.TransactionRepository;
+import es.stilnovo.library.service.TransactionService;
+import es.stilnovo.library.service.UserService;
 
 @Controller
 public class PdfController {
@@ -36,16 +37,20 @@ public class PdfController {
     private static final Color DANGER_RED = new Color(220, 53, 69);
 
     @Autowired
-    private TransactionRepository transactionRepository;
+    private TransactionService transactionService;
+
+    @Autowired
+    private UserService userService;
 
     /**
      * Build an ultra-detailed invoice with professional breakdown. 
      */
-    @GetMapping("/pdf/invoice/{transactionId}")
-    public ResponseEntity<byte[]> exportInvoice(@PathVariable long transactionId, Principal principal)
+    @GetMapping("/pdf/invoice")
+    public ResponseEntity<byte[]> exportInvoice(@RequestParam long transactionId, Principal principal)
             throws DocumentException, IOException {
         
-        Transaction t = validateInvolvedParties(transactionId, principal);
+        // Use service layer for data access and security validation
+        Transaction t = transactionService.getTransactionForInvolvedUser(transactionId, principal.getName());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Document doc = new Document(PageSize.A4, 45, 45, 45, 45);
         PdfWriter.getInstance(doc, out);
@@ -110,11 +115,12 @@ public class PdfController {
     /**
      * Build shipping label with fragile warnings and logistics data. [cite: 159-181]
      */
-    @GetMapping("/pdf/shipping-label/{transactionId}")
-    public ResponseEntity<byte[]> exportShippingLabel(@PathVariable long transactionId, Principal principal)
+    @GetMapping("/pdf/shipping-label")
+    public ResponseEntity<byte[]> exportShippingLabel(@RequestParam long transactionId, Principal principal)
             throws DocumentException, IOException {
         
-        Transaction t = validateSellerTransaction(transactionId, principal);
+        // Use service layer for data access and security validation (seller only)
+        Transaction t = transactionService.getTransactionForSeller(transactionId, principal.getName());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Document doc = new Document(new Rectangle(420, 595), 30, 30, 30, 30);
         PdfWriter.getInstance(doc, out);
@@ -201,19 +207,84 @@ public class PdfController {
         return c;
     }
 
-    // (Keep previous helper methods like validateUser, pdfResponse, loadLogoBytes, formatCurrency)
-    private Transaction validateInvolvedParties(long id, Principal p) {
-        Transaction t = transactionRepository.findById(id).orElseThrow();
-        if (!p.getName().equals(t.getSeller().getName()) && !p.getName().equals(t.getBuyer().getName())) throw new IllegalStateException();
-        return t;
+    /**
+     * Export user statistics as a professional PDF document.
+     * Uses Principal for secure authentication - no ID parameters needed.
+     */
+    @GetMapping("/pdf/statistics")
+    public ResponseEntity<byte[]> exportStatistics(Principal principal) throws DocumentException, IOException {
+        
+        // Use service layer for data access and security validation
+        java.util.List<Transaction> transactions = transactionService.getSellerTransactions(principal.getName());
+        
+        // Calculate statistics
+        double totalSales = transactions.stream()
+            .mapToDouble(Transaction::getFinalPrice)
+            .sum();
+        
+        int itemsSold = transactions.size();
+        
+        double avgRating = userService.getAverageRatingForSeller(principal.getName());
+        
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Document doc = new Document(PageSize.A4, 45, 45, 45, 45);
+        PdfWriter.getInstance(doc, out);
+        doc.open();
+
+        // Add professional header
+        addBrandHeader(doc, "STILNOVO STATISTICS REPORT", loadLogoBytes());
+
+        // Statistics Summary Section
+        doc.add(new Paragraph("\nPERFORMANCE OVERVIEW", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BRAND_BLUE)));
+        doc.add(new Paragraph(""));
+        
+        PdfPTable stats = new PdfPTable(3);
+        stats.setWidthPercentage(100);
+        stats.setSpacingBefore(10f);
+        stats.setSpacingAfter(20f);
+        
+        stats.addCell(headerCell("Total Sales"));
+        stats.addCell(headerCell("Items Sold"));
+        stats.addCell(headerCell("Avg. Rating"));
+        
+        stats.addCell(valueCell(formatCurrency(totalSales)));
+        stats.addCell(valueCell(String.valueOf(itemsSold)));
+        stats.addCell(valueCell(avgRating + " ⭐"));
+        
+        doc.add(stats);
+        
+        // Transaction Details
+        if (!transactions.isEmpty()) {
+            doc.add(new Paragraph("\nRECENT TRANSACTIONS", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BRAND_BLUE)));
+            
+            PdfPTable tTable = new PdfPTable(new float[]{2, 2, 2, 1});
+            tTable.setWidthPercentage(100);
+            tTable.setSpacingBefore(10f);
+            
+            tTable.addCell(headerCell("Product"));
+            tTable.addCell(headerCell("Buyer"));
+            tTable.addCell(headerCell("Amount"));
+            tTable.addCell(headerCell("Date"));
+            
+            transactions.stream().limit(15).forEach(t -> {
+                tTable.addCell(valueCell(t.getProduct().getName()));
+                tTable.addCell(valueCell(t.getBuyer().getName()));
+                tTable.addCell(valueCell(formatCurrency(t.getFinalPrice())));
+                tTable.addCell(valueCell(t.getCreatedAt() != null ? t.getCreatedAt().format(DATE_FORMATTER) : "N/A"));
+            });
+            
+            doc.add(tTable);
+        }
+        
+        // Footer
+        addFooter(doc, "Statistics Report Generated by Stilnovo Marketplace");
+        doc.close();
+        
+        return pdfResponse(out, "Stilnovo_Statistics_Report.pdf");
     }
 
-    private Transaction validateSellerTransaction(long id, Principal p) {
-        Transaction t = transactionRepository.findById(id).orElseThrow();
-        if (!p.getName().equals(t.getSeller().getName())) throw new IllegalStateException();
-        return t;
-    }
-
+    // (Keep previous helper methods like pdfResponse, loadLogoBytes, formatCurrency)
+    
     private void addFooter(Document doc, String note) throws DocumentException {
         doc.add(new Paragraph("\n"));
         Paragraph f = new Paragraph(note + "\nDigital Document protected by Stilnovo Security Layer.", FontFactory.getFont(FontFactory.HELVETICA, 8, Color.GRAY));

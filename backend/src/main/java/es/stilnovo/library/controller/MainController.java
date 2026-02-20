@@ -56,7 +56,7 @@ public class MainController {
 
             // Redirect if unique result
             if (products.size() == 1) {
-                return "redirect:/info-product-page/" + products.get(0).getId();
+                return "redirect:/info-product-page?id=" + products.get(0).getId();
             }
 
         } else {
@@ -78,7 +78,7 @@ public class MainController {
 
         // 3. Navigation Logic
         if (products.size() == 1 && (query != null || category != null)) {
-            return "redirect:/info-product-page/" + products.get(0).getId();
+            return "redirect:/info-product-page?id=" + products.get(0).getId();
         }
 
         return "index";

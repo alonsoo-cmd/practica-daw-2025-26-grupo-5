@@ -6,13 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.service.ProductService;
+import es.stilnovo.library.service.UserService;
 
 @Controller
 public class ContactSellerController {
@@ -21,10 +20,10 @@ public class ContactSellerController {
     private ProductService productService;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
-    @GetMapping("/contact-seller-page/{id}")
-    public String showContactSeller(@PathVariable long id, Model model, Principal principal,
+    @GetMapping("/contact-seller-page")
+    public String showContactSeller(@RequestParam long id, Model model, Principal principal,
                                     @RequestParam(required = false) String sent,
                                     @RequestParam(required = false) String error,
                                     @RequestParam(required = false) String cooldown) {
@@ -35,7 +34,8 @@ public class ContactSellerController {
         model.addAttribute("seller", seller);
 
         if (principal != null) {
-            userRepository.findByName(principal.getName()).ifPresent(user -> {
+            // Use service layer instead of direct repository access
+            userService.findByName(principal.getName()).ifPresent(user -> {
                 model.addAttribute("buyerName", user.getName());
                 model.addAttribute("buyerEmail", user.getEmail());
             });

@@ -1,7 +1,7 @@
 package es.stilnovo.library.controller;
 
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.repository.UserRepository; 
+import es.stilnovo.library.service.UserService; 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -13,7 +13,7 @@ import java.security.Principal;
 public class GlobalControllerAdvice {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @ModelAttribute
     public void addAttributes(Model model, HttpServletRequest request) {
@@ -21,7 +21,8 @@ public class GlobalControllerAdvice {
         
         if (principal != null) {
             // Buscamos al usuario por su email/nombre (el que uses para loguear)
-            User user = userRepository.findByName(principal.getName()).orElse(null);
+            // Use service layer instead of direct repository access
+            User user = userService.findByName(principal.getName()).orElse(null);
             
             if (user != null) {
                 model.addAttribute("logged", true);

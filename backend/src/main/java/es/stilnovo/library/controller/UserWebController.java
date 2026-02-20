@@ -18,9 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.stilnovo.library.model.Product;
+import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.service.ProductService;
+import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,13 +30,13 @@ import jakarta.servlet.http.HttpServletRequest;
 public class UserWebController {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private ProductService productService;
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TransactionService transactionService;
 
     /**
      * GET method to retrieve the profile photo of the currently authenticated user.
@@ -155,7 +156,8 @@ public class UserWebController {
     @GetMapping("/help-center-page/{id}")
     public String showHelpCenterPage(Model model, @PathVariable long id, HttpServletRequest request) {
 
-        User user = userRepository.findById(id).orElseThrow();
+        // Use service layer instead of direct repository access
+        User user = userService.findById(id).orElseThrow();
 
         if (request.getUserPrincipal() == null || !request.getUserPrincipal().getName().equals(user.getName())) {
             return "redirect:/error";
@@ -190,8 +192,8 @@ public class UserWebController {
 
     /*-- Edit product --*/
     // GET method to display the edit form with existing data
-    @GetMapping("/edit-product-page/{id}")
-    public String showEditForm(Model model, @PathVariable long id, Principal principal) {
+    @GetMapping("/edit-product-page")
+    public String showEditForm(Model model, @RequestParam long id, Principal principal) {
     
         // 1. Find the product by its ID using the service
         Product product = productService.getProductForEditing(id, principal.getName());
@@ -202,8 +204,8 @@ public class UserWebController {
         return "edit-product-page"; 
     }
     
-    @PostMapping("/edit-product/{id}")
-    public String updateProduct(@PathVariable long id,Product updatedProduct, Principal principal, @RequestParam MultipartFile newProfilePhoto) throws IOException {
+    @PostMapping("/edit-product")
+    public String updateProduct(@RequestParam long id, Product updatedProduct, Principal principal, @RequestParam MultipartFile newProfilePhoto) throws IOException {
     
         //Delegate: Send the base product and the product with changes
         productService.updateProductSafely(id, updatedProduct, principal.getName(), newProfilePhoto);
@@ -338,6 +340,54 @@ public class UserWebController {
 
         // 3. Redirect to the home page as an anonymous guest
         return "redirect:/";
+    }
+
+    /**
+     * Display the statistics page for the authenticated user.
+     * Uses Principal for secure authentication - no user ID in URL.
+     * Calculates real statistics from transaction data.
+     */
+    @GetMapping("/statistics-page")
+    public String showStatisticsPage(Model model, Principal principal) {
+        
+        // 1. Use Service Layer to get the authenticated user (secure identification via Principal)
+        User user = userService.findByName(principal.getName()).orElseThrow(
+            () -> new IllegalStateException("User not found: " + principal.getName())
+        );
+
+        // 2. Get all seller transactions for this user
+        java.util.List<Transaction> transactions = transactionService.getSellerTransactions(principal.getName());
+
+        // 3. Calculate statistics from real transaction data
+        double totalSales = transactions.stream()
+            .mapToDouble(Transaction::getFinalPrice)
+            .sum();
+        
+        int itemsSold = transactions.size();
+        
+        // 4. Calculate average rating (example: average from all ratings received)
+        double avgRating = userService.getAverageRatingForSeller(principal.getName());
+
+        // 5. Add statistics and user to model for template rendering
+        model.addAttribute("user", user);
+        model.addAttribute("userId", user.getUserId());
+        model.addAttribute("totalSales", String.format("%.2f", totalSales));
+        model.addAttribute("itemsSold", itemsSold);
+        model.addAttribute("avgRating", String.format("%.1f", avgRating));
+        model.addAttribute("inventoryValue", calculateInventoryValue(user));
+
+        // 6. Render the statistics page template
+        return "statistics-page";
+    }
+
+    /**
+     * Helper method to calculate the total value of user's inventory.
+     */
+    private String calculateInventoryValue(User user) {
+        double total = user.getProducts().stream()
+            .mapToDouble(Product::getPrice)
+            .sum();
+        return String.format("%.2f", total);
     }
 
 }

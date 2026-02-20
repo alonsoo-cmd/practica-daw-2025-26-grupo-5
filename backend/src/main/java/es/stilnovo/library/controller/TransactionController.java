@@ -13,8 +13,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.service.MailService;
+import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
 import jakarta.mail.MessagingException;
@@ -26,7 +26,7 @@ public class TransactionController {
     private TransactionService transactionService;
     
     @Autowired
-    private ProductRepository productRepository;
+    private ProductService productService;
 
     @Autowired  
     private UserService userService;
@@ -48,14 +48,14 @@ public class TransactionController {
     @PostMapping("/transactions/confirm/{productId}")
     public String confirmPayment(@PathVariable long productId, Principal principal) {
         
-        // 1. Context Retrieval: Fetch full entities
+        // 1. Context Retrieval: Fetch full entities via Service Layer
         User buyer = userService.getFullUserProfile(principal.getName());
-        Product product = productRepository.findById(productId)
+        Product product = productService.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
         // 2. Security Check: Prevent self-buying
         if (product.getSeller().getUserId().equals(buyer.getUserId())) {
-            return "redirect:/info-product-page/" + productId + "?error=self_purchase";
+            return "redirect:/info-product-page?id=" + productId + "&error=self_purchase";
         }
 
         try {
@@ -91,7 +91,7 @@ public class TransactionController {
 
         } catch (IllegalStateException e) {
             // Handle business logic errors (e.g., product already sold or insufficient funds)
-            return "redirect:/info-product-page/" + productId + "?error=" + e.getMessage();
+            return "redirect:/info-product-page?id=" + productId + "&error=" + e.getMessage();
         }
     }
 

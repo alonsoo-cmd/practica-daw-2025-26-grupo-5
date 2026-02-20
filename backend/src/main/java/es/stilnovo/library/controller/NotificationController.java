@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.model.Inquiry;
-import es.stilnovo.library.repository.InquiryRepository;
-import es.stilnovo.library.repository.UserRepository;
+import es.stilnovo.library.service.InquiryService;
 import es.stilnovo.library.service.MailService;
 import es.stilnovo.library.service.ProductService;
+import es.stilnovo.library.service.UserService;
 import jakarta.mail.MessagingException;
 
 @Controller
@@ -31,10 +31,10 @@ public class NotificationController {
     private MailService mailService;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
-    private InquiryRepository inquiryRepository;
+    private InquiryService inquiryService;
 
     @Autowired
     private ResourceLoader resourceLoader; // To load the logo from classpath
@@ -51,23 +51,24 @@ public class NotificationController {
         // 1. Validate Product and User authentication
         Product product = productService.findById(productId).orElseThrow();
         if (principal == null) {
-            return "redirect:/contact-seller-page/" + productId + "?error=auth";
+            return "redirect:/contact-seller-page?id=" + productId + "&error=auth";
         }
 
-        User buyer = userRepository.findByName(principal.getName()).orElse(null);
+        // Use service layer instead of direct repository access
+        User buyer = userService.findByName(principal.getName()).orElse(null);
         if (buyer == null) {
-            return "redirect:/contact-seller-page/" + productId + "?error=auth";
+            return "redirect:/contact-seller-page?id=" + productId + "&error=auth";
         }
 
         // 2. Cooldown Logic: Prevent spam (30 minutes wait)
-        Inquiry lastInquiry = inquiryRepository
-                .findTopByBuyerIdAndProductIdOrderByCreatedAtDesc(buyer.getUserId(), product.getId());
+        // Use service layer instead of direct repository access
+        Inquiry lastInquiry = inquiryService.getLastInquiry(buyer.getUserId(), product.getId()).orElse(null);
         if (lastInquiry != null) {
             long secondsSince = Duration.between(lastInquiry.getCreatedAt(), LocalDateTime.now()).getSeconds();
             long cooldown = 1800 - secondsSince;
             if (cooldown > 0) {
                 long minutes = (long) Math.ceil(cooldown / 60.0);
-                return "redirect:/contact-seller-page/" + productId + "?cooldown=" + minutes;
+            return "redirect:/contact-seller-page?id=" + productId + "&cooldown=" + minutes;
             }
         }
 
@@ -84,33 +85,43 @@ public class NotificationController {
         );
         String buyerHtml = MailTemplates.buyerConfirmation(product.getName(), type, message);
 
-        // 5. Create Inquiry Record for Database
-        Inquiry inquiry = new Inquiry();
-        inquiry.setProductId(product.getId());
-        inquiry.setProductName(product.getName());
-        inquiry.setSellerId(product.getSeller().getUserId());
-        inquiry.setSellerEmail(sellerEmail);
-        inquiry.setBuyerId(buyer.getUserId());
-        inquiry.setBuyerName(buyer.getName());
-        inquiry.setBuyerEmail(buyer.getEmail());
-        inquiry.setBuyerPhone(phoneValue);
-        inquiry.setInquiryType(type);
-        inquiry.setMessage(message);
-        inquiry.setCreatedAt(LocalDateTime.now());
-
-        // 6. Send Emails and Save Status
+        // 5. Send Emails and Save Status via Service Layer
         try {
             mailService.sendHtmlWithInline(sellerEmail, "New Inquiry: " + product.getName(), sellerHtml, logoCid, logoResource);
             mailService.sendHtml(buyer.getEmail(), "Confirmation: Message sent to seller", buyerHtml);
             
-            inquiry.setStatus("SENT");
-            inquiryRepository.save(inquiry);
-            return "redirect:/contact-seller-page/" + productId + "?sent=true";
+            // Use service to create and save the inquiry
+            inquiryService.createInquiry(
+                product.getId(),
+                product.getName(),
+                product.getSeller().getUserId(),
+                sellerEmail,
+                buyer.getUserId(),
+                buyer.getName(),
+                buyer.getEmail(),
+                phoneValue,
+                type,
+                message,
+                "SENT"
+            );
+            return "redirect:/contact-seller-page?id=" + productId + "&sent=true";
 
         } catch (MailException | MessagingException ex) {
-            inquiry.setStatus("FAILED_MAIL");
-            inquiryRepository.save(inquiry);
-            return "redirect:/contact-seller-page/" + productId + "?error=mail";
+            // Save inquiry with failed status
+            inquiryService.createInquiry(
+                product.getId(),
+                product.getName(),
+                product.getSeller().getUserId(),
+                sellerEmail,
+                buyer.getUserId(),
+                buyer.getName(),
+                buyer.getEmail(),
+                phoneValue,
+                type,
+                message,
+                "FAILED_MAIL"
+            );
+            return "redirect:/contact-seller-page?id=" + productId + "&error=mail";
         }
     }
 

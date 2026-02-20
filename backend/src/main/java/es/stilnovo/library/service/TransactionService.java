@@ -2,6 +2,8 @@ package es.stilnovo.library.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.stilnovo.library.model.Product;
@@ -63,5 +65,61 @@ public class TransactionService {
 
         // 4. Save the transaction and return it
         return transactionRepository.save(transaction);
+    }
+
+    /**
+     * Gets a transaction if the current user is either the buyer or seller.
+     * Used for Invoice generation (both parties can see it).
+     * @param transactionId The ID of the transaction
+     * @param username The authenticated username from Principal
+     * @return The transaction if user has access
+     * @throws IllegalStateException if user is not involved or transaction not found
+     */
+    public Transaction getTransactionForInvolvedUser(long transactionId, String username) {
+        Transaction transaction = transactionRepository.findById(transactionId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+        
+        // Security check: User must be either buyer or seller
+        boolean isBuyer = transaction.getBuyer().getName().equals(username);
+        boolean isSeller = transaction.getSeller().getName().equals(username);
+        
+        if (!isBuyer && !isSeller) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+        
+        return transaction;
+    }
+
+    /**
+     * Gets a transaction if the current user is the seller.
+     * Used for Shipping Label generation (only seller can generate it).
+     * @param transactionId The ID of the transaction
+     * @param username The authenticated username from Principal
+     * @return The transaction if user is the seller
+     * @throws IllegalStateException if user is not the seller or transaction not found
+     */
+    public Transaction getTransactionForSeller(long transactionId, String username) {
+        Transaction transaction = transactionRepository.findById(transactionId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+        
+        // Security check: User must be the seller
+        if (!transaction.getSeller().getName().equals(username)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+        
+        return transaction;
+    }
+
+    /**
+     * Gets all transactions where the user is the seller.
+     * Used for statistics and reports (secure via Principal-based username).
+     * @param username The authenticated username from Principal
+     * @return List of transactions where this user is the seller
+     */
+    public java.util.List<Transaction> getSellerTransactions(String username) {
+        User seller = userRepository.findByName(username)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        
+        return transactionRepository.findBySeller(seller);
     }
 }

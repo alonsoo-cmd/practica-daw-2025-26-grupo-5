@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.service.AdminService;
+import es.stilnovo.library.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
@@ -21,10 +21,10 @@ import jakarta.servlet.http.HttpServletRequest;
 public class AdminController {
 
     @Autowired
-    private UserRepository userRepository;
+    private AdminService adminService;
 
     @Autowired
-    private AdminService adminService;  
+    private UserService userService;  
 
     @GetMapping("/panel")
     public String showAdminPanel() {
@@ -34,7 +34,8 @@ public class AdminController {
     // List users: añadimos el objeto _csrf al modelo para que Mustache lo use
     @GetMapping("/users")
     public String listUsers(Model model, HttpServletRequest request) {
-        List<User> users = userRepository.findAll();
+        // Use service layer instead of direct repository access
+        List<User> users = userService.findAll();
         model.addAttribute("users", users);
 
         // Add CSRF token object to model so Mustache section {{#_csrf}} works
@@ -68,7 +69,8 @@ public class AdminController {
     // Access administration page for a specific admin user
     @GetMapping("/{id}")
     public String showAdministrationpage(Model model, @PathVariable Long id, HttpServletRequest request) {
-        User user = userRepository.findById(id).orElseThrow();
+        // Use service layer instead of direct repository access
+        User user = userService.findById(id).orElseThrow();
         model.addAttribute("user", user);
 
         // Also expose CSRF token in case the admin panel has forms
@@ -84,11 +86,12 @@ public class AdminController {
     @PostMapping("/users/ban/{id}")
     public String toggleBanUser(@PathVariable Long id) {
 
-        User user = userRepository.findById(id).orElseThrow();
+        // Use service layer instead of direct repository access
+        User user = userService.findById(id).orElseThrow();
 
         user.setBanned(!user.isBanned()); // TOGGLE
 
-        userRepository.save(user);
+        userService.save(user);
 
         return "redirect:/admin/users";
     }

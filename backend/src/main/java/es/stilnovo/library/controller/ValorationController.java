@@ -73,10 +73,10 @@ public class ValorationController {
 
     /**
      * Handles the deletion of a specific review.
-     * Uses @PathVariable to identify the resource, following REST conventions.
+     * Uses @RequestParam for secure identification without exposing IDs in URLs.
      */
-    @PostMapping("/valoration/delete/{id}")
-    public String deleteValoration(@PathVariable long id, Principal principal) {
+    @PostMapping("/valoration/delete")
+    public String deleteValoration(@RequestParam long id, Principal principal) {
         
         // 1. Identify the authenticated user
         User user = userService.getFullUserProfile(principal.getName());
@@ -90,10 +90,10 @@ public class ValorationController {
 
     /**
      * Processes the update request for a specific valoration.
-     * Uses @PathVariable for the ID and @RequestParam for the form data.
+     * Uses @RequestParam for secure ID handling without exposing IDs in URLs.
      */
-    @PostMapping("/valoration/edit/{id}")
-    public String editValoration(@PathVariable long id, 
+    @PostMapping("/valoration/edit")
+    public String editValoration(@RequestParam long id, 
                                 @RequestParam int stars, 
                                 @RequestParam String comment, 
                                 Principal principal) {

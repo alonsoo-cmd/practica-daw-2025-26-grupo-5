@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import es.stilnovo.library.repository.UserRepository;
+import es.stilnovo.library.service.UserService;
 
 import org.springframework.ui.Model;
 
@@ -31,7 +31,7 @@ public class SignupWebController {
     }
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -83,8 +83,8 @@ public class SignupWebController {
         // We add ROLE_USER so they can log in later
         User newUser = new User(username, encodedPassword, email, imageBlob, 5.0, null, null, null , 0, 0.0, 0.0, null, "ROLE_USER");
 
-        // 4. Save to Docker database
-        userRepository.save(newUser);
+        // 4. Save to database via Service Layer
+        userService.save(newUser);
 
         //If signup ok, redirect
         return "redirect:/login-page";

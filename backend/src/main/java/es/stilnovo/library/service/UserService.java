@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import es.stilnovo.library.model.User;
+import es.stilnovo.library.model.Valoration;
 import es.stilnovo.library.repository.TransactionRepository;
 import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.repository.ValorationRepository;
@@ -47,6 +48,10 @@ public class UserService {
         return userRepository.findById(id);
     }
     
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+    
     public boolean existsUser(String name) {
         return userRepository.findByName(name).isPresent();
     }
@@ -60,6 +65,24 @@ public class UserService {
 
     @Autowired
     private ValorationRepository valorationRepository;
+
+    /**
+     * Calculates the average rating received by a seller.
+     */
+    @Transactional(readOnly = true)
+    public double getAverageRatingForSeller(String username) {
+        User seller = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        java.util.List<Valoration> valorations = valorationRepository.findBySeller(seller);
+        if (valorations.isEmpty()) {
+            return 0.0;
+        }
+        return valorations.stream()
+                .mapToInt(Valoration::getStars)
+                .average()
+                .orElse(0.0);
+    }
 
     /**
      * Updates the profile settings and billing information for the authenticated user.

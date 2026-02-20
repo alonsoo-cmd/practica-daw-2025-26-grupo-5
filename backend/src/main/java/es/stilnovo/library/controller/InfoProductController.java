@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
@@ -25,10 +25,10 @@ public class InfoProductController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/info-product-page/{id}")
-    public String infoProduct(Model model, @PathVariable long id, HttpServletRequest request) {
+    @GetMapping("/info-product-page")
+    public String infoProduct(Model model, @RequestParam long id, HttpServletRequest request) {
         
-        // FIX: Ora findById torna Optional, usiamo .orElse(null) per prendere il Product
+        // Get product by ID from Service Layer
         Product product = productService.findById(id).orElse(null);
         
         if (product == null) {

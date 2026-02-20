@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.repository.ProductRepository;
-import es.stilnovo.library.repository.UserRepository;
+import es.stilnovo.library.service.ProductService;
+import es.stilnovo.library.service.UserService;
 
 /**
  * Controller responsible for handling the secure checkout process.
@@ -20,10 +20,10 @@ import es.stilnovo.library.repository.UserRepository;
 public class PaymentController {
 
     @Autowired
-    private ProductRepository productRepository;
+    private ProductService productService;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     /**
      * Renders the payment page for a specific product.
@@ -40,20 +40,20 @@ public class PaymentController {
             return "redirect:/login-page";
         }
 
-        // 2. Fetch target product
-        Product product = productRepository.findById(id).orElseThrow();
+        // 2. Fetch target product via Service Layer
+        Product product = productService.findById(id).orElseThrow();
 
-        // 3. Fetch current logged-in user (the buyer)
-        User buyer = userRepository.findByName(principal.getName()).orElseThrow();
+        // 3. Fetch current logged-in user (the buyer) via Service Layer
+        User buyer = userService.findByName(principal.getName()).orElseThrow();
 
         // 4. BUSINESS RULE: Prevent sellers from buying their own items
         if (product.getSeller().getUserId().equals(buyer.getUserId())) {
-            return "redirect:/info-product-page/" + id + "?error=self_purchase";
+            return "redirect:/info-product-page?id=" + id + "&error=self_purchase";
         }
 
         // 5. STATUS CHECK: Ensure the product is still available for sale
         if (!"active".equalsIgnoreCase(product.getStatus())) {
-            return "redirect:/info-product-page/" + id + "?error=not_available";
+            return "redirect:/info-product-page?id=" + id + "&error=not_available";
         }
 
         // 6. Map attributes for Mustache template rendering
