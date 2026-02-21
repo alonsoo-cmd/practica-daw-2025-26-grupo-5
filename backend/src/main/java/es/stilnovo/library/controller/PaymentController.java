@@ -48,12 +48,12 @@ public class PaymentController {
 
         // 4. BUSINESS RULE: Prevent sellers from buying their own items
         if (product.getSeller().getUserId().equals(buyer.getUserId())) {
-            return "redirect:/info-product-page?id=" + id + "&error=self_purchase";
+            return "redirect:/info-product-page/" + id + "?error=self_purchase";
         }
 
         // 5. STATUS CHECK: Ensure the product is still available for sale
         if (!"active".equalsIgnoreCase(product.getStatus())) {
-            return "redirect:/info-product-page?id=" + id + "&error=not_available";
+            return "redirect:/info-product-page/" + id + "?error=not_available";
         }
 
         // 6. Map attributes for Mustache template rendering

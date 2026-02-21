@@ -51,13 +51,13 @@ public class NotificationController {
         // 1. Validate Product and User authentication
         Product product = productService.findById(productId).orElseThrow();
         if (principal == null) {
-            return "redirect:/contact-seller-page?id=" + productId + "&error=auth";
+            return "redirect:/contact-seller-page/" + productId + "?error=auth";
         }
 
         // Use service layer instead of direct repository access
         User buyer = userService.findByName(principal.getName()).orElse(null);
         if (buyer == null) {
-            return "redirect:/contact-seller-page?id=" + productId + "&error=auth";
+            return "redirect:/contact-seller-page/" + productId + "?error=auth";
         }
 
         // 2. Cooldown Logic: Prevent spam (30 minutes wait)
@@ -68,7 +68,7 @@ public class NotificationController {
             long cooldown = 1800 - secondsSince;
             if (cooldown > 0) {
                 long minutes = (long) Math.ceil(cooldown / 60.0);
-            return "redirect:/contact-seller-page?id=" + productId + "&cooldown=" + minutes;
+            return "redirect:/contact-seller-page/" + productId + "?cooldown=" + minutes;
             }
         }
 
@@ -104,7 +104,7 @@ public class NotificationController {
                 message,
                 "SENT"
             );
-            return "redirect:/contact-seller-page?id=" + productId + "&sent=true";
+            return "redirect:/contact-seller-page/" + productId + "?sent=true";
 
         } catch (MailException | MessagingException ex) {
             // Save inquiry with failed status
@@ -121,7 +121,7 @@ public class NotificationController {
                 message,
                 "FAILED_MAIL"
             );
-            return "redirect:/contact-seller-page?id=" + productId + "&error=mail";
+            return "redirect:/contact-seller-page/" + productId + "?error=mail";
         }
     }
 

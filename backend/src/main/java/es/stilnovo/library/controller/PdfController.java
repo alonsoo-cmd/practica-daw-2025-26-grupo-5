@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.lowagie.text.*;
@@ -45,8 +46,8 @@ public class PdfController {
     /**
      * Build an ultra-detailed invoice with professional breakdown. 
      */
-    @GetMapping("/pdf/invoice")
-    public ResponseEntity<byte[]> exportInvoice(@RequestParam long transactionId, Principal principal)
+    @GetMapping("/pdf/invoice/{transactionId}")
+    public ResponseEntity<byte[]> exportInvoice(@PathVariable long transactionId, Principal principal)
             throws DocumentException, IOException {
         
         // Use service layer for data access and security validation
@@ -115,8 +116,8 @@ public class PdfController {
     /**
      * Build shipping label with fragile warnings and logistics data. [cite: 159-181]
      */
-    @GetMapping("/pdf/shipping-label")
-    public ResponseEntity<byte[]> exportShippingLabel(@RequestParam long transactionId, Principal principal)
+    @GetMapping("/pdf/shipping-label/{transactionId}")
+    public ResponseEntity<byte[]> exportShippingLabel(@PathVariable long transactionId, Principal principal)
             throws DocumentException, IOException {
         
         // Use service layer for data access and security validation (seller only)

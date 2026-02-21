@@ -192,8 +192,8 @@ public class UserWebController {
 
     /*-- Edit product --*/
     // GET method to display the edit form with existing data
-    @GetMapping("/edit-product-page")
-    public String showEditForm(Model model, @RequestParam long id, Principal principal) {
+    @GetMapping("/edit-product-page/{id}")
+    public String showEditForm(Model model, @PathVariable long id, Principal principal) {
     
         // 1. Find the product by its ID using the service
         Product product = productService.getProductForEditing(id, principal.getName());
@@ -204,8 +204,8 @@ public class UserWebController {
         return "edit-product-page"; 
     }
     
-    @PostMapping("/edit-product")
-    public String updateProduct(@RequestParam long id, Product updatedProduct, Principal principal, @RequestParam MultipartFile newProfilePhoto) throws IOException {
+    @PostMapping("/edit-product/{id}")
+    public String updateProduct(@PathVariable long id, Product updatedProduct, Principal principal, @RequestParam MultipartFile newProfilePhoto) throws IOException {
     
         //Delegate: Send the base product and the product with changes
         productService.updateProductSafely(id, updatedProduct, principal.getName(), newProfilePhoto);

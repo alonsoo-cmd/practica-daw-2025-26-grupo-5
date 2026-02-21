@@ -55,7 +55,7 @@ public class TransactionController {
 
         // 2. Security Check: Prevent self-buying
         if (product.getSeller().getUserId().equals(buyer.getUserId())) {
-            return "redirect:/info-product-page?id=" + productId + "&error=self_purchase";
+            return "redirect:/info-product-page/" + productId + "?error=self_purchase";
         }
 
         try {
@@ -91,7 +91,7 @@ public class TransactionController {
 
         } catch (IllegalStateException e) {
             // Handle business logic errors (e.g., product already sold or insufficient funds)
-            return "redirect:/info-product-page?id=" + productId + "&error=" + e.getMessage();
+            return "redirect:/info-product-page/" + productId + "?error=" + e.getMessage();
         }
     }
 

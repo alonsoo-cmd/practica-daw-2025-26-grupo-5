@@ -95,10 +95,9 @@
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="clay-card modal-content p-4 border-0 shadow-lg">
                                 <h3 class="fw-800 h5 mb-4 text-primary text-center">Update your Feedback</h3>
-                                <form action="/valoration/edit" method="post">
+                                <form action="/valoration/edit/{{id}}" method="post">
 
                                     <input type="hidden" name="_csrf" value="{{token}}"/>
-                                    <input type="hidden" name="id" value="{{id}}"/>
 
                                     <div class="mb-3">
                                         <label class="label-categories mb-2 text-uppercase text-center d-block">Score (1 to 5)</label>
@@ -124,10 +123,9 @@
                                 <p class="small text-muted fw-700 mb-4">This action is permanent. You are removing your feedback for <span class="text-dark">{{seller.name}}</span> regarding <strong>{{transaction.product.name}}</strong>.</p>
                                 
                                 <div class="d-grid gap-2">
-                                    <form action="/valoration/delete" method="post" class="m-0">
+                                    <form action="/valoration/delete/{{id}}" method="post" class="m-0">
 
                                         <input type="hidden" name="_csrf" value="{{token}}"/>
-                                        <input type="hidden" name="id" value="{{id}}"/>
                                         
                                         <button type="submit" class="btn btn-danger w-100 py-3 rounded-pill fw-800 shadow-sm border-0">
                                             Confirm Deletion
