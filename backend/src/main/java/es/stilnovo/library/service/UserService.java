@@ -137,7 +137,15 @@ public class UserService {
         User currentUser = userRepository.findByName(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         
-        // 2. Perform the deletion. JPA handles the cascading of related records.
+        List<String> userRoles = currentUser.getRoles();
+
+        // 2. Security Check: Prevent admin deletion (manualy by hackers)
+        if (userRoles.contains("ROLE_ADMIN")) {
+            // We throw an exception with a 403 Forbidden status and a specific message
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot delete an administrator user.");
+        }
+
+        // 3. Perform the deletion for non-admin users
         userRepository.deleteById(currentUser.getUserId());
     }
 

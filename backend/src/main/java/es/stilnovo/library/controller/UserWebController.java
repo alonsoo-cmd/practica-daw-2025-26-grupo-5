@@ -296,7 +296,11 @@ public class UserWebController {
         // 2. Fetch the full User entity from the Service (NOT just the Principal)
         // The Principal only provides the name; we need the full JPA entity for the view 
         User loggedInUser = userService.getFullUserProfile(principal.getName());
-
+        
+        //If is admin, we not show delete form
+        boolean isAdmin = loggedInUser.getRoles().contains("ROLE_ADMIN");
+        model.addAttribute("isAdmin", isAdmin);
+        
         // 3. Add the complete User object to the model for the Mustache template
         model.addAttribute("user", loggedInUser);
 
@@ -330,7 +334,8 @@ public class UserWebController {
      */
     @PostMapping("/user-settings/delete")
     public String deleteUserInSettings(Principal principal, HttpServletRequest request) throws ServletException {
-        
+
+
         // 1. Delete the user from the database via the service layer
         userService.deleteUser(principal.getName());
 
