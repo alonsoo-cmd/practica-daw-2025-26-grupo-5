@@ -95,15 +95,15 @@
                 <div class="seller-bio-container mt-4 pt-4 border-top">
                     <span class="x-small fw-800 text-uppercase text-muted mb-2 d-block">Seller's Note</span>
                     
-                    {{#seller.userDescription}}
-                    <p class="seller-bio-text mb-0 italic">"{{seller.userDescription}}"</p>
-                    {{/seller.userDescription}}
+                    {{#seller.description}}
+                    <p class="seller-bio-text mb-0 italic">"{{seller.description}}"</p>
+                    {{/seller.description}}
                 
-                    {{^seller.userDescription}}
+                    {{^seller.description}}
                     <p class="seller-bio-text mb-0 italic opacity-50" style="font-style: italic;">
                         "Curating history and timeless pieces. Proud member of the Stilnovo community."
                     </p>
-                    {{/seller.userDescription}}
+                    {{/seller.description}}
                 </div>
             </div>
         </div>
