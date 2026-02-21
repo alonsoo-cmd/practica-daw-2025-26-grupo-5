@@ -24,6 +24,7 @@ import com.lowagie.text.pdf.*;
 import com.lowagie.text.pdf.draw.LineSeparator;
 
 import es.stilnovo.library.model.Transaction;
+import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
 
@@ -42,6 +43,9 @@ public class PdfController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * Build an ultra-detailed invoice with professional breakdown. 
@@ -227,6 +231,13 @@ public class PdfController {
         
         double avgRating = userService.getAverageRatingForSeller(principal.getName());
         
+        // Calculate Inventory Value (sum of all products)
+        es.stilnovo.library.model.User seller = userRepository.findByName(principal.getName())
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "User not found"));
+        double inventoryValue = seller.getProducts().stream()
+            .mapToDouble(p -> p.getPrice())
+            .sum();
+        
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Document doc = new Document(PageSize.A4, 45, 45, 45, 45);
         PdfWriter.getInstance(doc, out);
@@ -239,17 +250,19 @@ public class PdfController {
         doc.add(new Paragraph("\nPERFORMANCE OVERVIEW", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BRAND_BLUE)));
         doc.add(new Paragraph(""));
         
-        PdfPTable stats = new PdfPTable(3);
+        PdfPTable stats = new PdfPTable(4);
         stats.setWidthPercentage(100);
         stats.setSpacingBefore(10f);
         stats.setSpacingAfter(20f);
         
         stats.addCell(headerCell("Total Sales"));
         stats.addCell(headerCell("Items Sold"));
+        stats.addCell(headerCell("Inventory Value"));
         stats.addCell(headerCell("Avg. Rating"));
         
         stats.addCell(valueCell(formatCurrency(totalSales)));
         stats.addCell(valueCell(String.valueOf(itemsSold)));
+        stats.addCell(valueCell(formatCurrency(inventoryValue)));
         stats.addCell(valueCell(avgRating + " ⭐"));
         
         doc.add(stats);
@@ -325,7 +338,7 @@ public class PdfController {
 
     private byte[] loadLogoBytes() { try (InputStream s = Thread.currentThread().getContextClassLoader().getResourceAsStream("static/images/logo.png")) { return (s != null) ? s.readAllBytes() : null; } catch (IOException e) { return null; } }
     private byte[] loadQrBytes() { try (InputStream s = Thread.currentThread().getContextClassLoader().getResourceAsStream("static/images/qr-stilnovo.png")) { return (s != null) ? s.readAllBytes() : null; } catch (IOException e) { return null; } }
-    private String formatCurrency(double a) { return CURRENCY.format(a) + " €"; }
+    private String formatCurrency(double a) { return "$" + CURRENCY.format(a); }
     private ResponseEntity<byte[]> pdfResponse(ByteArrayOutputStream os, String n) {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + n + "\"")
