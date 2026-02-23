@@ -51,7 +51,7 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    public List<Product> findActiveProducts(String status){
+    public List<Product> findProductsByStatus(String status){
         return productRepository.findByStatus(status);
     }
 
@@ -84,13 +84,13 @@ public class ProductService {
     // ALGORITHM METHODS
     public List<Product> getRecommendations(User user) {
         if (user == null) {
-            return productRepository.findTop8ByOrderByIdDesc();
+            return productRepository.findTop10ByOrderByIdDesc();
         }
 
         List<Product> recommendations = productRepository.findRecommendedProducts(user.getUserId());
 
         if (recommendations.isEmpty()) {
-            return productRepository.findTop8ByOrderByIdDesc();
+            return productRepository.findTop10ByOrderByIdDesc();
         }
 
         return recommendations;

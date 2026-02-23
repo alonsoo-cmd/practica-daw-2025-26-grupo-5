@@ -21,11 +21,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findByCategoryContainingIgnoreCase(String category);
 
-    List<Product> findTop8ByOrderByIdDesc();
+    List<Product> findTop10ByOrderByIdDesc();
     
     /* ask teacher if its good implementation */
     @Query(value = """
-        SELECT p.* FROM product p
+        SELECT p.* FROM product_table p
         JOIN (
             SELECT 
                 prod.category as cat_name, 
@@ -35,7 +35,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                     WHEN ui.type = 'VIEW' THEN 1 
                     ELSE 0 END) as score
             FROM user_interactions ui
-            JOIN product prod ON ui.product_id = prod.id
+            JOIN product_table prod ON ui.product_id = prod.id
             WHERE ui.user_id = :userId
             GROUP BY prod.category
         ) as prefs ON p.category = prefs.cat_name
@@ -44,7 +44,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         LIMIT 8
         """, nativeQuery = true)
     List<Product> findRecommendedProducts(@Param("userId") Long userId);
-
+    
     List<Product> findByStatus(String status);
 
 }

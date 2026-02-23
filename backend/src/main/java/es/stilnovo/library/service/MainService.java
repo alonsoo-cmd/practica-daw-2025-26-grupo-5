@@ -34,7 +34,7 @@ public class MainService {
             return productService.findByQueryCategory(category);
         } 
         
-        return productService.findActiveProducts(status);      
+        return productService.findProductsByStatus(status);      
     }
 
     /**
