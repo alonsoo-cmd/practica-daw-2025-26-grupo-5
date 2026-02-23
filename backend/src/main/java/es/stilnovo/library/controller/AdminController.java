@@ -26,10 +26,11 @@ public class AdminController {
     @Autowired
     private UserService userService;  
 
-    @GetMapping("/panel")
+    @GetMapping({ "", "/", "/panel" })
     public String showAdminPanel() {
         return "admin-panel-page";
     }
+
 
     // List users: añadimos el objeto _csrf al modelo para que Mustache lo use
     @GetMapping("/users")
@@ -66,21 +67,7 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    // Access administration page for a specific admin user
-    @GetMapping("/{id}")
-    public String showAdministrationpage(Model model, @PathVariable Long id, HttpServletRequest request) {
-        // Use service layer instead of direct repository access
-        User user = userService.findById(id).orElseThrow();
-        model.addAttribute("user", user);
-
-        // Also expose CSRF token in case the admin panel has forms
-        CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
-        if (csrf != null) {
-            model.addAttribute("_csrf", csrf);
-        }
-
-        return "admin-panel-page";
-    }
+    
 
     // Ban / Unban user (toggle)
     @PostMapping("/users/ban/{id}")
