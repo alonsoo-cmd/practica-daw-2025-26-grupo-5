@@ -23,7 +23,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findTop10ByOrderByIdDesc();
     
-    /* ask teacher if its good implementation */
     @Query(value = """
         SELECT p.* FROM product_table p
         JOIN (
@@ -40,8 +39,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             GROUP BY prod.category
         ) as prefs ON p.category = prefs.cat_name
         WHERE p.seller_user_id != :userId 
+        AND p.status != 'Sold'
         ORDER BY prefs.score DESC, p.id DESC
-        LIMIT 8
+        LIMIT 4
         """, nativeQuery = true)
     List<Product> findRecommendedProducts(@Param("userId") Long userId);
     

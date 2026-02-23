@@ -53,9 +53,9 @@ public class InquiryService {
      * @return The saved inquiry
      */
     public Inquiry createInquiry(Long productId, String productName, Long sellerId, 
-                                  String sellerEmail, Long buyerId, String buyerName, 
-                                  String buyerEmail, String buyerPhone, String inquiryType, 
-                                  String message, String status) {
+                                    String sellerEmail, Long buyerId, String buyerName, 
+                                    String buyerEmail, String buyerPhone, String inquiryType, 
+                                    String message, String status) {
         Inquiry inquiry = new Inquiry();
         inquiry.setProductId(productId);
         inquiry.setProductName(productName);
