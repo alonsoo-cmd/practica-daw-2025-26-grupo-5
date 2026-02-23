@@ -54,7 +54,8 @@
                 <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mt-3 animate slideIn">
                     <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/user-page">View Profile</a></li>
                     <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/user-products-page">My Inventory</a></li>
-                    {{#isAdmin}} <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/admin/{{userId}}">Administration</a></li>
+                    {{#isAdmin}} <!--delete /admin/{{userId}} -to-> /admin -->
+                    <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/admin">Administration</a></li>
                     {{/isAdmin}}
                     <li><hr class="dropdown-divider opacity-50"></li>
                     <li>
