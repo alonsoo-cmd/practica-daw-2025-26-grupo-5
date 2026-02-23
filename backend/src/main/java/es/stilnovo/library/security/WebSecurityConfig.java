@@ -41,41 +41,42 @@ public class WebSecurityConfig {
 
         http
             .authorizeHttpRequests(authorize -> authorize
-                // PUBLIC PAGES
+
+                // PUBLIC
                 .requestMatchers("/", "/error").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
                 .requestMatchers("/banned").permitAll()
-
-                // AUTH
-                .requestMatchers("/login-page", "/login-error").permitAll()
-                .requestMatchers("/signup-page").permitAll()
-
+                .requestMatchers("/login-page", "/login-error", "/signup-page").permitAll()
                 .requestMatchers("/product-images/**").permitAll()
                 .requestMatchers("/info-product-page/**").permitAll()
                 .requestMatchers("/about-page/**").permitAll()
-                .requestMatchers("/user/*/profile-photo").permitAll()
 
-                // PRIVATE
-                .requestMatchers("/payment-page/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/contact-seller-page/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/add-product-page/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/edit-product-page/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/sales-and-orders-page/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/statistics-page/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/user-page/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/user-products-page/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/user-setting-page/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/favorite-products-page/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/help-center-page/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/pdf/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/v1/notifications/**").hasAnyRole("USER", "ADMIN")
+                // profile photos (nuevo sistema)
+                .requestMatchers("/user/me/profile-photo").permitAll()
+
+                // USER / ADMIN
+                .requestMatchers(
+                    "/payment-page/**",
+                    "/contact-seller-page/**",
+                    "/add-product-page/**",
+                    "/edit-product-page/**",
+                    "/sales-and-orders-page/**",
+                    "/statistics-page/**",
+                    "/user-page",
+                    "/user-products-page",
+                    "/user-setting-page",
+                    "/favorite-products-page/**",
+                    "/help-center-page/**",
+                    "/pdf/**",
+                    "/api/v1/notifications/**"
+                ).hasAnyRole("USER", "ADMIN")
 
                 // ADMIN
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/users/ban/**").hasRole("ADMIN")
 
                 .anyRequest().authenticated()
             )
+
             .formLogin(formLogin -> formLogin
                 .loginPage("/login-page")
                 .failureUrl("/login-error")              // moved to failureHandler to keep banned logic
