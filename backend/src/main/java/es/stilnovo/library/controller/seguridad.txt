@@ -1,3 +1,6 @@
 Pregunta si debes usar un hash para las contraseñas de user y admin, muestrale DataInitializer
 Debes encriptar tambien la información de la tarjeta de crédito y guardarla encriptada.
 Preguntar por diagrama clases (mostrar tuyo y preguntar si añadir TODAS clases)
+1 imagen por producto? 
+El lunes, como será? es decir, que debemos preparar bien
+Pedir hacer la expo los primeros.

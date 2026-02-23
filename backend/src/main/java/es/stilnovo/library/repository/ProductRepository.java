@@ -44,4 +44,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         LIMIT 8
         """, nativeQuery = true)
     List<Product> findRecommendedProducts(@Param("userId") Long userId);
+
+    List<Product> findByStatus(String status);
+
 }

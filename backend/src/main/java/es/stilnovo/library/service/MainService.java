@@ -25,10 +25,16 @@ public class MainService {
      * Executes product search based on query or category.
      */
     public List<Product> searchProducts(String query, String category) {
+        String status = "Active";
+
+        if(query != null && !query.isEmpty()){
+            return productService.findByQuery(query);
+        }
         if (category != null && !category.isEmpty()) {
             return productService.findByQueryCategory(category);
-        }
-        return productService.findByQuery(query);
+        } 
+        
+        return productService.findActiveProducts(status);      
     }
 
     /**
@@ -37,5 +43,9 @@ public class MainService {
     public User getUserContext(String username) {
         if (username == null) return null;
         return userRepository.findByName(username).orElse(null);
+    }
+
+    public boolean isUserAdmin(User user) {
+        return user != null && user.getRoles().contains("ROLE_ADMIN");
     }
 }

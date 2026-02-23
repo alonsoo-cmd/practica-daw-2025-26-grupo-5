@@ -43,13 +43,16 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    // --- FIX CRITICO: Ritorna Optional per non rompere gli altri Controller ---
     public Optional<Product> findById(long id) {
         return productRepository.findById(id);
     }
 
     public void deleteById(long id) {
         productRepository.deleteById(id);
+    }
+
+    public List<Product> findActiveProducts(String status){
+        return productRepository.findByStatus(status);
     }
 
     // Search methods

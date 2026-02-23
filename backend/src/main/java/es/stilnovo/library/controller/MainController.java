@@ -26,14 +26,14 @@ public class MainController {
                         @RequestParam(required = false) String category,
                         Principal principal) {
 
-        // 1. Get typed data from Service (NO casting needed = NO errors)
+        // 1. Get typed data from Service
         List<Product> products = mainService.searchProducts(query, category);
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
 
         // 2. Populate Model
         boolean logged = (user != null);
-        boolean isAdmin = logged && user.getRoles().contains("ROLE_ADMIN");
-
+        boolean isAdmin = mainService.isUserAdmin(user);
+                
         model.addAttribute("products", products);
         model.addAttribute("user", user);
         model.addAttribute("logged", logged);
