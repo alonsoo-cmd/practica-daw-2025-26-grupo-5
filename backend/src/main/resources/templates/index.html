@@ -54,8 +54,7 @@
                 <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mt-3 animate slideIn">
                     <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/user-page">View Profile</a></li>
                     <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/user-products-page">My Inventory</a></li>
-                    {{#isAdmin}} <!--delete /admin/{{userId}} -to-> /admin -->
-                    <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/admin/{{userId}}">Administration</a></li>
+                    {{#isAdmin}} <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/admin/{{userId}}">Administration</a></li>
                     {{/isAdmin}}
                     <li><hr class="dropdown-divider opacity-50"></li>
                     <li>
@@ -94,12 +93,10 @@
                     <h1 class="fw-800">Reinvent your space: Where design with history finds its new home.</h1>
                     <p class="hero-subtitle mt-3">Start buying or selling your items today</p>
                     <div class="hero-btns mt-5 d-flex gap-3">
-                        {{#logged}} <!--If logged-->
-                            <a href="/user-products-page" class="btn-sell">Sell Now</a>
+                        {{#logged}} <a href="/user-products-page" class="btn-sell">Sell Now</a>
                         {{/logged}}
                             
-                        {{^logged}} <!--If NOT logged-->
-                            <a href="/login-page" class="btn-sell">Sell Now</a>
+                        {{^logged}} <a href="/login-page" class="btn-sell">Sell Now</a>
                         {{/logged}}
                             
                         <a href="/about-page" class="btn-about">About Us</a>
@@ -123,10 +120,42 @@
         <div class="container text-center py-4">
             <p class="divider-phrase">Curated treasures waiting for a new chapter</p>
         </div>
+    </div>
+
+    {{#recommendedProducts.0}}
+    <section class="container product-grid-container pt-5">
+        <h2 class="fw-800 mb-5 text-center">Recommended for You</h2> 
+        <div class="row g-4">
+            {{#recommendedProducts}}
+            <div class="col-12 col-md-6 col-lg-3">
+                <a href="/info-product-page/{{id}}" class="text-decoration-none text-dark">
+                    <div class="clay-card">
+                        <div class="img-container">
+                            <img src="/product-images/{{id}}" alt="{{name}}">
+                        </div>
+                        <div class="product-details">
+                            <h3>{{name}}</h3>
+                            <p class="price">{{price}}€</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {{/recommendedProducts}}
+        </div>
     </section>
+    {{/recommendedProducts.0}}
+
 
     <section class="container product-grid-container pt-5">
-        <h2 class="fw-800 mb-5 text-center">Featured Treasures</h2>
+        <div class="section-title text-center mb-5">
+            {{#searching}}
+                <h2 class="fw-800">Search Results</h2>
+            {{/searching}}
+            {{^searching}}
+                <h2 class="fw-800">Explore Other Products</h2>
+            {{/searching}}
+        </div>
+
         <div class="row g-4">
             
             {{#products}}
@@ -135,7 +164,7 @@
                     <div class="clay-card">
                         <div class="img-container">
                             <img src="/product-images/{{id}}" alt="{{name}}">
-                            <!--
+                        <!--
                                 This secction will be implemented in the future using js
                             <form action="/add-favorite/{{id}}" method="post">
                                 <input type="hidden" name="_csrf" value="{{token}}"/>
@@ -162,7 +191,7 @@
             <div id="spinner" class="spinner-border text-primary d-none ms-2" role="status"></div>
         </div>
     </section>
-    
+
     {{>footer}}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

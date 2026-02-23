@@ -22,7 +22,7 @@ public class MainController {
     private MainService mainService;
 
     @Autowired
-    private ProductService productService; // Injected service for the recommendation algorithm
+    private ProductService productService;
 
     @GetMapping("/")
     public String index(Model model,
@@ -34,16 +34,21 @@ public class MainController {
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
 
         List<Product> products;
+        List<Product> recommendedProducts = null; // Nuova lista per le raccomandazioni
         
         // Check if the user is performing a search
         boolean isSearching = (query != null && !query.isEmpty()) || (category != null && !category.isEmpty());
 
         if (isSearching) {
-            // If searching, use the main search functionality
+            // Se cerca, usiamo solo il motore di ricerca normale
             products = mainService.searchProducts(query, category);
         } else {
-            // If not searching, show the products RECOMMENDED by the algorithm
-            products = productService.getRecommendations(user);
+            // SE NON CERCA: Carichiamo ENTRAMBE le liste
+            // 1. Tutti i prodotti (il catalogo normale)
+            products = mainService.searchProducts(query, category); 
+            
+            // 2. I prodotti raccomandati dal TUO algoritmo
+            recommendedProducts = productService.getRecommendations(user);
         }
 
         // 2. Populate Model
@@ -51,6 +56,11 @@ public class MainController {
         boolean isAdmin = mainService.isUserAdmin(user);
                 
         model.addAttribute("products", products);
+        
+        // Passiamo la nuova lista e una variabile per dire all'HTML se ci sono raccomandazioni
+        model.addAttribute("recommendedProducts", recommendedProducts);
+        model.addAttribute("hasRecommendations", recommendedProducts != null && !recommendedProducts.isEmpty());
+
         model.addAttribute("user", user);
         model.addAttribute("logged", logged);
         model.addAttribute("isAdmin", isAdmin);
