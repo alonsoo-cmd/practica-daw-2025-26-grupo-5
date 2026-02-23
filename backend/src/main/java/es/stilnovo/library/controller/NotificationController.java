@@ -83,12 +83,12 @@ public class NotificationController {
                 product.getId(), product.getName(), type, message, 
                 buyer.getName(), buyer.getEmail(), phoneValue, logoCid
         );
-        String buyerHtml = MailTemplates.buyerConfirmation(product.getName(), type, message);
+        String buyerHtml = MailTemplates.buyerConfirmation(product.getName(), type, message, logoCid);
 
         // 5. Send Emails and Save Status via Service Layer
         try {
             mailService.sendHtmlWithInline(sellerEmail, "New Inquiry: " + product.getName(), sellerHtml, logoCid, logoResource);
-            mailService.sendHtml(buyer.getEmail(), "Confirmation: Message sent to seller", buyerHtml);
+            mailService.sendHtmlWithInline(buyer.getEmail(), "Confirmation: Message sent to seller", buyerHtml, logoCid, logoResource);
             
             // Use service to create and save the inquiry
             inquiryService.createInquiry(
@@ -175,17 +175,54 @@ public class NotificationController {
                 """.formatted(logoCid, escape(productName), escape(buyerName), escape(buyerEmail), escape(buyerEmail), escape(phone), escape(type), escape(message), productId);
         }
 
-        private static String buyerConfirmation(String productName, String type, String message) {
+        private static String buyerConfirmation(String productName, String type, String message, String logoCid) {
             return """
-                <div style="font-family: Arial, sans-serif; color: #1a1f2e; padding: 20px; border: 1px solid #e6e9f2; border-radius: 12px;">
-                    <h2 style="color:#2f6ced;">We've received your inquiry</h2>
-                    <p>Your message has been sent to the seller of <strong>%s</strong>.</p>
-                    <p><strong>Type:</strong> %s</p>
-                    <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
-                    <p style="font-style: italic; color: #555;">"%s"</p>
-                    <p style="font-size: 12px; color: #888; margin-top: 30px;">Thanks for using Stilnovo.</p>
-                </div>
-                """.formatted(escape(productName), escape(type), escape(message));
+                <!DOCTYPE html>
+                <html>
+                <body style="margin: 0; padding: 0; background-color: #f4f7f6;">
+                    <div style="font-family: Arial, sans-serif; color: #1a1f2e; max-width: 600px; margin: 20px auto; border: 1px solid #e6e9f2; border-radius: 16px; background-color: #ffffff; overflow: hidden;">
+                        <div style="background-color: #ffffff; padding: 30px; text-align: center; border-bottom: 1px solid #f0f0f0;">
+                            <img src="cid:%s" alt="Stilnovo" width="60" style="display: block; margin: 0 auto;">
+                            <h1 style="color: #2f6ced; margin: 15px 0 0; font-size: 24px;">Inquiry Sent!</h1>
+                        </div>
+                        <div style="padding: 30px;">
+                            <p style="font-size: 16px;">Great! Your inquiry has been sent to the seller.</p>
+                            <h2 style="margin: 10px 0; font-size: 20px; color: #1a1f2e;">%s</h2>
+                            
+                            <div style="background-color: #eef4ff; padding: 20px; border-radius: 12px; margin: 25px 0;">
+                                <p style="margin: 0 0 10px 0; font-weight: bold; color: #2f6ced;">Inquiry Details:</p>
+                                <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.8;">
+                                    <li><strong>Type:</strong> %s</li>
+                                    <li><strong>Status:</strong> Sent to Seller</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: #ffffff; border-left: 4px solid #2f6ced; padding: 15px; border-radius: 4px; margin: 20px 0; background-color: #f9fbff;">
+                                <p style="margin: 0; font-size: 14px; color: #555;">
+                                    Your message: "%s"
+                                </p>
+                            </div>
+
+                            <div style="background: #ffffff; border-left: 4px solid #2f6ced; padding: 15px; border-radius: 4px; margin: 20px 0; background-color: #f9fbff;">
+                                <p style="margin: 0; font-size: 14px; color: #555;">
+                                    The seller will review your inquiry and contact you shortly. You can track all your inquiries in your dashboard.
+                                </p>
+                            </div>
+
+                            <div style="text-align: center; margin-top: 35px;">
+                                <a href="https://localhost:8443/sales-and-orders-page" 
+                                    style="background-color: #2f6ced; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block;">
+                                    View Your Inquiries
+                                </a>
+                            </div>
+                        </div>
+                        <div style="padding: 20px; text-align: center; font-size: 12px; color: #888; background-color: #fafafa; border-top: 1px solid #f0f0f0;">
+                            <p>© 2026 Stilnovo Marketplace • Giving design a second life.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """.formatted(logoCid, escape(productName), escape(type), escape(message));
         }
 
         private static String escape(String value) {
