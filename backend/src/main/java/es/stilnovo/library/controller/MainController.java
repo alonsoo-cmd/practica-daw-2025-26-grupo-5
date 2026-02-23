@@ -13,12 +13,16 @@ import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
 
 import es.stilnovo.library.service.MainService;
+import es.stilnovo.library.service.ProductService; 
 
 @Controller
 public class MainController {
 
     @Autowired
     private MainService mainService;
+
+    @Autowired
+    private ProductService productService; // Injected service for the recommendation algorithm
 
     @GetMapping("/")
     public String index(Model model,
@@ -27,8 +31,20 @@ public class MainController {
                         Principal principal) {
 
         // 1. Get typed data from Service (NO casting needed = NO errors)
-        List<Product> products = mainService.searchProducts(query, category);
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
+
+        List<Product> products;
+        
+        // Check if the user is performing a search
+        boolean isSearching = (query != null && !query.isEmpty()) || (category != null && !category.isEmpty());
+
+        if (isSearching) {
+            // If searching, use the main search functionality
+            products = mainService.searchProducts(query, category);
+        } else {
+            // If not searching, show the products RECOMMENDED by the algorithm
+            products = productService.getRecommendations(user);
+        }
 
         // 2. Populate Model
         boolean logged = (user != null);
@@ -39,45 +55,10 @@ public class MainController {
         model.addAttribute("logged", logged);
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("query", (query != null) ? query : (category != null ? category : ""));
-        model.addAttribute("searching", query != null || category != null);
-
-        /*// 2. Product Search Logic
-        List<Product> products;
-        boolean isSearching = (query != null && !query.isEmpty()) || (category != null && !category.isEmpty());
-
-        if (isSearching) {
-            if (category != null && !category.isEmpty()) {
-                products = productService.findByQueryCategory(category);
-                model.addAttribute("query", category);
-            } else {
-                products = productService.findByQuery(query);
-                model.addAttribute("query", query);
-            }
-
-            // Redirect if unique result
-            if (products.size() == 1) {
-                return "redirect:/info-product-page/" + products.get(0).getId();
-            }
-
-        } else {
-            // Recommendation Algorithm
-            products = productService.getRecommendations(currentUser);
-        }
-
-        // 3. Favorites Logic
-            if (currentUser != null && products != null) {
-                List<Product> userFavs = currentUser.getFavoriteProducts(); 
-                for (Product p : products) {
-                    boolean isFav = userFavs.stream().anyMatch(fav -> fav.getId().equals(p.getId())); 
-                    p.setFavorite(isFav); 
-                }
-            }
-
         model.addAttribute("searching", isSearching);
-        model.addAttribute("products", products);*/
 
         // 3. Navigation Logic
-        if (products.size() == 1 && (query != null || category != null)) {
+        if (products.size() == 1 && isSearching) {
             return "redirect:/info-product-page/" + products.get(0).getId();
         }
 
