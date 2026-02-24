@@ -51,6 +51,10 @@ public class InfoProductController {
             recommendations.removeIf(p -> p.getId().equals(id));
         }
 
+        // To render or not the you may also like secction
+        boolean showSection = (recommendations != null && !recommendations.isEmpty());
+        model.addAttribute("haveRecoProds", showSection);
+
         // 6. Populate the model for the Mustache template
         model.addAttribute("product", product);
         model.addAttribute("recommendedProducts", recommendations);

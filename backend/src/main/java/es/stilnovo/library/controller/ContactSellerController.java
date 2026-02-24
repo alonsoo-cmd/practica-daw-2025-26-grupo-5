@@ -28,8 +28,18 @@ public class ContactSellerController {
                                     @RequestParam(required = false) String sent,
                                     @RequestParam(required = false) String error,
                                     @RequestParam(required = false) String cooldown) {
+        
+        if (principal == null) {
+            return "redirect:/login-page";
+        }
+
         Product product = productService.findById(id).orElseThrow();
         User seller = product.getSeller();
+        User buyer = userService.findByName(principal.getName()).orElseThrow();
+
+        if (seller.getUserId().equals(buyer.getUserId())) {
+            return "redirect:/info-product-page/" + id + "?error=self_purchase";
+        }
 
         model.addAttribute("product", product);
         model.addAttribute("seller", seller);
