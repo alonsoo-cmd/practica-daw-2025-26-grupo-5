@@ -1,6 +1,7 @@
 package es.stilnovo.library.controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,21 +35,28 @@ public class MainController {
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
 
         List<Product> products;
+        List<Product> recommendedProducts = null; 
         
         // Check if the user is performing a search
         boolean isSearching = (query != null && !query.isEmpty()) || (category != null && !category.isEmpty());
 
         if (isSearching) {
-            // If searching, use the main search functionality
-            products = mainService.searchProducts(query, category);
-            model.addAttribute("recommendedProducts", null);
+            products = new ArrayList<>(mainService.searchProducts(query, category));
         } else {
-            // If not searching, show the products RECOMMENDED by the algorithm
-            List<Product> recommendedProducts = productService.getRecommendations(user);
-            model.addAttribute("recommendedProducts", recommendedProducts);
+            // if not searching, show all products and recommendations
+            // 1. all products (or filtered by category if category is selected)
+            products = new ArrayList<>(mainService.searchProducts(query, category)); 
+            
+            // 2. your recommendations based on user preferences and history
+            recommendedProducts = productService.getRecommendations(user);
 
-
-            products = mainService.searchProducts(null, null); //no searching = null values
+            // 3. Filter: removing recommended products from the main list to avoid duplicates
+            if (recommendedProducts != null && !recommendedProducts.isEmpty()) {
+                // extracting IDs of recommended products for efficient lookup
+                List<Long> recommendedIds = recommendedProducts.stream().map(Product::getId).toList();
+                // removing products that are in the recommended list
+                products.removeIf(p -> recommendedIds.contains(p.getId()));
+            }
         }
 
         // 2. Populate Model
@@ -56,6 +64,7 @@ public class MainController {
         boolean isAdmin = mainService.isUserAdmin(user);
                 
         model.addAttribute("products", products);
+        model.addAttribute("recommendedProducts", recommendedProducts);
         model.addAttribute("user", user);
         model.addAttribute("logged", logged);
         model.addAttribute("isAdmin", isAdmin);
