@@ -2,6 +2,7 @@ package es.stilnovo.library.service;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,15 +84,12 @@ public class ProductService {
 
     // ALGORITHM METHODS
     public List<Product> getRecommendations(User user) {
-        if (user == null) {
-            return productRepository.findTop10ByOrderByIdDesc();
+        //If there is no user, show nothing
+        if (user == null) { 
+            return Collections.emptyList(); 
         }
 
         List<Product> recommendations = productRepository.findRecommendedProducts(user.getUserId());
-
-        if (recommendations.isEmpty()) {
-            return productRepository.findTop10ByOrderByIdDesc();
-        }
 
         return recommendations;
     }
@@ -105,6 +103,11 @@ public class ProductService {
         //return productRepository.findByNameContainingIgnoreCase(query);
     }
 
+    public void recordView(User user, Product product) {
+        UserInteraction interaction = new UserInteraction(user, product, UserInteraction.InteractionType.VIEW);
+        userInteractionRepository.save(interaction);
+    }
+    
     public List<Product> findByQueryCategory(String query) {
         if (query == null || query.isEmpty()) {
             return productRepository.findAll();
