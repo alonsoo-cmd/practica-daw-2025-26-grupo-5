@@ -12,6 +12,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import es.stilnovo.library.model.Image;
+import es.stilnovo.library.model.Product;
 import es.stilnovo.library.repository.ImageRepository;
 
 @Service
@@ -69,4 +70,9 @@ public class ImageService {
         return image;
     }
 
+    public void setProduct(Product product, Image image) {
+        image.setProduct(product);
+    }
 }
+
+

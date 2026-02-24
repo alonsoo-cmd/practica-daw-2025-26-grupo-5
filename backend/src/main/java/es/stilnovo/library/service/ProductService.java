@@ -194,6 +194,7 @@ public class ProductService {
             
             // Link the persistent Image entity directly to the product
             newProduct.setImage(img); 
+            img.setProduct(newProduct);
         }
 
         // 4. Persistence: Save the product. Cascading handles the Image entity
