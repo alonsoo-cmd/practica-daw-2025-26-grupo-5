@@ -44,7 +44,7 @@ public class WebSecurityConfig {
 
                 // PUBLIC
                 .requestMatchers("/", "/error").permitAll()
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                .requestMatchers("/css/**", "/javascript/**", "/images/**", "/favicon.ico").permitAll()
                 .requestMatchers("/banned").permitAll()
                 .requestMatchers("/login-page", "/login-error", "/signup-page").permitAll()
                 .requestMatchers("/product-images/**").permitAll()
@@ -53,6 +53,9 @@ public class WebSecurityConfig {
 
                 // profile photos (nuevo sistema)
                 .requestMatchers("/user/me/profile-photo").permitAll()
+
+                // You can scroll without login
+                .requestMatchers("/load-more-products").permitAll()
 
                 // USER / ADMIN
                 .requestMatchers(

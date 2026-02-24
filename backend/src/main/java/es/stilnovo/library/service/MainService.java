@@ -34,7 +34,7 @@ public class MainService {
             return productService.findByQueryCategory(category);
         } 
         
-        return productService.findProductsByStatus(status);      
+        return productService.getProductsByStatusAndPage(status, 0, 10); // Default to first page of active products
     }
 
     /**

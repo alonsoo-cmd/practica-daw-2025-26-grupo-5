@@ -6,8 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
+
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     // Spring generates the SQL automatically: SELECT * FROM Product WHERE user_id = ?
@@ -46,5 +50,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findRecommendedProducts(@Param("userId") Long userId);
     
     List<Product> findByStatus(String status);
+
+    Page<Product> findByStatus(String status, Pageable pageable);
 
 }
