@@ -1,8 +1,142 @@
+<footer class="footer-stilnovo mt-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="mb-3">
+                    <a href="/" class="text-decoration-none d-flex align-items-center gap-2">
+                        <img src="/images/logo.png" alt="Stilnovo" style="height:40px; filter: brightness(0) invert(1);">
+                        <span class="text-white fw-bold fs-2">Stilnovo</span>
+                    </a>
+                </div>
+                <p>Elevate your style, sustain the planet. The ultimate premium marketplace for circular fashion and unique designer treasures.</p>
+                <div class="d-flex gap-3 mt-4">
+                    <a href="https://www.instagram.com/stilnovo_marketplace/" 
+                    target="_blank" 
+                    class="social-link btn-sell">
+                        <i class="fa-brands fa-instagram fs-5"></i>
+                    </a>                    <!--<a href="#" class="social-link"><i class="fa-brands fa-twitter fs-5"></i></a>
+                    <a href="#" class="social-link"><i class="fa-brands fa-tiktok fs-5"></i></a>-->
+                </div>
+            </div>
 
-<div>
+            <div class="col-lg-2 offset-lg-1">
+                <h6>PLATFORM</h6>
+                <ul class="list-unstyled d-flex flex-column gap-3">
+                    <li><a href="/about-page" class="footer-link">About Us</a></li>
+                    <li><a class="footer-link" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a></li>
+                    <li><a class="footer-link" data-bs-toggle="modal" data-bs-target="#safetyModal">Safety Rules</a></li>
+                </ul>
+            </div>
 
-<footer class="footer-divider container-fluid py-5 text-center">
-    <span>© STILNOVO 2026 - ALL RIGHTS RESERVED</span>
+            <div class="col-lg-2">
+                <h6>SUPPORT</h6>
+                <ul class="list-unstyled d-flex flex-column gap-3">
+                    <li><a class="footer-link" data-bs-toggle="modal" data-bs-target="#helpModal">Help Center</a></li>
+                    <li><a class="footer-link" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a></li>
+                    <li><a class="footer-link" data-bs-toggle="modal" data-bs-target="#cookieModal">Cookies</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3">
+                <h6>READY TO START?</h6>
+                <p class="mb-4 small">If you don´t have an account, please join our community and start trading unique pieces today.</p>
+                <a href="/signup-page" class="btn-sell">CREATE ACCOUNT</a>
+            </div>
+        </div>
+
+        <hr style="border-color: rgba(255, 255, 255, 0.1);" class="my-5">
+
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <p style="font-size: 0.85rem; color: #94a3b8;">&copy; 2026 Stilnovo Marketplace. All rights reserved.</p>
+            <div class="d-flex gap-3 text-white fs-4 opacity-75">
+                <i class="fa-brands fa-cc-visa"></i>
+                <i class="fa-brands fa-cc-mastercard"></i>
+                <i class="fa-brands fa-cc-apple-pay"></i>
+            </div>
+        </div>
+    </div>
 </footer>
 
+<div class="modal fade" id="helpModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content stn-modal-content p-4 text-center">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="stn-modal-title w-100">Need Assistance?</h5>
+                <button type="button" class="btn-about" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body stn-modal-body">
+                <p>To access our official support and FAQs, please follow this path:</p>
+                <div class="stn-path-box my-3">
+                    My Account <i class="fa-solid fa-chevron-right mx-2 fs-small"></i> Help Center
+                </div>
+                <p class="text-danger small fw-bold"><i class="fa-solid fa-lock me-1"></i> You must be logged in to view this section.</p>
+                <button class="btn-about" data-bs-dismiss="modal">UNDERSTOOD</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content stn-modal-content p-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="stn-modal-title">Terms of Service</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body stn-modal-body">
+                <p>By using Stilnovo, you agree to our community guidelines. We provide a platform for circular fashion. All users must maintain integrity in transactions and respect intellectual property rights. We are not liable for direct disputes between users but provide tools to facilitate safe trading.</p>
+                <button class="btn-about" data-bs-dismiss="modal">I accept the terms</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content stn-modal-content p-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="stn-modal-title">Privacy Policy</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body stn-modal-body">
+                <p>Your data is safe with us. We use industry-standard encryption to protect your personal information and transaction history. We never sell your data to third parties.</p>
+                <button class="btn-about" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="safetyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content stn-modal-content p-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="stn-modal-title">Safety Rules</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body stn-modal-body">
+                <ul class="list-unstyled">
+                    <li class="mb-3"><i class="fa-solid fa-shield-check text-primary me-2"></i> Only trade through Stilnovo's platform.</li>
+                    <li class="mb-3"><i class="fa-solid fa-shield-check text-primary me-2"></i> Verify item authenticity before shipping.</li>
+                    <li><i class="fa-solid fa-shield-check text-primary me-2"></i> Report suspicious behavior immediately.</li>
+                </ul>
+                <button class="btn-about" style="text-align: center;" data-bs-dismiss="modal">Stay safe</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="cookieModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content stn-modal-content p-4 text-center">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body stn-modal-body">
+                <i class="fa-solid fa-cookie-bite text-primary fs-1 mb-3"></i>
+                <h5 class="stn-modal-title mb-3">Cookie Policy</h5>
+                <p>We use cookies to personalize your experience and analyze our traffic. By continuing to use our site, you accept our cookie usage.</p>
+                <button class="btn-about" data-bs-dismiss="modal">Accept all</button>
+            </div>
+        </div>
+    </div>
 </div>

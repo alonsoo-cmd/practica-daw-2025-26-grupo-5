@@ -149,7 +149,7 @@
 
     <section class="container product-grid-container pt-5">
         <h2 class="fw-800 mb-5 text-center">Featured Treasures</h2>
-        <div id="product-container" class="row g-4 justify-content-center">
+        <div id="product-container" class="row g-4">
             
             {{#products}}
             <div class="col-12 col-md-6 col-lg-3">
@@ -185,7 +185,9 @@
 
         <div class="text-center mt-5 py-4">
             <button id="load-more" class="btn-load-more">Load more results</button>
-            <div id="spinner" class="spinner-border text-primary d-none ms-2" role="status"></div>
+            <svg id="spinner" class="stn-loader d-none ms-2" viewBox="25 25 50 50">
+                <circle r="20" cy="50" cx="50"></circle>
+            </svg>        
         </div>
     </section>
     

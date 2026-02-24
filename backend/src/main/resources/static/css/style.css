@@ -1527,20 +1527,171 @@ main.overflow-auto {
 .badge-admin { padding: 5px 10px; border-radius: 8px; font-weight: 700; font-size: 0.7rem; }
 
 .btn-no-more {
-  display: inline-block;
-  padding: 12px 40px;
-  border-radius: 50px;
-  
-  background-color: transparent;
-  border: 2px solid #d32f2f; 
-  color: #d32f2f;
+    display: inline-block;
+    padding: 12px 40px;
+    border-radius: 50px;
+    
+    background-color: transparent;
+    border: 2px solid #d32f2f; 
+    color: #d32f2f;
 
-  font-family: 'Arial', sans-serif;
-  font-weight: bold;
-  font-size: 1.1rem;
-  text-decoration: none;
-  text-align: center;
-  
-  transition: all 0.3s ease;
-  cursor: pointer;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-decoration: none;
+    text-align: center;
+    
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+/* --- STILNOVO FINAL FOOTER & MODALS --- */
+
+/* Footer Container */
+.footer-stilnovo {
+    background-color: #0f172a !important;
+    border-top: 3px solid #3b82f6;
+    padding: 4rem 0 2rem 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Force White Titles */
+.footer-stilnovo h6 {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 1.5rem;
+}
+
+/* Descriptions & Muted Text */
+.footer-stilnovo p, 
+.footer-stilnovo .text-muted {
+    color: #cbd5e1 !important;
+    font-size: 0.95rem;
+}
+
+/* Links (Light Blue to White) */
+.footer-stilnovo .footer-link {
+    color: #93c5fd !important;
+    text-decoration: none !important;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.footer-stilnovo .footer-link:hover {
+    color: #ffffff !important;
+    padding-left: 8px;
+}
+
+/* Social Buttons (Vibrant Blue Background) */
+.footer-stilnovo .social-link {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.footer-stilnovo .social-link:hover {
+    transform: translateY(-5px);
+    background-color: #2563eb !important;
+}
+
+/* Final Sign Up Button (The replacement for Newsletter) */
+.btn-stn-primary {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 12px 24px;
+    font-weight: 800;
+    border-radius: 12px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.btn-stn-primary:hover {
+    background-color: #ffffff !important;
+    color: #3b82f6 !important;
+    transform: scale(1.05);
+}
+
+/* --- MODAL STYLING (Vibrant & High Contrast) --- */
+.stn-modal-content {
+    background: #0f172a !important;
+    border: 2px solid #3b82f6 !important;
+    border-radius: 24px !important;
+}
+
+.stn-modal-title {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+}
+
+.stn-modal-body {
+    color: #cbd5e1 !important;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Fix for the invisible "X" button */
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%) !important;
+}
+
+/* Path box for Help Center */
+.stn-path-box {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px dashed #3b82f6;
+    color: #ffffff;
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+/* --- STILNOVO CUSTOM SVG LOADER --- */
+
+.stn-loader {
+        width: 2.5em; /* Ajustado para que quede bien junto al botón */
+        transform-origin: center;
+        animation: rotate4 2s linear infinite;
+        vertical-align: middle;
+}
+    
+.stn-loader circle {
+        fill: none;
+        stroke: #3b82f6; /* Color azul Stilnovo */
+        stroke-width: 4; /* Un poco más grueso para que se vea mejor */
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+        stroke-linecap: round;
+        animation: dash4 1.5s ease-in-out infinite;
+}
+    
+@keyframes rotate4 {
+        100% {
+        transform: rotate(360deg);
+    }
+}
+    
+@keyframes dash4 {
+        0% {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+        }
+    
+        50% {
+        stroke-dasharray: 90, 200;
+        stroke-dashoffset: -35px;
+        }
+    
+        100% {
+        stroke-dashoffset: -125px;
+        }
 }

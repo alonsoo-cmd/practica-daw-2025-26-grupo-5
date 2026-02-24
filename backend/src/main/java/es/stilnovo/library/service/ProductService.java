@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Page;
 
 import es.stilnovo.library.model.Image;
 import es.stilnovo.library.model.Product;

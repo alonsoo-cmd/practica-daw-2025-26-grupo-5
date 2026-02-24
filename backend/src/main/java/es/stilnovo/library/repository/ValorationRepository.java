@@ -1,6 +1,8 @@
 package es.stilnovo.library.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import es.stilnovo.library.model.Valoration;
@@ -38,4 +40,9 @@ public interface ValorationRepository extends JpaRepository<Valoration, Long> {
      * @return A list of valorations authored by the buyer.
      */
     List<Valoration> findByBuyer(User buyer);
+
+    // Deletes all valorations associated with a list of transactions in one go
+    @Modifying
+    @Query("DELETE FROM Valoration v WHERE v.transaction IN :transactions")
+    void deleteByTransactionIn(List<Transaction> transactions);
 }

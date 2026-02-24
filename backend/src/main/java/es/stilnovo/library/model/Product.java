@@ -1,6 +1,5 @@
 package es.stilnovo.library.model;
 
-import java.util.List;
 
 import jakarta.persistence.*;
 

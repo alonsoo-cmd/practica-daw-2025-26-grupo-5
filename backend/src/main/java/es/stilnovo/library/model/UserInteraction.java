@@ -1,7 +1,7 @@
 package es.stilnovo.library.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+//import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_interactions")
@@ -22,7 +22,7 @@ public class UserInteraction {
     @Enumerated(EnumType.STRING)
     private InteractionType type; // VIEW, CLICK, BUY
 
-    private LocalDateTime timestamp;
+    //private LocalDateTime timestamp;
 
     public UserInteraction() {}
 
@@ -30,7 +30,7 @@ public class UserInteraction {
         this.user = user;
         this.product = product;
         this.type = type;
-        this.timestamp = LocalDateTime.now();
+        //this.timestamp = LocalDateTime.now();
     }
 
     // Getters

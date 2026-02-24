@@ -19,4 +19,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     
     // Retrieves all transactions where the user entity is the seller
     List<Transaction> findBySeller(User seller);
+    
+    // Find all transactions where this user is buyer OR seller
+    List<Transaction> findByBuyerOrSeller(User buyer, User seller);
 }

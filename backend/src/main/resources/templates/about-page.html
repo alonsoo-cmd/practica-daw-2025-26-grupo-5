@@ -25,10 +25,18 @@
         <nav class="nav-actions">
             {{#logged}}
             <div class="d-flex align-items-center gap-3">
-                <span class="fw-700 small d-none d-md-inline">{{username}}</span>
-                <a href="/user-page">
-                    <img src="/user/me/profile-photo" class="rounded-circle border" width="40" height="40" style="object-fit: cover;" onerror="this.src='/images/profile-photo.png'">
-                </a>
+                <div class="text-end d-none d-lg-block">
+                    <p class="mb-0 small fw-800 lh-1 text-dark">{{username}}</p>
+                    <p class="mb-0 x-small fw-700 text-muted">My Account <i class="fa-solid fa-chevron-down ms-1" style="font-size: 0.6rem;"></i></p>
+                </div>
+                <div class="position-relative">
+                    <img src="/user/me/profile-photo" 
+                        class="rounded-circle border border-2 border-white shadow-sm profile-nav-img" 
+                        width="42" height="42" 
+                        style="object-fit: cover;"
+                        onerror="this.src='/images/profile-photo.png'">
+                    <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-2 border-white rounded-circle"></span>
+                </div>
             </div>
             {{/logged}}
             {{^logged}}

@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.model.Valoration;
 import es.stilnovo.library.repository.TransactionRepository;
+import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.repository.ValorationRepository;
 
@@ -31,6 +32,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserInteractionRepository interactionRepository;
 
     public void save(User user) {
         userRepository.save(user);
@@ -125,28 +129,48 @@ public class UserService {
     }
 
     /**
-     * Deletes the authenticated user from the system.
-     * Due to the 'CascadeType.ALL' configuration on the User entity, this operation 
-     * will automatically remove all associated products and images.
-     * @param username The unique name of the user to be deleted.
+     * Core method to perform a secure deletion of a user by their ID.
+     * This handles all database constraints and security checks.
+     *
+     * @param userId The ID of the user to be deleted.
+     * @throws ResponseStatusException 403 if the user is an admin.
+     * @throws ResponseStatusException 404 if the user is not found.
      */
     @Transactional
-    public void deleteUser(String username) {
-        
-        // 1. Fetch the user entity to retrieve the internal ID
-        User currentUser = userRepository.findByName(username)
+    public void deleteUserById(Long userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        
-        List<String> userRoles = currentUser.getRoles();
 
-        // 2. Security Check: Prevent admin deletion (manualy by hackers)
-        if (userRoles.contains("ROLE_ADMIN")) {
-            // We throw an exception with a 403 Forbidden status and a specific message
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot delete an administrator user.");
+        // Security Check: Block admin deletion
+        if (user.getRoles().contains("ROLE_ADMIN")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot delete an administrator.");
         }
 
-        // 3. Perform the deletion for non-admin users
-        userRepository.deleteById(currentUser.getUserId());
+        // 1. Clear Valorations and Transactions
+        List<Transaction> userTransactions = transactionRepository.findByBuyerOrSeller(user, user);
+        if (!userTransactions.isEmpty()) {
+            valorationRepository.deleteByTransactionIn(userTransactions);
+            transactionRepository.deleteAll(userTransactions);
+        }
+
+        // 2. Clear Interactions
+        interactionRepository.deleteByUser(user);
+
+        // 3. Final Delete (Cascade handles products)
+        userRepository.delete(user);
+    }
+
+    /**
+     * Deletes the currently authenticated user based on their username.
+     * @param username The username of the user performing self-deletion.
+     */
+    @Transactional
+    public void deleteUserSelf(String username) {
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        
+        // We reuse the logic by calling the ID-based method
+        deleteUserById(user.getUserId());
     }
 
     /**

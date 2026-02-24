@@ -337,7 +337,7 @@ public class UserWebController {
 
 
         // 1. Delete the user from the database via the service layer
-        userService.deleteUser(principal.getName());
+        userService.deleteUserSelf(principal.getName());
 
         // 2. request.logout() invalidates the session and 
         // clears the SecurityContext in Spring Security.

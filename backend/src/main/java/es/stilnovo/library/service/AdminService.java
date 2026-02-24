@@ -3,8 +3,6 @@ package es.stilnovo.library.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import es.stilnovo.library.model.User;
-import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,21 +13,12 @@ public class AdminService {
     private UserRepository userRepository;
 
     @Autowired
-    private ProductRepository productRepository;
+    private UserService userService; 
 
     @Transactional
     public void deleteUser(Long userId) {
-
-        User user = userRepository.findById(userId).orElseThrow();
-
-        // 1. Delete user's products
-        productRepository.deleteAll(productRepository.findBySeller(user));
-
-        // 2. Clear favorites
-        user.getFavoriteProducts().clear();
-
-        // 3. Delete user
-        userRepository.delete(user);
+        // Delegate all responsability to userService
+        userService.deleteUserById(userId);
     }
 
     @Transactional(readOnly = true)
