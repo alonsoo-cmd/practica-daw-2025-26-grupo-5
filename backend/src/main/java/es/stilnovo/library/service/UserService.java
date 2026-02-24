@@ -24,6 +24,8 @@ import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.repository.ValorationRepository;
 
 import org.springframework.core.io.Resource;
+
+import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -290,5 +292,16 @@ public class UserService {
 
         return data;
     } 
+
+    public double calculateInventoryValue(String username) {
+        // 1. Find the user
+        User seller = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // 2. Calculate the total sum of prices
+        return seller.getProducts().stream()
+                .mapToDouble(Product::getPrice)
+                .sum();
+    }
 
 }

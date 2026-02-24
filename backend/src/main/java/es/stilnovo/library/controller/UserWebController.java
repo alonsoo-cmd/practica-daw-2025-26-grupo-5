@@ -38,6 +38,11 @@ public class UserWebController {
     @Autowired
     private TransactionService transactionService;
 
+    @GetMapping("/about-page")
+	public String login() {
+		return "about-page";
+	}
+    
     /**
      * GET method to retrieve the profile photo of the currently authenticated user.
      * Uses 'me' in the URL to hide the ID and rely on the session Principal.
