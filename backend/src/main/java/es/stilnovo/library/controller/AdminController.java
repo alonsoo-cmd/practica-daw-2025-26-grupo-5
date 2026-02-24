@@ -27,7 +27,24 @@ public class AdminController {
     private UserService userService;  
 
     @GetMapping({ "", "/", "/panel" })
-    public String showAdminPanel() {
+    public String showAdminPanel(Model model) {
+
+        int numUsers = adminService.getNumTotalUsers();
+        int numBanneds = adminService.getNumBanneds();
+
+        model.addAttribute("numUsers", numUsers);
+        model.addAttribute("numBanneds", numBanneds);
+        
+        List<User> allUsers = userService.findAll();
+        List<User> dashboardUsers = allUsers.stream()
+                                            .limit(3)
+                                            .toList();
+        
+        model.addAttribute("users", dashboardUsers);
+
+        long usedMemory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
+        model.addAttribute("memoryUsage", usedMemory + " MB");
+
         return "admin-panel-page";
     }
 

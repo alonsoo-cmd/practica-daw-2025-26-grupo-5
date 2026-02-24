@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AdminService {
@@ -16,6 +17,7 @@ public class AdminService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Transactional
     public void deleteUser(Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow();
@@ -29,5 +31,16 @@ public class AdminService {
         // 3. Delete user
         userRepository.delete(user);
     }
+
+    @Transactional(readOnly = true)
+    public int getNumBanneds() {
+        return userRepository.countByBanned(true);
+    }
+
+    @Transactional(readOnly = true)
+    public int getNumTotalUsers(){
+        return (int) userRepository.count();
+    }
+
 }
 

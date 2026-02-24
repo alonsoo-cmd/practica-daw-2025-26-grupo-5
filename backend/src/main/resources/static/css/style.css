@@ -1498,18 +1498,30 @@ main.overflow-auto {
     background: #ff4d4d !important;
     border: none !important;
 }
-.btn-no-more {
-    background-color: transparent;
-    border: 2px solid #dc3545; /* Intense red */
-    color: #dc3545;            /* Red text*/
-    border-radius: 50px;       /* Oval/pill shape*/
-    padding: 10px 30px;
-    font-weight: bold;
-    text-transform: none;
-    cursor: not-allowed;       /* Change the cursor in order to indicate it is disabeld */
-    opacity: 0.8;              /* A little bit of transparency on the final state*/
+.status-active, .status-banned { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; font-size: 0.75rem; font-weight: 700; border-radius: 10px; }
+        .status-active { background-color: #e6fffa; color: #2f855a; border: 1px solid #c6f6d5; }
+        .status-banned { background-color: #fff5f5; color: #c53030; border: 1px solid #fed7d7; }
+        .user-id-mono { font-family: 'Courier New', Courier, monospace; font-weight: 700; color: #64748b; }
+        .btn-action-admin { width: 35px; height: 35px; border-radius: 8px; border: none; transition: 0.2s; background: #f1f5f9; color: #475569; }
+        .btn-action-admin:hover { transform: translateY(-2px); }
+        .btn-ban:hover { background: #fee2e2; color: #dc2626; }
+        .btn-delete:hover { background: #fee2e2; color: #dc2626; }
+
+/* System Pulse Animation */
+.status-pulse {
+    width: 10px;
+    height: 10px;
+    background-color: #28a745;
+    border-radius: 50%;
     display: inline-block;
+    box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    animation: pulse-green 2s infinite;
 }
-.btn-no-more:disabled {
-    pointer-events: none;
+
+@keyframes pulse-green {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(40, 167, 69, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
 }
+
+.badge-admin { padding: 5px 10px; border-radius: 8px; font-weight: 700; font-size: 0.7rem; }
