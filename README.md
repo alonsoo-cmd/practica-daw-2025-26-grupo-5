@@ -234,14 +234,43 @@ Solo si han cambiado.
 
 #### **Pasos para ejecutar la aplicación**
 
-1. **Clonar el repositorio**
+1. **Clonar el repositorio**  
+   Crea una carpeta para el proyecto, accede a ella y clona el repositorio:
+
    ```bash
-   git clone https://github.com/[usuario]/[nombre-repositorio].git
-   cd [nombre-repositorio]
+   git clone https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5.git
+   cd practica-daw-2025-26/practica-daw-2025-26-grupo-5
    ```
 
-2. **AQUÍ INDICAR LO SIGUIENTES PASOS**
+2. **Acceder al directorio del backend**  
+   Entra en la carpeta que contiene la lógica del servidor:
 
+   ```bash
+   cd backend
+   ```
+
+3. **Levantar la base de datos**  
+   Asegúrate de tener abierto Docker Desktop (o cualquier otro motor de Docker) y ejecuta el script para inicializar la base de datos:
+
+   ```bash
+   ./start_db.sh
+   ```
+
+   **Nota:** Espera unos segundos tras ejecutar el script para asegurar que la base de datos se ha creado y configurado correctamente antes del siguiente paso.
+
+4. **Ejecutar la aplicación**  
+   Localiza el archivo principal del proyecto en tu IDE (IntelliJ, VS Code, etc.):
+
+   `src/main/java/es/stilnovo/library/Application.java`
+
+5. **Acceso a la web**  
+   Una vez que la aplicación esté en marcha, abre tu navegador y accede a:
+
+   ```bash
+   https://localhost:8443
+   ```
+
+Solo un recordatorio: como la aplicación usa HTTPS en el puerto 8443, la primera vez que entres el navegador te dará un aviso de "Conexión no privada" (por el certificado auto-firmado de desarrollo). Solo tienes que darle a **"Configuración avanzada"** y **"Acceder a localhost (sitio no seguro)"** para entrar.
 #### **Credenciales de prueba**
 - **Usuario Admin**: usuario: `admin`, contraseña: `admin`
 - **Usuario Registrado**: usuario: `user`, contraseña: `user`
