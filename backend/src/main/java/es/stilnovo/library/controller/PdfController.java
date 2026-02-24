@@ -18,12 +18,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.lowagie.text.*;
-import com.lowagie.text.Image;
 import com.lowagie.text.pdf.*;
 import com.lowagie.text.pdf.draw.LineSeparator;
 
 import es.stilnovo.library.model.Transaction;
-import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
 
@@ -42,9 +40,6 @@ public class PdfController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private UserRepository userRepository;
 
     /**
      * Build an ultra-detailed invoice with professional breakdown. 
@@ -231,11 +226,7 @@ public class PdfController {
         double avgRating = userService.getAverageRatingForSeller(principal.getName());
         
         // Calculate Inventory Value (sum of all products)
-        es.stilnovo.library.model.User seller = userRepository.findByName(principal.getName())
-                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "User not found"));
-        double inventoryValue = seller.getProducts().stream()
-            .mapToDouble(p -> p.getPrice())
-            .sum();
+        double inventoryValue = userService.calculateInventoryValue(principal.getName());
         
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Document doc = new Document(PageSize.A4, 45, 45, 45, 45);
