@@ -125,6 +125,7 @@ public class UserWebController {
 
         // 2. Data Retrieval: Fetch the full user entity using the secure Principal name
         User user = userService.getFullUserProfile(principal.getName());
+        String formattedDate = userService.getFormattedDate();
 
         // 3. Model Population: Add the user object to the view
         model.addAttribute("user", user);
@@ -132,6 +133,7 @@ public class UserWebController {
         // 4. Ownership Logic: Since this route is ID-less and bound to the Principal,
         // the visitor is ALWAYS the owner of this specific page.
         model.addAttribute("isOwner", true);
+        model.addAttribute("date", formattedDate);
 
         return "user-page"; 
     }

@@ -3,8 +3,11 @@ package es.stilnovo.library.service;
 import java.io.IOException;
 import java.util.Optional;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.hibernate.engine.jdbc.proxy.BlobProxy;
@@ -304,4 +307,10 @@ public class UserService {
                 .sum();
     }
 
+    public String getFormattedDate() {
+        LocalDate actualDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH);
+        String formattedDate = actualDate.format(formatter);
+        return formattedDate;
+    }
 }
