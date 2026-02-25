@@ -63,11 +63,21 @@ public class MainController {
         // 2. Populate Model
         boolean logged = (user != null);
         boolean isAdmin = mainService.isUserAdmin(user);
-        boolean isLast = true;
+        
+        int recSize = (recommendedProducts != null) ? recommendedProducts.size() : 0;
+        int maxItems = 10;
+        
+        // Calculate how many regular products we can show in the first view
+        int regularLimit = Math.max(0, maxItems - recSize);
+        
+        // It is the last page if the sum of recommended and regular products is <= 10
+        boolean isLast = (recSize + products.size()) <= maxItems;
+        
+        int nextOffset = products.size(); 
 
-        if (!products.isEmpty() && products.size() > 10) {
-            isLast = false;
-            products = products.subList(0, 10); // Show only the first 10 products
+        if (products.size() > regularLimit) {
+            products = products.subList(0, regularLimit);
+            nextOffset = regularLimit; // Save the index where we left off
         }
                 
         model.addAttribute("products", products);
@@ -78,6 +88,7 @@ public class MainController {
         model.addAttribute("query", (query != null) ? query : (category != null ? category : ""));
         model.addAttribute("searching", isSearching);
         model.addAttribute("isLast", isLast);
+        model.addAttribute("nextOffset", nextOffset); // Added for the JS
 
         // 3. Navigation Logic
         if (products.size() == 1 && isSearching) {
