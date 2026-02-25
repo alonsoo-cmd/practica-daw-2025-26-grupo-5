@@ -303,17 +303,19 @@ Diagrama de clases de la aplicación con diferenciación por colores o secciones
 
 ### **Participación de Miembros en la Práctica 1**
 
-#### **Alumno 1 - [Nombre Completo]**
+#### **Alumno 1 - Victor Hugo Oliveira Petroceli**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+Responsable del desarrollo de la arquitectura backend y de la lógica de negocio en las áreas de valoraciones, transacciones, productos y usuario. He implementado el flujo completo de transacciones P2P, el sistema de valoraciones, la seguridad mediante Spring Security y el ciclo de vida integral de los productos . Además, ha gestionado la integración de imágenes y la optimización de la persistencia de datos y relaciones complejas entre entidades en la base de datos.
 
-| Nº    | Commits      | Files      |
+> **Nota sobre los archivos:** En la columna "Files" se han listado únicamente los archivos más representativos de cada hito técnico. El desarrollo de controladores y servicios implica la gestión coordinada de sus respectivos repositorios y capas de lógica asociada para el correcto funcionamiento del sistema.
+
+| Nº | Commits | Files |
 |:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+|1| [feat: implement full p2p transaction flow, user ratings, and profile settings](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/0e7534c90c98f684d3dfa4065fc83d454309ab15) | [TransactionController](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/0e7534c90c98f684d3dfa4065fc83d454309ab15#diff-fafb316474669bbc128d5aac6ef54decd8baff1c2b01cd57f5bfaf026366c75c), [ValorationController](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/0e7534c90c98f684d3dfa4065fc83d454309ab15#diff-484aeaed59b804771e289a5fea582f1acc6b89a1fc87132e1f1c79523548dfa4) |
+|2| [refactor: major security overhaul, service-layer migration, and UI fixes](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/4a93d87216e616314c06cf6c1e8f7e82644c6972) | [UserService](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/4a93d87216e616314c06cf6c1e8f7e82644c6972#diff-c5ef5add8914256b60cdeae6c6b3141bc2d30cea8f64e94cd604bfc400c531ad), [ProductService](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/4a93d87216e616314c06cf6c1e8f7e82644c6972#diff-0dffa1dad51ad4edd7b773abcd6b60042e4c35cacd589d6579e4f5c08268a47d) |
+|3| [Product editing and adding implemented with search and categories](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/cec4e04d380abd3adf90684a2d8390aec0b11a61) | [UserWebController](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/cec4e04d380abd3adf90684a2d8390aec0b11a61), [MainController](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/cec4e04d380abd3adf90684a2d8390aec0b11a61#diff-c721ef6549cb0126a13962ec015d4cea1d1cf5c97c8b7c0790a586fcebba58a8) |
+|4| [Signup working](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/967380ebc229fc60ffbfb0b15d48551f6842120f) | [SignupController](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/967380ebc229fc60ffbfb0b15d48551f6842120f#diff-4618f51589ec4dabe8d27f9baa458960f21c454afc1bd895d29142451f0b0cda), [MainController](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/967380ebc229fc60ffbfb0b15d48551f6842120f#diff-6dbda15cf13098b21ebbda773b336d05e1bba7ddd690dfbb26a6de5b3c347994) |
+|5| [fix: resolve null product_id in images table by correctly setting bidirectional relationship](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/10504e3b9f907f682d634dd142c5058f2e26feb8) | [ImageService](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/10504e3b9f907f682d634dd142c5058f2e26feb8#diff-fb2df8d4380dfabccf6b45cc453692ba9ce0c50bd3110132cc35eaad693cc755), [ProductService](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/10504e3b9f907f682d634dd142c5058f2e26feb8#diff-0dffa1dad51ad4edd7b773abcd6b60042e4c35cacd589d6579e4f5c08268a47d) |
 
 ---
 
