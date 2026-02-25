@@ -305,7 +305,7 @@ Diagrama de clases de la aplicación con diferenciación por colores o secciones
 
 #### **Alumno 1 - Victor Hugo Oliveira Petroceli**
 
-Responsable del desarrollo de la arquitectura backend y de la lógica de negocio en las áreas de valoraciones, transacciones, productos y usuario. He implementado el flujo completo de transacciones P2P, el sistema de valoraciones, la seguridad mediante Spring Security y el ciclo de vida integral de los productos . Además, ha gestionado la integración de imágenes y la optimización de la persistencia de datos y relaciones complejas entre entidades en la base de datos.
+Responsable del desarrollo de la arquitectura backend y de la lógica de negocio en las áreas de valoraciones, transacciones, productos y usuario. He implementado el flujo completo de transacciones P2P, el sistema de valoraciones, la seguridad mediante Spring Security y el ciclo de vida integral de los productos . Además, he gestionado la integración de imágenes y la optimización de la persistencia de datos y relaciones complejas entre entidades en la base de datos.
 
 > **Nota sobre los archivos:** En la columna "Files" se han listado únicamente los archivos más representativos de cada hito técnico. El desarrollo de controladores y servicios implica la gestión coordinada de sus respectivos repositorios y capas de lógica asociada para el correcto funcionamiento del sistema.
 
