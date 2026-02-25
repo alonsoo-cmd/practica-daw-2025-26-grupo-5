@@ -158,8 +158,9 @@ public class UserService {
             transactionRepository.deleteAll(userTransactions);
         }
 
-        // 2. Clear Interactions
+        // 2. Clear Interactions 
         interactionRepository.deleteByUser(user);
+        interactionRepository.deleteByProductSeller(user);
 
         // 3. Final Delete (Cascade handles products)
         userRepository.delete(user);
