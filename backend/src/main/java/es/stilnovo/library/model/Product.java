@@ -2,6 +2,7 @@ package es.stilnovo.library.model;
 
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity(name = "ProductTable")
 public class Product {
@@ -34,6 +35,9 @@ public class Product {
 
     // --- ADDED: Transient field for UI Logic (Uncommented) ---
     // Transient means this field is NOT saved to the database
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserInteraction> interactions;
+
     @Transient
     private boolean favorite; // Temporary flag for the view
 

@@ -233,22 +233,20 @@ public class ProductService {
      */
     @Transactional
     public void deleteProduct(Long id, String username) {
-        
-        // 1. Domain Logic: Retrieve the user and product entities from the database [cite: 681, 754]
         User user = userRepository.findByName(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
-        // 2. Security Check: Compare the authenticated User ID with the Product's Seller ID [cite: 782, 942]
-        // We use .equals() for safe object comparison of Long values
-        if (!product.getSeller().getUserId().equals(user.getUserId())) {
-            // Throw 403 Forbidden to prevent unauthorized deletion [cite: 661]
+        // Check if they are the owner OR if they are an administrator
+        boolean isOwner = product.getSeller().getUserId().equals(user.getUserId());
+        boolean isAdmin = user.getRoles() != null && user.getRoles().contains("ROLE_ADMIN");
+
+        if (!isOwner && !isAdmin) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized: You do not own this product");
         }
 
-        // 3. Persistence: Delete the product and trigger cascading cleanup
         productRepository.delete(product);
     }
 
