@@ -179,16 +179,20 @@
             
         </div>
 
+        <div class="text-center mt-5 py-4">
+            {{^isLast}}
+                <button id="load-more" class="btn-load-more">Load more results</button>
+                <div id="spinner" class="spinner-border text-primary d-none ms-2" role="status"></div>
+            {{/isLast}}
+
+            {{#isLast}}
+                <button class="btn-no-more" disabled>No more treasures found</button>
+            {{/isLast}}
+        </div>
+
         {{#isLast}}
         <div id="no-more-marker" style="display:none;"></div>
         {{/isLast}}
-
-        <div class="text-center mt-5 py-4">
-            <button id="load-more" class="btn-load-more">Load more results</button>
-            <svg id="spinner" class="stn-loader d-none ms-2" viewBox="25 25 50 50">
-                <circle r="20" cy="50" cx="50"></circle>
-            </svg>        
-        </div>
     </section>
     
     {{>footer}}

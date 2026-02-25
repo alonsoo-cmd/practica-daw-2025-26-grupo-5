@@ -59,9 +59,16 @@ public class MainController {
             }
         }
 
+
         // 2. Populate Model
         boolean logged = (user != null);
         boolean isAdmin = mainService.isUserAdmin(user);
+        boolean isLast = true;
+
+        if (!products.isEmpty() && products.size() > 10) {
+            isLast = false;
+            products = products.subList(0, 10); // Show only the first 10 products
+        }
                 
         model.addAttribute("products", products);
         model.addAttribute("recommendedProducts", recommendedProducts);
@@ -70,6 +77,7 @@ public class MainController {
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("query", (query != null) ? query : (category != null ? category : ""));
         model.addAttribute("searching", isSearching);
+        model.addAttribute("isLast", isLast);
 
         // 3. Navigation Logic
         if (products.size() == 1 && isSearching) {
