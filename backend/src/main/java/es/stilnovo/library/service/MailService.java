@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
+/** Service for sending email notifications to users */
 @Service
 public class MailService {
 

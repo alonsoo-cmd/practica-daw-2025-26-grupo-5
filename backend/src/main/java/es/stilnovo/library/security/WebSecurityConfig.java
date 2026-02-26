@@ -10,6 +10,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+/** Spring Security configuration for the application.
+ *  Defines access rules, authentication, password encoding, and CSRF protection. */
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {

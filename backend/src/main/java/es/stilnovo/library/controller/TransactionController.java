@@ -19,6 +19,7 @@ import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
 import jakarta.mail.MessagingException;
 
+/** Controller for handling purchase transactions and payment confirmation */
 @Controller
 public class TransactionController {
 

@@ -26,6 +26,7 @@ import es.stilnovo.library.service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 
+/** Controller for user profile, settings, favorites, and order history */
 @Controller
 public class UserWebController {
 

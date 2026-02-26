@@ -15,6 +15,9 @@ import java.util.List;
  * Provides abstracted data access for user feedback and reputation management.
  */
 @Repository
+/**
+ * Repository for Valoration (review/rating) CRUD operations
+ */
 public interface ValorationRepository extends JpaRepository<Valoration, Long> {
 
     /**

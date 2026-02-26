@@ -16,6 +16,10 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 
+/**
+ * Represents a user/member of the marketplace platform.
+ * Can be a buyer, seller, or admin with different permissions.
+ */
 @Entity(name = "UserTable")
 public class User {
 
@@ -23,53 +27,61 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long userId;
 
+    /** User's username/login name */
     public Long getUserId() {
         return userId;
     }
 
+    /** Username for login */
     private String name;
 
+    /** Encrypted password */
     private String encodedPassword;
 
+    /** User roles (ROLE_USER, ROLE_ADMIN, etc.) */
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;
 
+    /** User profile image */
     @Lob
     private Blob profileImage;
 
+    /** Average rating as a seller (1-5 stars) */
     private Double rating;
 
     @Column(unique = true, nullable = false)
     private String email;
 
-    // banned status for users
+    /** Whether user is banned from the platform */
     @Column(nullable = false)
     private boolean banned = false;
 
-    // Payment / card info (some controllers/services referenced these)
+    /** Payment card information (for purchases) */
     private String cardNumber;
     private String cardCvv;
     private String cardExpiringDate;
 
-    // Additional metadata expected by services
+    /** User profile description/bio */
     private String description;
 
-    // number of ratings / reviews
+    /** Count of ratings/reviews received */
     private int numRatings;
 
-    // Financial fields used by TransactionService / others
+    /** Account balance/wallet */
     private double balance;
+    
+    /** Total revenue from product sales */
     private double totalRevenue;
 
-    // One-to-many: products the user is selling
+    /** Products this user is selling */
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
 
-    // Favorite products (many-to-many)
+    /** Products this user has marked as favorites */
     @ManyToMany
     private List<Product> favoriteProducts = new ArrayList<>();
 
-    // Valorations / ratings received as seller (class Valoration assumed present in project)
+    /** Ratings/reviews received from buyers (as a seller) */
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Valoration> valorations = new ArrayList<>();
 

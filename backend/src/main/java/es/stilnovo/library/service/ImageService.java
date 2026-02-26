@@ -15,6 +15,7 @@ import es.stilnovo.library.model.Image;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.repository.ImageRepository;
 
+/** Service for handling product image upload, retrieval, and storage */
 @Service
 public class ImageService {
 

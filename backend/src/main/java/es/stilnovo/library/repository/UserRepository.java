@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import es.stilnovo.library.model.User;
 
+/** Repository for User CRUD operations and custom queries */
 public interface UserRepository extends JpaRepository<User, Long> {
     
     Optional<User> findByName(String name);

@@ -11,6 +11,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 
+/**
+ * Represents a product image stored in the database.
+ */
 @Entity(name="ImageTable")
 public class Image {
 
@@ -18,9 +21,11 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    /** The image file stored as binary data */
     @Lob
     private Blob imageFile;
 
+    /** The product this image belongs to */
     @ManyToOne
     @JsonIgnore
     private Product product;

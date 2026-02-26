@@ -3,6 +3,9 @@ package es.stilnovo.library.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * Represents a completed transaction/sale between buyer and seller.
+ */
 @Entity(name = "TransactionTable")
 public class Transaction {
 
@@ -10,33 +13,42 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long transactionId;
 
+    /** The seller in this transaction */
     @ManyToOne
     private User seller;
 
+    /** The buyer in this transaction */
     @ManyToOne
     private User buyer;
 
     /**
-    * One product belongs to exactly one transaction.
-    * cascade = CascadeType.MERGE ensures that if the product 
-    * state changes (e.g., becomes 'Sold'), it saves correctly.
+    * Product being sold in this transaction.
+    * cascade = CascadeType.MERGE ensures product status updates are saved correctly.
     */
     @OneToOne(cascade = CascadeType.MERGE)
     private Product product;
 
+    /** Final price paid by buyer */
     private double finalPrice;
+    
+    /** When transaction was created */
     private LocalDateTime createdAt;
-    private String transactionStatus; 
+    
+    /** Transaction status: Pending, Completed, Cancelled, etc. */
+    private String transactionStatus;
 
     // Rating integration
-    // We use @Transient so it's NOT saved in the database, 
-    // it's only used for the logic of the view
+    /** Whether the buyer has rated the seller for this transaction */
     @Transient
     private boolean rated;
-    private Integer stars; // 1 to 5
+    
+    /** Star rating given by buyer to seller (1-5 stars) */
+    private Integer stars;
 
+    /** Default constructor for JPA */
     public Transaction() {}
 
+    /** Create transaction for a product purchase */
     public Transaction(User seller, User buyer, Product product, String status) {
         this.seller = seller;
         this.buyer = buyer;

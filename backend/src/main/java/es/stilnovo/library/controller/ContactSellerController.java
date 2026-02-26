@@ -14,6 +14,7 @@ import es.stilnovo.library.model.User;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
 
+/** Controller for buyer-to-seller communication/inquiry page */
 @Controller
 public class ContactSellerController {
 

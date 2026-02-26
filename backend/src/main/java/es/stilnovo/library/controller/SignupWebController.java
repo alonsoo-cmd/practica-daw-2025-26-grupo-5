@@ -22,6 +22,7 @@ import org.springframework.ui.Model;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+/** Controller for user registration/signup */
 @Controller
 public class SignupWebController {
 

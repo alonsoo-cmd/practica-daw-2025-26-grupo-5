@@ -4,23 +4,39 @@ package es.stilnovo.library.model;
 import jakarta.persistence.*;
 import java.util.List;
 
+/**
+ * Represents a product/item listed for sale on the marketplace.
+ * Contains product details like name, price, description, and seller information.
+ */
 @Entity(name = "ProductTable")
 public class Product {
 
+    /** Unique identifier for this product */
+    /** Unique identifier for this product */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    /** Product name/title */
     private String name;
+    
+    /** Category of product (Electronics, Books, etc.) */
     private String category;
+    
+    /** Price of the product */
     private double price;
+    
+    /** Location where product is available */
     private String location;
 
+    /** Detailed product description */
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    /** Product status: Active, Inactive, or Sold */
     private String status; // active, inactive
     
+    /** Primary image associated with this product */
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Image image;
 
@@ -29,18 +45,19 @@ public class Product {
     @OneToMany(cascade  = CascadeType.ALL)
     private List<Image> images;*/
 
-
+    /** The seller (User) who owns this product */
     @ManyToOne
     private User seller; // product owner
 
-    // --- ADDED: Transient field for UI Logic (Uncommented) ---
-    // Transient means this field is NOT saved to the database
+    /** User interactions with this product (for analytics/recommendations) */
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserInteraction> interactions;
 
+    /** Temporary flag: whether current user marked this as favorite (not saved to DB) */
     @Transient
     private boolean favorite; // Temporary flag for the view
 
+    /** Get/Set favorite status for UI display */
     public boolean isFavorite() {
         return favorite;
     }
@@ -49,6 +66,7 @@ public class Product {
         this.favorite = favorite;
     }
 
+    // CONSTRUCTORS
     public Product() {}
 
     public Product(String name, String category, double price, String description, String status, User seller, String location) {
@@ -62,7 +80,7 @@ public class Product {
     }
 
 
-    // --- GETTERS AND SETTERS ---
+    // GETTERS AND SETTERS
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -94,10 +112,7 @@ public class Product {
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
     
-    /**
-     * Helper method for UI logic. 
-     * Mustache interprets this as the 'isActive' boolean property.
-     */
+    /** Check if product is currently active/available for purchase */
     public boolean isActive() {
         return "Active".equalsIgnoreCase(this.status);
     }

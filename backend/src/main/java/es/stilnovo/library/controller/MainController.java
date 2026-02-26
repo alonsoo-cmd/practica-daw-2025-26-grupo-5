@@ -16,6 +16,7 @@ import es.stilnovo.library.model.User;
 import es.stilnovo.library.service.MainService;
 import es.stilnovo.library.service.ProductService; 
 
+/** Controller for homepage and main product search/browsing */
 @Controller
 public class MainController {
 
@@ -25,6 +26,7 @@ public class MainController {
     @Autowired
     private ProductService productService;
 
+    /** Display homepage with product listings and recommendations */
     @GetMapping("/")
     public String index(Model model,
                         @RequestParam(required = false) String query,

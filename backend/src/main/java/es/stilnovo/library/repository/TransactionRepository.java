@@ -9,6 +9,9 @@ import java.util.List;
  * Repository for Transaction entities.
  * Provides methods to retrieve sales and purchases for specific users.
  */
+/**
+ * Repository for Transaction CRUD operations
+ */
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     
     // Retrieves all transactions where the user was the buyer

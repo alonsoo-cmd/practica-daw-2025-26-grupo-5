@@ -17,6 +17,7 @@ import es.stilnovo.library.model.Image;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.service.ProductService;
 
+/** Controller for serving product images */
 @Controller
 public class ImageController {
 

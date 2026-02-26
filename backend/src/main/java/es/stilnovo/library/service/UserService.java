@@ -32,6 +32,7 @@ import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
 import org.springframework.transaction.annotation.Transactional;
 
+/** Business logic for user operations (CRUD, profile management, ratings) */
 @Service
 public class UserService {
 
@@ -41,6 +42,7 @@ public class UserService {
     @Autowired
     private UserInteractionRepository interactionRepository;
 
+    /** Save or update a user */
     public void save(User user) {
         userRepository.save(user);
     }

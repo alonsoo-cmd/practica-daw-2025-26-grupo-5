@@ -13,6 +13,9 @@ import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
 
 
+/**
+ * Repository for Product CRUD operations and custom search queries
+ */
 public interface ProductRepository extends JpaRepository<Product, Long> {
     // Spring generates the SQL automatically: SELECT * FROM Product WHERE user_id = ?
     List<Product> findBySeller(User seller);

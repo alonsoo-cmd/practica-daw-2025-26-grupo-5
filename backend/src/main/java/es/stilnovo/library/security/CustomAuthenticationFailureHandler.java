@@ -13,6 +13,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/** Handles authentication failures - redirects banned users to banned page. */
 @Component
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
 

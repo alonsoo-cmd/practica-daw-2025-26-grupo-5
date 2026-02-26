@@ -8,6 +8,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+/**
+ * Represents a customer inquiry/question about a product.
+ * Allows buyers to contact sellers before purchase.
+ */
 @Entity(name = "InquiryTable")
 public class Inquiry {
 
@@ -15,20 +19,40 @@ public class Inquiry {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    /** ID of the product this inquiry is about */
     private Long productId;
+    
+    /** Name of the product */
     private String productName;
+    
+    /** ID of the seller */
     private Long sellerId;
+    
+    /** Email of the seller */
     private String sellerEmail;
+    
+    /** ID of the buyer asking the question */
     private Long buyerId;
+    
+    /** Name of the buyer */
     private String buyerName;
+    
+    /** Email of the buyer */
     private String buyerEmail;
+    
+    /** Phone number of the buyer */
     private String buyerPhone;
+    
+    /** Type of inquiry (question, offer, complaint, etc.) */
     private String inquiryType;
 
     @Column(columnDefinition = "TEXT")
     private String message;
 
+    /** When the inquiry was created */
     private LocalDateTime createdAt;
+    
+    /** Status of inquiry: Open, Answered, Closed, etc. */
     private String status;
 
     public Long getId() {

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.repository.UserRepository;
 
+/** Service to load user details from database for Spring Security authentication.
+ *  Handles role conversion and banned user detection. */
 @Service
 public class RepositoryUserDetailsService implements UserDetailsService {
 

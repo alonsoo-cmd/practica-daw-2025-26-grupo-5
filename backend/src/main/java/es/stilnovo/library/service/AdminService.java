@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import es.stilnovo.library.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+/** Business logic for admin operations (user management, statistics) */
 @Service
 public class AdminService {
 

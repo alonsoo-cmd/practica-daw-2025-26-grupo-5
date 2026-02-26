@@ -25,6 +25,7 @@ import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
 
+/** Controller for generating and serving PDF invoices/receipts for transactions */
 @Controller
 public class PdfController {
 

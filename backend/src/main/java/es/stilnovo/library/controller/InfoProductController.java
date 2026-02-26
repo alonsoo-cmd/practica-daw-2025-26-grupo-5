@@ -16,7 +16,7 @@ import es.stilnovo.library.model.User;
 import es.stilnovo.library.service.MainService;
 import es.stilnovo.library.service.ProductService;
 
-
+/** Controller for displaying detailed product information page */
 @Controller
 public class InfoProductController {
 

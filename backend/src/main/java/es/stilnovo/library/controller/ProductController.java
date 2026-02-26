@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.service.MainService;
-import es.stilnovo.library.service.ProductService; 
+import es.stilnovo.library.service.ProductService;
 
+/** Controller for product loading and pagination */
 @Controller
 public class ProductController {
 
@@ -24,6 +25,7 @@ public class ProductController {
     @Autowired
     private MainService mainService;
 
+    /** Load more products via AJAX for infinite scroll */
     @GetMapping("/load-more-products")
     public String loadMore(@RequestParam int offset, 
                            @RequestParam(required = false) String query,

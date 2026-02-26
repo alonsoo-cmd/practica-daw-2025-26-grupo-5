@@ -18,6 +18,7 @@ import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.repository.UserRepository;
 
+/** Initializes database with sample data on application startup */
 @Service
 public class DataBaseInitializer {
 

@@ -23,6 +23,7 @@ import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.repository.UserRepository;
 import jakarta.transaction.Transactional;
 
+/** Business logic for product operations (CRUD, search, recommendations) */
 @Service
 public class ProductService {
 
@@ -38,6 +39,7 @@ public class ProductService {
     @Autowired
     private ImageService imageService;
     
+    /** Check if product exists by ID */
     public boolean exist(long id) {
         return productRepository.existsById(id);
     }

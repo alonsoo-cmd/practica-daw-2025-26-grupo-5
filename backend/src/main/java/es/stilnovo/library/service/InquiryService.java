@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import es.stilnovo.library.model.Inquiry;
 import es.stilnovo.library.repository.InquiryRepository;
 
+/** Service for handling customer inquiries and questions about products */
 @Service
 public class InquiryService {
 

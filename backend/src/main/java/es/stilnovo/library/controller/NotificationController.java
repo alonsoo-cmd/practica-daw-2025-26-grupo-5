@@ -21,6 +21,7 @@ import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
 import jakarta.mail.MessagingException;
 
+/** Controller for handling customer inquiries and notifications to sellers */
 @Controller
 public class NotificationController {
 

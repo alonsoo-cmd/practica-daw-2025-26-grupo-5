@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+/** Controller for login and authentication pages */
 @Controller
 public class LoginWebController {
 
+    /** Show login form */
     @GetMapping("/login-page")
     public String login(Model model, HttpServletRequest request) {
 
@@ -21,6 +23,7 @@ public class LoginWebController {
         return "login-page";
     }
 
+    /** Show login form with error message after failed login */
     @GetMapping("/login-error")
     public String loginError(Model model, HttpServletRequest request) {
 
@@ -33,7 +36,7 @@ public class LoginWebController {
         return "login-page";
     }
 
-    //NEW ENDPOINT
+    /** Show banned user page */
     @GetMapping("/banned")
     public String bannedPage() {
         return "banned-page";
