@@ -6,7 +6,17 @@ import org.springframework.stereotype.Service;
 import es.stilnovo.library.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Business logic for admin operations (user management, statistics) */
+/**
+ * AdminService: Manages administrative operations
+ * 
+ * This service handles:
+ * - User deletion and account removal
+ * - User banning/unbanning
+ * - System statistics (total users, banned users count)
+ * - Admin panel data preparation
+ * 
+ * Uses: UserRepository, UserService
+ */
 @Service
 public class AdminService {
 

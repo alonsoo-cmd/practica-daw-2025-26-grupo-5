@@ -9,8 +9,15 @@ import es.stilnovo.library.model.User;
 import es.stilnovo.library.repository.UserRepository;
 
 /**
- * Service to offload logic from the MainController.
- * Handles product searching and user context retrieval.
+ * MainService: Central service for homepage and main operations
+ * 
+ * This service handles:
+ * - Product searching by query text or category filter
+ * - User context retrieval from authentication
+ * - Admin privilege checking
+ * - Main page data preparation
+ * 
+ * Uses: ProductService, UserRepository
  */
 @Service
 public class MainService {

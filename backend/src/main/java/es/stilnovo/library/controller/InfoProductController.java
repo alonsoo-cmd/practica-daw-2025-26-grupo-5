@@ -16,7 +16,19 @@ import es.stilnovo.library.model.User;
 import es.stilnovo.library.service.MainService;
 import es.stilnovo.library.service.ProductService;
 
-/** Controller for displaying detailed product information page */
+/**
+ * InfoProductController: Displays detailed product information pages
+ * 
+ * This controller manages:
+ * - Product details display (description, price, seller info, images)
+ * - Product availability status checking
+ * - Related/similar products display
+ * - Buyer can contact seller functionality
+ * - Favorite/unfavorite product actions
+ * - In-stock availability status
+ * 
+ * Uses: ProductService, UserService
+ */
 @Controller
 public class InfoProductController {
 

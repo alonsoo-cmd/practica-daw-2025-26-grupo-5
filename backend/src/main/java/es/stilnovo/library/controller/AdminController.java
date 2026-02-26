@@ -16,6 +16,20 @@ import es.stilnovo.library.service.AdminService;
 import es.stilnovo.library.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 
+/**
+ * AdminController: Handles all administrative panel operations
+ * 
+ * This controller manages:
+ * - Admin dashboard display (statistics, user count, banned users)
+ * - User list management and filtering
+ * - User deletion from the system
+ * - User banning/unbanning functionality
+ * - System inventory view
+ * - Transaction history view
+ * 
+ * All endpoints are protected with ADMIN role requirement
+ * Uses: AdminService, UserService
+ */
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
@@ -24,8 +38,12 @@ public class AdminController {
     private AdminService adminService;
 
     @Autowired
-    private UserService userService;  
-
+    private UserService userService;
+    
+    /**
+     * Displays the main admin dashboard with system statistics
+     * Shows: total users, banned users count, recent users list, memory usage
+     */
     @GetMapping({ "", "/", "/panel" })
     public String showAdminPanel(Model model) {
 
@@ -48,8 +66,10 @@ public class AdminController {
         return "admin-panel-page";
     }
 
-
-    // List users: añadimos el objeto _csrf al modelo para que Mustache lo use
+    /**
+     * Lists all users in the system with sorting/filtering
+     * Includes CSRF token for delete/ban operations
+     */
     @GetMapping("/users")
     public String listUsers(Model model, HttpServletRequest request) {
         // Use service layer instead of direct repository access
@@ -65,17 +85,28 @@ public class AdminController {
         return "admin-user-managment-page";
     }
 
+    /**
+     * Displays global product inventory view
+     * Shows all products in the system with status
+     */
     @GetMapping("/global-inventory")
     public String showGlobalInventory() {
         return "admin-global-invent-page";
     }
 
+    /**
+     * Displays all transactions in the system
+     * Shows: buyer, seller, product, price, status, timestamp
+     */
     @GetMapping("/transactions")
     public String showTransactions() {
         return "admin-global-transac-page";
     }
 
-    //safe delete
+    /**
+     * Permanently deletes a user account from the system
+     * Also deletes all associated products, transactions, and reviews
+     */
     @PostMapping("/users/delete/{id}")
     public String deleteUser(@PathVariable Long id) {
 
@@ -84,9 +115,10 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    
-
-    // Ban / Unban user (toggle)
+    /**
+     * Toggles user banned status (ban/unban)
+     * Banned users cannot log in or perform any actions
+     */
     @PostMapping("/users/ban/{id}")
     public String toggleBanUser(@PathVariable Long id) {
 

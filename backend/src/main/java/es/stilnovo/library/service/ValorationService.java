@@ -20,8 +20,15 @@ import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.repository.TransactionRepository;
 
 /**
- * Service responsible for managing user feedback and calculating seller reputation.
- * It ensures that every review is linked to a valid transaction.
+ * ValorationService: Manages user reviews and ratings
+ * 
+ * This service handles:
+ * - Rating/review creation after completed transactions
+ * - Pending reviews retrieval (transactions awaiting feedback)
+ * - Seller rating calculation and aggregation
+ * - Review persistence and management
+ * 
+ * Uses: ValorationRepository, UserRepository, TransactionRepository
  */
 @Service
 public class ValorationService {

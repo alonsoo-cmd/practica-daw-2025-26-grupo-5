@@ -23,7 +23,19 @@ import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.repository.UserRepository;
 import jakarta.transaction.Transactional;
 
-/** Business logic for product operations (CRUD, search, recommendations) */
+/**
+ * ProductService: Manages all product-related operations
+ * 
+ * This service handles:
+ * - Product CRUD operations (create, read, update, delete)
+ * - Product search and filtering (by name, category, seller)
+ * - Product availability status management
+ * - Product image handling
+ * - Personalized product recommendations based on user interactions
+ * - User interaction tracking (views, likes, purchases)
+ * 
+ * Uses: ProductRepository, UserRepository, ImageService, UserInteractionRepository
+ */
 @Service
 public class ProductService {
 
@@ -39,7 +51,7 @@ public class ProductService {
     @Autowired
     private ImageService imageService;
     
-    /** Check if product exists by ID */
+    /** Checks if a product exists by ID */
     public boolean exist(long id) {
         return productRepository.existsById(id);
     }
@@ -48,6 +60,7 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    /** Gets a product by ID from database */
     public Optional<Product> findById(long id) {
         return productRepository.findById(id);
     }
@@ -56,6 +69,7 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
+    /** Retrieves all products with a specific status (Active, Inactive, Sold) */
     public List<Product> findProductsByStatus(String status){
         return productRepository.findByStatus(status);
     }

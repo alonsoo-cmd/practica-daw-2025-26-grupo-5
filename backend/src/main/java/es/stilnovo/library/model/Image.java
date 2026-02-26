@@ -12,7 +12,18 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 
 /**
- * Represents a product image stored in the database.
+ * Image: Stores product images as binary data
+ * 
+ * This entity manages:
+ * - Binary image files (BLOB format)
+ * - Image-to-product association
+ * - Image metadata (ID only)
+ * 
+ * Relationships:
+ * - ManyToOne: Product (the product this image belongs to)
+ * 
+ * JsonIgnore prevents infinite JSON serialization loops
+ * Used by: ImageService, ProductService
  */
 @Entity(name="ImageTable")
 public class Image {

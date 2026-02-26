@@ -17,8 +17,17 @@ import es.stilnovo.library.service.ValorationService;
 import es.stilnovo.library.service.UserService;
 
 /**
- * Handles user interactions regarding reviews and feedback.
- * All private routes use the Principal to ensure secure access.
+ * ValorationController: Manages product reviews and seller ratings
+ * 
+ * This controller manages:
+ * - Display pending reviews/ratings page
+ * - Review submission (1-5 stars + comment)
+ * - Review validation and persistence
+ * - Seller rating calculation after review
+ * - User valorations (ratings received) page
+ * - Review history display
+ * 
+ * Uses: ValorationService, UserService
  */
 @Controller
 public class ValorationController {

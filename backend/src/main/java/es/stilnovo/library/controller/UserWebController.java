@@ -26,7 +26,20 @@ import es.stilnovo.library.service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 
-/** Controller for user profile, settings, favorites, and order history */
+/**
+ * UserWebController: Manages user profile and account pages
+ * 
+ * This controller manages:
+ * - User profile page display
+ * - Profile photo upload/retrieval
+ * - User settings and preference management
+ * - Favorite products management
+ * - Order/transaction history
+ * - User valorations (ratings received)
+ * - Password changes and account updates
+ * 
+ * Uses: ProductService, UserService, TransactionService
+ */
 @Controller
 public class UserWebController {
 

@@ -5,8 +5,23 @@ import jakarta.persistence.*;
 import java.util.List;
 
 /**
- * Represents a product/item listed for sale on the marketplace.
- * Contains product details like name, price, description, and seller information.
+ * Product: Represents an item/product listed for sale
+ * 
+ * This entity manages:
+ * - Product details (name, description, price, category, location)
+ * - Product status (Active, Inactive, or Sold)
+ * - Product image and media
+ * - Seller information (who is selling this item)
+ * - User interactions tracking (analytics, recommendations)
+ * - Purchase availability checks
+ * 
+ * Relationships:
+ * - ManyToOne: User (the seller)
+ * - OneToOne: Image (product photo)
+ * - OneToMany: UserInteraction (views, likes, purchases)
+ * 
+ * Transient field 'favorite' is used by UI for real-time display
+ * Used by: Controllers, Services, Repositories
  */
 @Entity(name = "ProductTable")
 public class Product {

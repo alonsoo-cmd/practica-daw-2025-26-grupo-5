@@ -16,7 +16,19 @@ import es.stilnovo.library.model.User;
 import es.stilnovo.library.service.MainService;
 import es.stilnovo.library.service.ProductService; 
 
-/** Controller for homepage and main product search/browsing */
+/**
+ * MainController: Displays the homepage and handles product browsing
+ * 
+ * This controller manages:
+ * - Homepage display with product listings
+ * - Product search by query text
+ * - Product filtering by category
+ * - Personalized recommendations (for logged-in users)
+ * - Pagination/infinite scroll for product loading
+ * - Auto-redirect when search returns single product
+ * 
+ * Uses: MainService, ProductService
+ */
 @Controller
 public class MainController {
 

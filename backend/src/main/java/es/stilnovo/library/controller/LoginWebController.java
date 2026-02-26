@@ -7,7 +7,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-/** Controller for login and authentication pages */
+/**
+ * LoginWebController: Handles user authentication and login pages
+ * 
+ * This controller manages:
+ * - Login form display with CSRF protection
+ * - Failed login error handling
+ * - Banned user detection and restriction
+ * - Login error messages
+ * - Banned user informational page
+ * 
+ * Uses: No service - works directly with Spring Security
+ */
 @Controller
 public class LoginWebController {
 

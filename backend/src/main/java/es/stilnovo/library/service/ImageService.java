@@ -15,7 +15,17 @@ import es.stilnovo.library.model.Image;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.repository.ImageRepository;
 
-/** Service for handling product image upload, retrieval, and storage */
+/**
+ * ImageService: Handles product image storage and retrieval
+ * 
+ * This service handles:
+ * - Image file upload and validation
+ * - Image format conversion to BLOB (binary data)
+ * - Image retrieval by ID
+ * - Image association with products
+ * 
+ * Uses: ImageRepository
+ */
 @Service
 public class ImageService {
 

@@ -17,8 +17,22 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 
 /**
- * Represents a user/member of the marketplace platform.
- * Can be a buyer, seller, or admin with different permissions.
+ * User: Represents a marketplace participant (buyer, seller, or admin)
+ * 
+ * This entity manages:
+ * - User authentication (username, encrypted password, roles)
+ * - User profile (email, description, profile image, rating)
+ * - Seller data (products listed, ratings received from buyers)
+ * - Buyer data (favorite products, transaction history)
+ * - Financial data (credit card, balance, revenue from sales)
+ * - Account status (banned flag for policy violations)
+ * 
+ * Relationships:
+ * - OneToMany: Products (seller's items for sale)
+ * - ManyToMany: Favorite products (bookmarked/liked items)
+ * - OneToMany: Valorations (reviews received from buyers)
+ * 
+ * Used by: Controllers, Services, Repositories
  */
 @Entity(name = "UserTable")
 public class User {

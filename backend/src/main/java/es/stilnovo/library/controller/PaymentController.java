@@ -12,9 +12,19 @@ import es.stilnovo.library.model.User;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
 
+import es.stilnovo.library.service.UserService;
+
 /**
- * Controller responsible for handling the secure checkout process.
- * Prepares the necessary data for the payment gateway view.
+ * PaymentController: Handles checkout and payment page display
+ * 
+ * This controller manages:
+ * - Payment form display
+ * - Product and buyer information validation
+ * - Prevention of sellers buying their own products
+ * - Redirection to login for unauthenticated users
+ * - Payment form data preparation (buyer info, product details)
+ * 
+ * Uses: ProductService, UserService
  */
 @Controller
 public class PaymentController {

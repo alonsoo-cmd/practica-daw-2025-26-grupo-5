@@ -4,7 +4,22 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- * Represents a completed transaction/sale between buyer and seller.
+ * Transaction: Represents a completed sale between buyer and seller
+ * 
+ * This entity manages:
+ * - Transaction parties (buyer, seller identities)
+ * - Transaction details (product, price, date)
+ * - Transaction status (Pending, Completed, Cancelled, Returned)
+ * - Rating/feedback system (post-purchase buyer feedback)
+ * - Financial record keeping
+ * 
+ * Relationships:
+ * - ManyToOne: User seller (who is selling)
+ * - ManyToOne: User buyer (who is purchasing)
+ * - OneToOne: Product (item being sold)
+ * 
+ * Transient field 'rated' tracks if buyer has reviewed the seller
+ * Used by: Services for order processing, Controllers for transaction display
  */
 @Entity(name = "TransactionTable")
 public class Transaction {

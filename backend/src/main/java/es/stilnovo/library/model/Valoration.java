@@ -3,8 +3,24 @@ package es.stilnovo.library.model;
 import jakarta.persistence.*;
 
 /**
- * Entity representing user feedback after a completed transaction. [cite: 93]
- * Essential for the recommendation algorithm and seller reputation. [cite: 60, 65]
+ * Valoration: Represents a seller review/rating from a buyer
+ * 
+ * This entity manages:
+ * - Star rating (1-5 scale from buyer to seller)
+ * - Written review/comment from buyer
+ * - Link to completed transaction (proof of purchase)
+ * - Seller and buyer identification
+ * 
+ * Relationships:
+ * - OneToOne: Transaction (the completed sale being reviewed)
+ * - ManyToOne: User seller (receiving the rating)
+ * - ManyToOne: User buyer (giving the rating)
+ * 
+ * Used by:
+ * - ValorationService for rating management
+ * - Controllers for valoration display and creation
+ * - Recommendation engine for seller reputation
+ * - Analytics for marketplace trust metrics
  */
 @Entity
 @Table(name = "ValorationTable")

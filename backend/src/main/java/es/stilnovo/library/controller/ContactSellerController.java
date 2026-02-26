@@ -14,7 +14,19 @@ import es.stilnovo.library.model.User;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
 
-/** Controller for buyer-to-seller communication/inquiry page */
+/**
+ * ContactSellerController: Handles buyer-to-seller messaging
+ * 
+ * This controller manages:
+ * - Inquiry form display for contacting sellers
+ * - Inquiry submission and validation
+ * - Message/question storage
+ * - Spam prevention via cooldown periods
+ * - Seller notification of new inquiries
+ * - Inquiry status tracking
+ * 
+ * Uses: InquiryService, ProductService, UserService, MailService
+ */
 @Controller
 public class ContactSellerController {
 
