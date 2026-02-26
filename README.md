@@ -279,10 +279,29 @@ Solo un recordatorio: como la aplicación usa HTTPS en el puerto 8443, la primer
 
 Diagrama mostrando las entidades, sus campos y relaciones:
 
-![Diagrama Entidad-Relación](images/database-diagram.png)
+![Diagrama Entidad-Relación](Readme-Images/EntidadRelacion.png)
 
-> [Descripción opcional: Ej: "El diagrama muestra las 4 entidades principales: Usuario, Producto, Pedido y Categoría, con sus respectivos atributos y relaciones 1:N y N:M."]
-
+> **Descripción del Diagrama:**
+> 
+> El diagrama ilustra las **7 entidades principales** de la base de datos del marketplace:
+> 
+> - **User**: Gestiona usuarios (compradores, vendedores, administradores) con autenticación, perfiles, datos financieros (tarjeta, balance, revenue), y estado de cuenta (banned).
+> - **Product**: Productos en venta con nombre, categoría, precio, ubicación, descripción, estado (Active/Inactive/Sold) y relación con el vendedor.
+> - **Transaction**: Registros de transacciones completadas entre comprador y vendedor, incluyendo precio final, estado y sistema de valoración (stars).
+> - **Image**: Almacenamiento de imágenes de productos en formato BLOB.
+> - **Inquiry**: Mensajes/consultas de compradores a vendedores sobre productos específicos, con seguimiento de estado (Open/Answered/Closed).
+> - **UserInteraction**: Seguimiento de interacciones usuario-producto (VIEW, LIKE, BUY) para analytics y recomendaciones.
+> - **Valoration**: Sistema de reviews y ratings (1-5 estrellas) de compradores hacia vendedores post-compra.
+> 
+> **Relaciones clave:**
+> - Usuario **1:N** Productos (un vendedor tiene múltiples productos)
+> - Usuario **N:M** Productos (favoritos)
+> - Producto **1:1** Imagen
+> - Transaction **N:1** Usuario (buyer y seller)
+> - Transaction **1:1** Producto
+> - Valoration **1:1** Transaction (una valoración por transacción)
+> - Valoration **N:1** Usuario (buyer y seller)
+> - UserInteraction **N:1** Usuario y Producto
 ### **Diagrama de Clases y Templates**
 
 Diagrama de clases de la aplicación con diferenciación por colores o secciones:
