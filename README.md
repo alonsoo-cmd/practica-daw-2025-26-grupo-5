@@ -279,7 +279,7 @@ Solo un recordatorio: como la aplicación usa HTTPS en el puerto 8443, la primer
 
 Diagrama mostrando las entidades, sus campos y relaciones:
 
-![Diagrama Entidad-Relación](Readme-Images/README-FOTOS/EntidadRelacion.png))
+![Diagrama Entidad-Relación](Readme-Images/README-FOTOS/EntidadRelacion.png)
 
 > **Descripción del Diagrama:**
 > 
