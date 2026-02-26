@@ -302,12 +302,11 @@ Diagrama de clases de la aplicación con diferenciación por colores o secciones
 > El diagrama refleja un flujo de dependencias unidireccional (Controlador → Servicio → Repositorio), minimizando el acoplamiento y permitiendo que la lógica de negocio sea independiente de la tecnología de persistencia o de la interfaz de usuario.
 
 ### **Participación de Miembros en la Práctica 1**
+> **Nota sobre los archivos:** En la columna "Files" se han listado únicamente los archivos más representativos de cada hito técnico. El desarrollo de controladores y servicios implica la gestión coordinada de sus respectivos repositorios y capas de lógica asociada para el correcto funcionamiento del sistema.
 
 #### **Alumno 1 - Victor Hugo Oliveira Petroceli**
 
 Responsable del desarrollo de la arquitectura backend y de la lógica de negocio en las áreas de valoraciones, transacciones, productos y usuario. He implementado el flujo completo de transacciones P2P, el sistema de valoraciones, la seguridad mediante Spring Security y el ciclo de vida integral de los productos . Además, he gestionado la integración de imágenes y la optimización de la persistencia de datos y relaciones complejas entre entidades en la base de datos.
-
-> **Nota sobre los archivos:** En la columna "Files" se han listado únicamente los archivos más representativos de cada hito técnico. El desarrollo de controladores y servicios implica la gestión coordinada de sus respectivos repositorios y capas de lógica asociada para el correcto funcionamiento del sistema.
 
 | Nº | Commits | Files |
 |:------------: |:------------:| :------------:|
@@ -319,9 +318,9 @@ Responsable del desarrollo de la arquitectura backend y de la lógica de negocio
 
 ---
 
-#### **Alumno 2 - [Nombre Completo]**
+#### **Alumno 2 - Alonso Gutiérrez Sánchez**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+Responsable de el botón de load-more gestionado mediante un archivo JavaScript AJAX y de la creación de los gráficos de distribución de ventas por categoría (Donut Chart), el de evolución de ingresos mensuales (Line Chart) y el de análisis de visitas contra interés (Bar Chart).
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
