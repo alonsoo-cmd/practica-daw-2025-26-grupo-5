@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
+import es.stilnovo.library.model.Valoration;
 import es.stilnovo.library.service.AdminService;
 import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
+import es.stilnovo.library.service.ValorationService;
 import jakarta.servlet.http.HttpServletRequest;
 
 
@@ -45,6 +47,9 @@ public class AdminController {
     
     @Autowired
     private TransactionService transactionService;
+
+    @Autowired
+    private ValorationService valorationService;
 
 
     /**
@@ -148,5 +153,31 @@ public class AdminController {
         userService.save(user);
 
         return "redirect:/admin/users";
+    }
+
+    @GetMapping("/valorations")
+    public String showGlobalValorations(Model model, HttpServletRequest request) {
+        
+        List<Valoration> valorations = valorationService.findAll(); // O el método que tengas para listar todas
+        model.addAttribute("globalValorations", valorations);
+        model.addAttribute("numValorations", valorations.size());
+        
+        // Opcional: Calcular media global de la plataforma
+        double avg = valorations.stream().mapToInt(Valoration::getStars).average().orElse(0.0);
+        model.addAttribute("avgRating", Math.round(avg * 10.0) / 10.0);
+
+        // Seguridad CSRF
+        CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
+        if (csrf != null) {
+            model.addAttribute("token", csrf.getToken());
+        }
+
+        return "admin-global-valorations-page";
+    }
+
+    @PostMapping("/valorations/delete/{id}")
+    public String deleteValoration(@PathVariable Long id) {
+        valorationService.deleteById(id);
+        return "redirect:/admin/valorations";
     }
 }

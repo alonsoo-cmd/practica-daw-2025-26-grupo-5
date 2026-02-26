@@ -168,4 +168,46 @@ public class ValorationService {
         // Since the stars have changed, the average must be updated immediately.
         updateSellerStats(valoration.getSeller());
     }
+
+    /**
+     * Retrieves all valorations from the database.
+     * Used by the Admin Global Valorations panel.
+     * * @return A list of all persisted valorations.
+     */
+    @Transactional(readOnly = true)
+    public List<Valoration> findAll() {
+        return valorationRepository.findAll();
+    }
+
+    /**
+     * Deletes a valoration by its ID (Admin version).
+     * This method disconnects the review from users and triggers an 
+     * atomic update of the seller's statistics (average rating and count).
+     *
+     * @param id The unique identifier of the valoration to be removed.
+     * @throws ResponseStatusException 404 if the valoration is not found.
+     */
+    @Transactional
+    public void deleteById(Long id) {
+        // 1. Find the valoration or throw 404
+        Valoration valoration = valorationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Valoration not found"));
+
+        // 2. Keep reference to the seller before deletion
+        User seller = valoration.getSeller();
+
+        // 3. Clear references in User entities to ensure consistency
+        if (seller != null) {
+            seller.getValorations().remove(valoration);
+        }
+
+        // 4. Perform the hard delete from the repository
+        valorationRepository.delete(valoration);
+
+        // 5. CRITICAL: Recalculate seller stats using the existing helper
+        // This updates the 'rating' and 'numRatings' fields in the user_table
+        if (seller != null) {
+            updateSellerStats(seller);
+        }
+    }
 }
