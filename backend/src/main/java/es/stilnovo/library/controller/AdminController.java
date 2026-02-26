@@ -11,10 +11,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.service.AdminService;
+import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+
 
 /**
  * AdminController: Handles all administrative panel operations
@@ -40,6 +43,10 @@ public class AdminController {
     @Autowired
     private UserService userService;
     
+    @Autowired
+    private TransactionService transactionService;
+
+
     /**
      * Displays the main admin dashboard with system statistics
      * Shows: total users, banned users count, recent users list, memory usage
@@ -94,14 +101,6 @@ public class AdminController {
         return "admin-global-invent-page";
     }
 
-    /**
-     * Displays all transactions in the system
-     * Shows: buyer, seller, product, price, status, timestamp
-     */
-    @GetMapping("/transactions")
-    public String showTransactions() {
-        return "admin-global-transac-page";
-    }
 
     /**
      * Permanently deletes a user account from the system
@@ -115,10 +114,29 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    /**
-     * Toggles user banned status (ban/unban)
-     * Banned users cannot log in or perform any actions
-     */
+
+    @GetMapping("/transactions")
+    public String showTransactions(Model model, HttpServletRequest request) { // Añade el request aquí
+        
+        model.addAttribute("totalRevenue", transactionService.getTotalRevenue());
+        model.addAttribute("numTransactions", transactionService.getTotalNumOfTransactions());
+
+        List<Transaction> globalTransactions = transactionService.getAllTransactions();
+        model.addAttribute("globalTransactions", globalTransactions);
+        
+        return "admin-global-transac-page";
+    }
+
+    @PostMapping("/transactions/delete/{id}")
+    public String deleteTransaction(@PathVariable Long id) {
+
+        transactionService.deleteTransacction(id);
+        
+        return "redirect:/admin/transactions";
+    }
+    
+
+    // Ban / Unban user (toggle)
     @PostMapping("/users/ban/{id}")
     public String toggleBanUser(@PathVariable Long id) {
 

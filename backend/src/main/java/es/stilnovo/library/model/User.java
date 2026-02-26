@@ -3,6 +3,7 @@ package es.stilnovo.library.model;
 import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

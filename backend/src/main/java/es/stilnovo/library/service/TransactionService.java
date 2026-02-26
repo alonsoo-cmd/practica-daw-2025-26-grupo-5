@@ -1,5 +1,7 @@
 package es.stilnovo.library.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,7 @@ import es.stilnovo.library.model.User;
 import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.TransactionRepository;
 import es.stilnovo.library.repository.UserRepository;
+import es.stilnovo.library.repository.ValorationRepository;
 
 @Service
 public class TransactionService {
@@ -24,6 +27,9 @@ public class TransactionService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ValorationRepository valorationRepository;
 
 
     /**
@@ -116,10 +122,81 @@ public class TransactionService {
      * @param username The authenticated username from Principal
      * @return List of transactions where this user is the seller
      */
-    public java.util.List<Transaction> getSellerTransactions(String username) {
+    public List<Transaction> getSellerTransactions(String username) {
         User seller = userRepository.findByName(username)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         
         return transactionRepository.findBySeller(seller);
+    }
+
+    /**
+     * This method returns all the transactions at the moment.
+     * @return a list of transactions
+     */
+    public List<Transaction> getAllTransactions() {
+        return transactionRepository.findAll();
+    }
+
+    /**
+     * This method returns the totalRevenue of Stilnovo
+     * @return the totalRevenue of earnings
+     */
+    public int getTotalRevenue() {
+        List<Transaction> transactions = getAllTransactions();
+        int totalRevenue = 0;
+        for (Transaction transaction : transactions) {
+            totalRevenue += transaction.getProduct().getPrice();
+        }
+        return totalRevenue;
+    }
+
+    public int getTotalNumOfTransactions() {
+        return getAllTransactions().size();
+    }
+
+    /**
+     * Performs a secure deletion of a transaction by its ID.
+     * This method reverts the business logic associated with the sale:
+     * 1. Removes linked ratings to satisfy foreign key constraints.
+     * 2. Sets the product status back to 'Active' so it can be sold again.
+     * 3. Subtracts the sale price from the seller's balance with decimal precision.
+     * 4. Detaches entity relationships before final removal.
+     *
+     * @param transactionId the unique identifier of the transaction to be deleted
+     * @throws RuntimeException if the transaction does not exist in the database
+     */
+    @Transactional
+    public void deleteTransacction(Long transactionId) {
+        // 1. Retrieve the transaction or throw exception if not found
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+
+        // 2. Remove associated valorations (ratings) to avoid Foreign Key constraint errors
+        valorationRepository.deleteByTransactionIn(List.of(transaction));
+
+        User seller = transaction.getSeller();
+        Product product = transaction.getProduct();
+
+        // 3. Revert product state: Make it available for sale again
+        if (product != null) {
+            product.setStatus("Active");
+            product.setSeller(seller); // Ensure it remains linked to the original owner
+        }
+
+        // 4. Financial rollback: Subtract the price from seller's balance
+        if (seller != null && product != null) {
+            double price = product.getPrice();
+            // Using Math.round to fix floating-point precision issues (e.g., 129.1100000000000)
+            double newBalance = seller.getBalance() - price;
+            seller.setBalance(Math.round(newBalance * 100.0) / 100.0);
+        }
+
+        // 5. Detach relationships to prevent persistence/cache collisions
+        transaction.setBuyer(null);
+        transaction.setSeller(null);
+        transaction.setProduct(null);
+
+        // 6. Permanent deletion from the repository
+        transactionRepository.delete(transaction);
     }
 }

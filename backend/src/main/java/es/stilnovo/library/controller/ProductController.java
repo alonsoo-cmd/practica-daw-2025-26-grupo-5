@@ -28,10 +28,10 @@ public class ProductController {
     /** Load more products via AJAX for infinite scroll */
     @GetMapping("/load-more-products")
     public String loadMore(@RequestParam int offset, 
-                           @RequestParam(required = false) String query,
-                           @RequestParam(required = false) String category,
-                           Principal principal,
-                           Model model) {
+                            @RequestParam(required = false) String query,
+                            @RequestParam(required = false) String category,
+                            Principal principal,
+                            Model model) {
         
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
         List<Product> products = new ArrayList<>(mainService.searchProducts(query, category));

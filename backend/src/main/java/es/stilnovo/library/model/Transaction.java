@@ -2,6 +2,7 @@ package es.stilnovo.library.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Transaction: Represents a completed sale between buyer and seller
@@ -101,4 +102,11 @@ public class Transaction {
 
     public Integer getStars() { return stars; }
     public void setStars(Integer stars) { this.stars = stars; }
+
+    public String getFormattedDate() {
+    if (this.createdAt == null) return "";
+    
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return this.createdAt.format(formatter);
+    }
 }

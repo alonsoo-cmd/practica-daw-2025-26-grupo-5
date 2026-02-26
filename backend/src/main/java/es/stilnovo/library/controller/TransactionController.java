@@ -118,7 +118,7 @@ public class TransactionController {
      * Similar in style to the inquiry email template.
      */
     private String createPurchaseConfirmationEmail(String productName, Double price, 
-                                                   String sellerName, String buyerName, String logoCid) {
+                                                    String sellerName, String buyerName, String logoCid) {
         return """
             <!DOCTYPE html>
             <html>
