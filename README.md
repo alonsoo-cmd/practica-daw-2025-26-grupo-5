@@ -279,10 +279,29 @@ Solo un recordatorio: como la aplicación usa HTTPS en el puerto 8443, la primer
 
 Diagrama mostrando las entidades, sus campos y relaciones:
 
-![Diagrama Entidad-Relación](images/database-diagram.png)
+![Diagrama Entidad-Relación](Readme-Images/EntidadRelacion.png)
 
-> [Descripción opcional: Ej: "El diagrama muestra las 4 entidades principales: Usuario, Producto, Pedido y Categoría, con sus respectivos atributos y relaciones 1:N y N:M."]
-
+> **Descripción del Diagrama:**
+> 
+> El diagrama ilustra las **7 entidades principales** de la base de datos del marketplace:
+> 
+> - **User**: Gestiona usuarios (compradores, vendedores, administradores) con autenticación, perfiles, datos financieros (tarjeta, balance, revenue), y estado de cuenta (banned).
+> - **Product**: Productos en venta con nombre, categoría, precio, ubicación, descripción, estado (Active/Inactive/Sold) y relación con el vendedor.
+> - **Transaction**: Registros de transacciones completadas entre comprador y vendedor, incluyendo precio final, estado y sistema de valoración (stars).
+> - **Image**: Almacenamiento de imágenes de productos en formato BLOB.
+> - **Inquiry**: Mensajes/consultas de compradores a vendedores sobre productos específicos, con seguimiento de estado (Open/Answered/Closed).
+> - **UserInteraction**: Seguimiento de interacciones usuario-producto (VIEW, LIKE, BUY) para analytics y recomendaciones.
+> - **Valoration**: Sistema de reviews y ratings (1-5 estrellas) de compradores hacia vendedores post-compra.
+> 
+> **Relaciones clave:**
+> - Usuario **1:N** Productos (un vendedor tiene múltiples productos)
+> - Usuario **N:M** Productos (favoritos)
+> - Producto **1:1** Imagen
+> - Transaction **N:1** Usuario (buyer y seller)
+> - Transaction **1:1** Producto
+> - Valoration **1:1** Transaction (una valoración por transacción)
+> - Valoration **N:1** Usuario (buyer y seller)
+> - UserInteraction **N:1** Usuario y Producto
 ### **Diagrama de Clases y Templates**
 
 Diagrama de clases de la aplicación con diferenciación por colores o secciones:
@@ -332,17 +351,17 @@ Responsable de el botón de load-more gestionado mediante un archivo JavaScript 
 
 ---
 
-#### **Alumno 3 - [Nombre Completo]**
+#### **Alumno 3 - Raúl Tejada Merinero**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+Responsable de implementar la generación automática de 3 tipos de documentos PDF (factura de compra, recibo de transacción e invoice del vendedor), integrando la librería iText para crear reportes profesionales. Además, he desarrollado un sistema completo de notificaciones por email con 4 templates dinámicos (confirmación de compra, mensaje de comprador, notificación de venta al vendedor, y confirmación de mensaje enviado), utilizando JavaMailSender y SMTP. He optimizado la comunicación usuario-plataforma mediante plantillas de email HTML personalizadas y he asegurado la correcta persistencia y envío de datos críticos en el flujo de transacciones.
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+|1| [Emails + PDF (done)](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/5f3356464863ce14510d26b7efcc098f5d8d865b) | [‎MainController.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/MainController.java) |
+|2| [Pdf Download done](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/c22f5e6afb6de1453584c667cf57f9a5070f071b)  | [UserWebController.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/UserWebController.java)   |
+|3| [fix secure URLs from pdfs](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/953dd321c9ae1a4928028e6783aa541a5930bc54)  | [UserService.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/service/UserService.java) |
+|4| [Fix inquiry emails](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/6ee1d8db98149cba096ff2b8dd7b30bd74d99a8c)  | [AdminController.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/AdminController.java)  |
+|5| [New Bought Email Update](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/b2c72482cc49939da5b4f9af6dfe4caec7c03348)  | [ProductService.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/service/ProductService.java)   |
 
 ---
 
