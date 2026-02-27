@@ -1,5 +1,6 @@
 package es.stilnovo.library.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
@@ -97,6 +100,42 @@ public class AdminController {
         return "admin-user-managment-page";
     }
 
+    @GetMapping("/users/edit/{id}")
+    public String showEditUserAsAdmin(@PathVariable Long id, Model model, HttpServletRequest request) {
+
+        User user = userService.findById(id).orElseThrow();
+
+        model.addAttribute("user", user);
+        model.addAttribute("isAdminEditing", true);
+
+        boolean isAdmin = user.getRoles().contains("ROLE_ADMIN");
+        model.addAttribute("isAdmin", isAdmin);
+
+        CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
+        if (csrf != null) {
+            model.addAttribute("token", csrf.getToken());
+        }
+
+        return "user-setting-page";
+    }
+
+    @PostMapping("/users/edit/{id}")
+    public String updateUserAsAdmin(@PathVariable Long id,
+                                    @RequestParam(required = false) MultipartFile newProfilePhoto,
+                                    @RequestParam(required = false) String newEmail,
+                                    @RequestParam(required = false) String newCardNumber,
+                                    @RequestParam(required = false) String newCardCvv,
+                                    @RequestParam(required = false) String newCardExpiringDate,
+                                    @RequestParam(required = false) String newDescription) throws IOException {
+
+        adminService.updateUserAsAdmin(id, newProfilePhoto, newEmail,
+                newCardNumber, newCardCvv, newCardExpiringDate, newDescription);
+
+        return "redirect:/admin/users";
+    }
+
+
+
     /**
      * Displays global product inventory view
      * Shows all products in the system with status
@@ -180,4 +219,6 @@ public class AdminController {
         valorationService.deleteById(id);
         return "redirect:/admin/valorations";
     }
+
+    
 }
