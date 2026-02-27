@@ -5,6 +5,7 @@ import java.security.Principal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
@@ -133,24 +136,38 @@ public class UserWebController {
     @GetMapping("/user-page")
     public String showUserPage(Model model, Principal principal) {
         
-        // 1. Safety Check: If the user session is lost, redirect to login
+        // Safety Check: If the user session is lost, redirect to login
         if (principal == null) {
             return "redirect:/login-page";
         }
 
-        // 2. Data Retrieval: Fetch the full user entity using the secure Principal name
+        // Data Retrieval: Fetch the full user entity using the secure Principal name
         User user = userService.getFullUserProfile(principal.getName());
         String formattedDate = userService.getFormattedDate();
 
-        // 3. Model Population: Add the user object to the view
-        model.addAttribute("user", user);
+        // Obtain the transactions where the user is the seller to show purchase history
+        List<Transaction> sales = transactionService.getSellerTransactions(principal.getName());
 
-        List<Product> userSales = userService.getSales(principal.getName());
-        
-        model.addAttribute("userSales", userSales);
+        // Group and count by category using the transition relationship
+        Map<String, Long> salesByCategory = sales.stream()
+            .collect(Collectors.groupingBy(
+                t -> t.getProduct().getCategory(), 
+                Collectors.counting()  
+            ));
 
-        // 4. Ownership Logic: Since this route is ID-less and bound to the Principal,
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            model.addAttribute("chartLabels", mapper.writeValueAsString(salesByCategory.keySet()));
+            model.addAttribute("chartValues", mapper.writeValueAsString(salesByCategory.values()));
+        } catch (Exception e) {
+            // Fallback in case of JSON processing error
+            model.addAttribute("chartLabels", "[]");
+            model.addAttribute("chartValues", "[]");
+        }
+
+        // Ownership Logic: Since this route is ID-less and bound to the Principal,
         // the visitor is ALWAYS the owner of this specific page.
+        model.addAttribute("user", user);
         model.addAttribute("isOwner", true);
         model.addAttribute("date", formattedDate);
 

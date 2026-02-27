@@ -121,17 +121,13 @@
                 <div class="col-lg-5">
                     <div class="clay-card p-4 h-100">
                         <h3 class="fw-800 h5 mb-4">Sales by Category</h3>
-                        <div class="bar-chart-css d-flex align-items-end justify-content-around h-75">
-                            <div class="bar-item"><div class="bar-fill" style="height: 40%"></div><span>FASHION</span></div>
-                            <div class="bar-item"><div class="bar-fill" style="height: 80%"></div><span>HOME</span></div>
-                            <div class="bar-item"><div class="bar-fill" style="height: 30%"></div><span>TECH</span></div>
-                            <div class="bar-item"><div class="bar-fill" style="height: 60%"></div><span>CARS</span></div>
+        
+                        <div class="chart-container" style="position: relative; height:250px; width:100%">
+                            <canvas id="salesByCategoryChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
-
-
             <div class="clay-card p-4 mb-5">
                 <h3 class="fw-800 h5 mb-4">Recent Sales</h3>
                 <div class="table-responsive">
@@ -171,6 +167,16 @@
             </div>
         </main>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script id="chart-data" type="application/json">
+        {
+            "labels": {{{chartLabels}}},
+            "values": {{{chartValues}}}
+        }
+    </script>
+
+    <script src="/javascript/dashboard-charts.js"></script>
 
 </body>
 </html>
