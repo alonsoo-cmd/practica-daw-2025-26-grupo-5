@@ -15,8 +15,8 @@ import es.stilnovo.library.model.User;
 import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.UserRepository;
 import java.util.List;
-
 import es.stilnovo.library.model.Image;
+
 
 
 
@@ -120,6 +120,15 @@ public class AdminService {
         }
 
         productRepository.save(existingProduct);
+    }
+
+    @Transactional
+    public void deleteProductAsAdmin(Long id) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+
+        productRepository.delete(product);
     }
 
 }

@@ -165,9 +165,12 @@
                 <i class="fa-solid fa-pen small"></i>
             </button>
         </form>
-        <button class="btn-delete-listing ms-2">
-            <i class="fa-solid fa-trash me-1"></i> Delete
-        </button>
+        <form action="/admin/products/delete/{{id}}" method="post" style="display:inline;">
+            <input type="hidden" name="_csrf" value="{{token}}">
+            <button class="btn-delete-listing ms-2" type="submit">
+                <i class="fa-solid fa-trash me-1"></i> Delete
+            </button>
+        </form>
     </td>
 </tr>
 {{/products}}

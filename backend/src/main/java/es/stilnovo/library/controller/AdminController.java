@@ -261,4 +261,12 @@ public class AdminController {
 
         return "redirect:/admin/global-inventory";
     }
+
+    @PostMapping("/products/delete/{id}")
+    public String deleteProductAsAdmin(@PathVariable Long id) {
+
+        adminService.deleteProductAsAdmin(id);
+
+        return "redirect:/admin/global-inventory";
+    }
 }
