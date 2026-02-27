@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.model.Valoration;
@@ -22,6 +23,8 @@ import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
 import es.stilnovo.library.service.ValorationService;
 import jakarta.servlet.http.HttpServletRequest;
+import es.stilnovo.library.service.ProductService;
+
 
 
 /**
@@ -47,6 +50,9 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ProductService productService;
     
     @Autowired
     private TransactionService transactionService;
@@ -54,6 +60,7 @@ public class AdminController {
     @Autowired
     private ValorationService valorationService;
 
+    
 
     /**
      * Displays the main admin dashboard with system statistics
@@ -141,7 +148,16 @@ public class AdminController {
      * Shows all products in the system with status
      */
     @GetMapping("/global-inventory")
-    public String showGlobalInventory() {
+    public String showGlobalInventory(Model model, HttpServletRequest request) {
+
+        List<Product> products = adminService.getAllProducts();
+        model.addAttribute("products", products);
+
+        CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
+        if (csrf != null) {
+            model.addAttribute("token", csrf.getToken());
+        }
+
         return "admin-global-invent-page";
     }
 
@@ -220,5 +236,37 @@ public class AdminController {
         return "redirect:/admin/valorations";
     }
 
-    
+    @GetMapping("/products/edit/{id}")
+    public String showEditProductAsAdmin(@PathVariable Long id, Model model, HttpServletRequest request) {
+
+        Product product = productService.findById(id).orElseThrow();
+
+        model.addAttribute("product", product);
+        model.addAttribute("isAdminEditing", true);
+
+        CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
+        if (csrf != null) {
+            model.addAttribute("token", csrf.getToken());
+        }
+
+        return "edit-product-page";
+    }
+
+    @PostMapping("/products/edit/{id}")
+    public String updateProductAsAdmin(@PathVariable long id,
+                                    Product updatedProduct,
+                                    @RequestParam MultipartFile newProfilePhoto) throws IOException {
+
+        adminService.updateProductAsAdmin(id, updatedProduct, newProfilePhoto);
+
+        return "redirect:/admin/global-inventory";
+    }
+
+    @PostMapping("/products/delete/{id}")
+    public String deleteProductAsAdmin(@PathVariable Long id) {
+
+        adminService.deleteProductAsAdmin(id);
+
+        return "redirect:/admin/global-inventory";
+    }
 }
