@@ -3,16 +3,18 @@ package es.stilnovo.library.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
+import es.stilnovo.library.model.UserInteraction;
 import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.TransactionRepository;
+import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.repository.ValorationRepository;
 
@@ -30,6 +32,9 @@ public class TransactionService {
 
     @Autowired
     private ValorationRepository valorationRepository;
+
+    @Autowired
+    private UserInteractionRepository interactionRepository;
 
 
     /**
@@ -68,6 +73,8 @@ public class TransactionService {
         // 3. Mark the product as 'Sold' in the database
         product.setStatus("Sold");
         productRepository.save(product);
+        UserInteraction buyInteraction = new UserInteraction(buyer, product, UserInteraction.InteractionType.BUY);
+        interactionRepository.save(buyInteraction);
 
         // 4. Save the transaction and return it
         return transactionRepository.save(transaction);

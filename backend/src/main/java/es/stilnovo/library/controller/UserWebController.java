@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -21,11 +24,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
+import es.stilnovo.library.model.UserInteraction;
+import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
@@ -57,6 +63,9 @@ public class UserWebController {
 
     @Autowired
     private TransactionService transactionService;
+
+    @Autowired
+    private UserInteractionRepository interactionRepository;
 
     @GetMapping("/about-page")
 	public String login() {
@@ -136,7 +145,7 @@ public class UserWebController {
      * @return The user profile view template.
      */
     @GetMapping("/user-page")
-    public String showUserPage(Model model, Principal principal) {
+    public String showUserPage(Model model, Principal principal) throws JsonProcessingException {
         
         // Safety Check: If the user session is lost, redirect to login
         if (principal == null) {
@@ -169,6 +178,34 @@ public class UserWebController {
         List<String> monthLabels = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
         List<Double> monthlyRevenues = new ArrayList<>(revenueByMonth.values());
 
+        // Logic for the new graph: We will analyze the UserInteractions related to the products sold by this user.
+        List<UserInteraction> sellerInteractions = interactionRepository.findByProductSeller(user);
+        Map<String, Long> visitsByCategory = new HashMap<>();
+        Map<String, Long> interestByCategory = new HashMap<>();
+        Set<String> allCategories = new HashSet<>();
+
+        for (UserInteraction interaction : sellerInteractions) {
+            String category = interaction.getProduct().getCategory();
+            allCategories.add(category);
+            
+            // If it's a VIEW, it counts as a visit; if it's a LIKE or BUY, it counts as interest
+            if (interaction.getType() == UserInteraction.InteractionType.VIEW) {
+                visitsByCategory.put(category, visitsByCategory.getOrDefault(category, 0L) + 1);
+            } else {
+                interestByCategory.put(category, interestByCategory.getOrDefault(category, 0L) + 1);
+            }
+        }
+
+        List<String> barLabels = new ArrayList<>(allCategories);
+        List<Long> visitsData = new ArrayList<>();
+        List<Long> interestData = new ArrayList<>();
+
+        for (String category : barLabels) {
+            visitsData.add(visitsByCategory.getOrDefault(category, 0L));
+            interestData.add(interestByCategory.getOrDefault(category, 0L));
+        }
+
+
         ObjectMapper mapper = new ObjectMapper();
         try {
             // Graph for sales by category
@@ -189,6 +226,9 @@ public class UserWebController {
         model.addAttribute("user", user);
         model.addAttribute("isOwner", true);
         model.addAttribute("date", formattedDate);
+        model.addAttribute("barLabels", mapper.writeValueAsString(barLabels));
+        model.addAttribute("visitsData", mapper.writeValueAsString(visitsData));
+        model.addAttribute("interestData", mapper.writeValueAsString(interestData));
 
         return "user-page"; 
     }
@@ -415,7 +455,7 @@ public class UserWebController {
      * Calculates real statistics from transaction data.
      */
     @GetMapping("/statistics-page")
-    public String showStatisticsPage(Model model, Principal principal) {
+    public String showStatisticsPage(Model model, Principal principal) throws JsonProcessingException {
         
         // 1. Use Service Layer to get the authenticated user (secure identification via Principal)
         User user = userService.findByName(principal.getName()).orElseThrow(
@@ -450,6 +490,33 @@ public class UserWebController {
         List<String> monthLabels = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
         List<Double> monthlyRevenues = new ArrayList<>(revenueByMonth.values());
 
+        // Logic for the new graph: We will analyze the UserInteractions related to the products sold by this user.
+        List<UserInteraction> sellerInteractions = interactionRepository.findByProductSeller(user);
+        Map<String, Long> visitsByCategory = new HashMap<>();
+        Map<String, Long> interestByCategory = new HashMap<>();
+        Set<String> allCategories = new HashSet<>();
+
+        for (UserInteraction interaction : sellerInteractions) {
+            String category = interaction.getProduct().getCategory();
+            allCategories.add(category);
+            
+            // If it's a VIEW, it counts as a visit; if it's a LIKE or BUY, it counts as interest
+            if (interaction.getType() == UserInteraction.InteractionType.VIEW) {
+                visitsByCategory.put(category, visitsByCategory.getOrDefault(category, 0L) + 1);
+            } else {
+                interestByCategory.put(category, interestByCategory.getOrDefault(category, 0L) + 1);
+            }
+        }
+
+        List<String> barLabels = new ArrayList<>(allCategories);
+        List<Long> visitsData = new ArrayList<>();
+        List<Long> interestData = new ArrayList<>();
+
+        for (String category : barLabels) {
+            visitsData.add(visitsByCategory.getOrDefault(category, 0L));
+            interestData.add(interestByCategory.getOrDefault(category, 0L));
+        }
+
         ObjectMapper mapper = new ObjectMapper();
         try {
             // Graph for sales by category
@@ -474,6 +541,7 @@ public class UserWebController {
         
         // Calculate average rating (example: average from all ratings received)
         double avgRating = userService.getAverageRatingForSeller(principal.getName());
+        
 
         // Add statistics and user to model for template rendering
         model.addAttribute("user", user);
@@ -483,6 +551,9 @@ public class UserWebController {
         model.addAttribute("avgRating", String.format("%.1f", avgRating));
         model.addAttribute("inventoryValue", calculateInventoryValue(user));
         model.addAttribute("date", formattedDate);
+        model.addAttribute("barLabels", mapper.writeValueAsString(barLabels));
+        model.addAttribute("visitsData", mapper.writeValueAsString(visitsData));
+        model.addAttribute("interestData", mapper.writeValueAsString(interestData));
 
         // 6. Render the statistics page template
         return "statistics-page";

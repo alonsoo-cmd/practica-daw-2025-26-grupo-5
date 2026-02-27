@@ -120,6 +120,12 @@
                         </div>
                     </div>
                 </div>
+                <div class="clay-card p-4">
+                    <h3 class="fw-800 h5 mb-4">Visits vs. Interest</h3>
+                    <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+                        <canvas id="visitsInterestChart"></canvas>
+                    </div>
+                </div>
             </div>
             <div class="clay-card p-4 mb-5">
                 <h3 class="fw-800 h5 mb-4">Recent Sales</h3>
@@ -167,7 +173,10 @@
             "labels": {{{chartLabels}}},
             "values": {{{chartValues}}},
             "revenueLabels": {{{revenueLabels}}},
-            "revenueValues": {{{revenueValues}}}
+            "revenueValues": {{{revenueValues}}},
+            "barLabels": {{{barLabels}}},
+            "visitsData": {{{visitsData}}},
+            "interestData": {{{interestData}}}
         }
     </script>
 

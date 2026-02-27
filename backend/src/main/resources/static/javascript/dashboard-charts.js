@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", function() {
     let chartValues = [];
     let revenueLabels = [];
     let revenueValues = [];
+    let barLabels = [];
+    let visitsData = [];
+    let interestData = [];
 
     if (rawDataElement) {
         try {
@@ -13,13 +16,17 @@ document.addEventListener("DOMContentLoaded", function() {
             chartValues = chartData.values;
             revenueLabels = chartData.revenueLabels;
             revenueValues = chartData.revenueValues;
+            barLabels = chartData.barLabels;
+            visitsData = chartData.visitsData;
+            interestData = chartData.interestData;
+            alert(interestData);
 
         } catch (error) {
             console.error("Error at the chart data parsing:", error);
         }
     }
 
-    if (chartLabels && chartLabels.length > 0) {
+    if (chartLabels && typeof chartLabels !== 'undefinded' && chartLabels.length > 0) {
         const ctx = document.getElementById('salesByCategoryChart').getContext('2d');
 
         const brandPalette = [
@@ -99,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const revenueCtx = document.getElementById('revenueChart');
 
-    if (revenueLabels && revenueLabels.length > 0) {
+    if (revenueLabels && typeof revenueLabels !== 'undefined' && revenueLabels.length > 0) {
         
         new Chart(revenueCtx, {
             type: 'line',
@@ -139,5 +146,53 @@ document.addEventListener("DOMContentLoaded", function() {
                 '  <p class="text-muted text-center small">You have no sales yet.</p>' +
                 '</div>';
         }
+    }
+    const barCtx = document.getElementById('visitsInterestChart');
+    
+    if (barCtx && typeof barLabels !== 'undefined' && barLabels.length > 0) {
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: barLabels,
+                datasets: [
+                    {
+                        label: 'Visits',
+                        data: visitsData,
+                        backgroundColor: '#cbd5e0', 
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Interest (Favs/Buys)',
+                        data: interestData,
+                        backgroundColor: '#2f6ced',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { 
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                },
+                plugins: {
+                    legend: { 
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 10
+                        }
+                    }
+                }
+            }
+        });
+    } else if (barCtx) {
+        barCtx.parentElement.innerHTML = 
+            '<div class="d-flex align-items-center justify-content-center h-100">' +
+            '  <p class="text-muted text-center small">No interaction data available yet.</p>' +
+            '</div>';
     }
 });
