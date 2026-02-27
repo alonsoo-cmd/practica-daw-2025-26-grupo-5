@@ -120,88 +120,64 @@
                             </tr>
                         </thead>
                         <tbody>
-                            
-                            <tr>
-                                <td class="ps-4 py-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <img src="/images/coche.png" class="product-img-thumb bg-white">
-                                        <div>
-                                            <p class="fw-800 text-dark mb-0 small">Audi A3 Sportback</p>
-                                            <p class="ref-id mb-0">#ST-AUD-001</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="avatar-sm bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-800 small" style="width: 30px; height: 30px;">MG</div>
-                                        <div>
-                                            <p class="fw-700 text-dark mb-0 x-small">Mario G.</p>
-                                            <span class="x-small text-warning"><i class="fa-solid fa-star"></i> 4.9</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="badge-cat cat-cars">Cars</span></td>
-                                <td><span class="fw-800 text-dark small">45.200 €</span></td>
-                                <td><span class="status-pill st-active"><i class="fa-solid fa-circle x-small" style="font-size: 6px;"></i> Active</span></td>
-                                <td class="text-end pe-4">
-                                    <button class="btn-icon-clay btn-view" title="View Listing"><i class="fa-solid fa-eye small"></i></button>
-                                    <button class="btn-icon-clay btn-view" title="Edit Details"><i class="fa-solid fa-pen small"></i></button>
-                                    <button class="btn-delete-listing ms-2"><i class="fa-solid fa-trash me-1"></i> Delete</button>
-                                </td>
-                            </tr>
+{{#products}}
+<tr>
+    <td class="ps-4 py-3">
+        <div class="d-flex align-items-center gap-3">
+            <img src="/product-images/{{id}}" class="product-img-thumb bg-white">
+            <div>
+                <p class="fw-800 text-dark mb-0 small">{{name}}</p>
+                <p class="ref-id mb-0">#ST-{{id}}</p>
+            </div>
+        </div>
+    </td>
 
-                            <tr>
-                                <td class="ps-4 py-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="product-img-thumb bg-light d-flex align-items-center justify-content-center">
-                                            <i class="fa-solid fa-laptop text-muted"></i>
-                                        </div>
-                                        <div>
-                                            <p class="fw-800 text-dark mb-0 small">MacBook Pro M2</p>
-                                            <p class="ref-id mb-0">#ST-TEC-882</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="avatar-sm bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center fw-800 small" style="width: 30px; height: 30px;">SJ</div>
-                                        <div>
-                                            <p class="fw-700 text-dark mb-0 x-small">Sarah J.</p>
-                                            <span class="x-small text-warning"><i class="fa-solid fa-star"></i> 5.0</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="badge-cat cat-tech">Tech</span></td>
-                                <td><span class="fw-800 text-dark small">1.200 €</span></td>
-                                <td><span class="status-pill st-pending"><i class="fa-solid fa-clock x-small" style="font-size: 6px;"></i> Review</span></td>
-                                <td class="text-end pe-4">
-                                    <button class="btn-icon-clay btn-view"><i class="fa-solid fa-eye small"></i></button>
-                                    <button class="btn-icon-clay btn-view"><i class="fa-solid fa-pen small"></i></button>
-                                    <button class="btn-delete-listing ms-2"><i class="fa-solid fa-trash me-1"></i> Delete</button>
-                                </td>
-                            </tr>
+    <td>
+        <div class="d-flex align-items-center gap-2">
+            <div class="avatar-sm bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-800 small"
+                 style="width: 30px; height: 30px;">
+                {{seller.name}}
+            </div>
+            <div>
+                <p class="fw-700 text-dark mb-0 x-small">{{seller.name}}</p>
+            </div>
+        </div>
+    </td>
 
-                            <tr class="opacity-75">
-                                <td class="ps-4 py-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="product-img-thumb bg-light d-flex align-items-center justify-content-center">
-                                            <i class="fa-solid fa-chair text-muted"></i>
-                                        </div>
-                                        <div>
-                                            <p class="fw-800 text-muted mb-0 small text-decoration-line-through">Eames Chair Original</p>
-                                            <p class="ref-id mb-0">#ST-HOM-104</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="avatar-sm bg-secondary-subtle text-dark rounded-circle d-flex align-items-center justify-content-center fw-800 small" style="width: 30px; height: 30px;">DR</div>
-                                        <div>
-                                            <p class="fw-700 text-muted mb-0 x-small">David R.</p>
-                                            <span class="x-small text-muted"><i class="fa-solid fa-star"></i> 4.5</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="badge-cat cat-home opacity-50">Home</span></td>
-                                <td><span class="fw-800 text-muted small">850 €</span></td>
-                                <td>
+    <td>
+        <span class="badge-cat">{{category}}</span>
+    </td>
+
+    <td>
+        <span class="fw-800 text-dark small">{{price}} €</span>
+    </td>
+
+    <td>
+        <span class="status-pill">{{status}}</span>
+    </td>
+
+    <td class="text-end pe-4">
+        <button class="btn-icon-clay btn-view">
+            <i class="fa-solid fa-eye small"></i>
+        </button>
+        <form action="/admin/products/edit/{{id}}" method="get" style="display:inline;">
+            <button class="btn-icon-clay btn-view" type="submit">
+                <i class="fa-solid fa-pen small"></i>
+            </button>
+        </form>
+        <button class="btn-delete-listing ms-2">
+            <i class="fa-solid fa-trash me-1"></i> Delete
+        </button>
+    </td>
+</tr>
+{{/products}}
+</tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/admin-global-invent-page.js"></script>

@@ -10,8 +10,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
+import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.UserRepository;
+import java.util.List;
+
+import es.stilnovo.library.model.Image;
+
+
 
 /**
  * AdminService: Manages administrative operations
@@ -33,6 +40,12 @@ public class AdminService {
     @Autowired
     private UserService userService; 
 
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private ImageService imageService;
+
     @Transactional
     public void deleteUser(Long userId) {
         // Delegate all responsability to userService
@@ -47,6 +60,10 @@ public class AdminService {
     @Transactional(readOnly = true)
     public int getNumTotalUsers(){
         return (int) userRepository.count();
+    }
+
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
     }
 
     @Transactional
@@ -75,6 +92,34 @@ public class AdminService {
         if (description != null && !description.trim().isEmpty()) user.setUserDescription(description);
 
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void updateProductAsAdmin(long id,
+                                    Product updatedData,
+                                    MultipartFile imageFile) throws IOException {
+
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+
+        // Sin verificación de propietario (admin puede todo)
+
+        existingProduct.setName(updatedData.getName());
+        existingProduct.setPrice(updatedData.getPrice());
+        existingProduct.setDescription(updatedData.getDescription());
+        existingProduct.setCategory(updatedData.getCategory());
+        existingProduct.setLocation(updatedData.getLocation());
+        existingProduct.setStatus(updatedData.getStatus());
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+
+            Image newImage = imageService.createImage(imageFile.getInputStream());
+
+            existingProduct.setImage(newImage);
+            newImage.setProduct(existingProduct);
+        }
+
+        productRepository.save(existingProduct);
     }
 
 }
