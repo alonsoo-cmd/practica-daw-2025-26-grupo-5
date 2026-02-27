@@ -40,26 +40,17 @@ public class Inquiry {
     /** The buyer asking the question */
     @ManyToOne
     private User buyer;
-
-    /** ID of the product this inquiry is about (legacy field) */
-    private Long productId;
     
-    /** Name of the product */
+    /** Name of the product (cached from product object) */
     private String productName;
     
-    /** ID of the seller (can be obtained from product.getSeller()) */
-    private Long sellerId;
-    
-    /** Email of the seller */
+    /** Email of the seller (cached from product.seller) */
     private String sellerEmail;
     
-    /** ID of the buyer asking the question (legacy field) */
-    private Long buyerId;
-    
-    /** Name of the buyer */
+    /** Name of the buyer (cached from buyer object) */
     private String buyerName;
     
-    /** Email of the buyer */
+    /** Email of the buyer (cached from buyer object) */
     private String buyerEmail;
     
     /** Phone number of the buyer */
@@ -101,14 +92,6 @@ public class Inquiry {
         this.buyer = buyer;
     }
 
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
-
     public String getProductName() {
         return productName;
     }
@@ -117,28 +100,12 @@ public class Inquiry {
         this.productName = productName;
     }
 
-    public Long getSellerId() {
-        return sellerId;
-    }
-
-    public void setSellerId(Long sellerId) {
-        this.sellerId = sellerId;
-    }
-
     public String getSellerEmail() {
         return sellerEmail;
     }
 
     public void setSellerEmail(String sellerEmail) {
         this.sellerEmail = sellerEmail;
-    }
-
-    public Long getBuyerId() {
-        return buyerId;
-    }
-
-    public void setBuyerId(Long buyerId) {
-        this.buyerId = buyerId;
     }
 
     public String getBuyerName() {

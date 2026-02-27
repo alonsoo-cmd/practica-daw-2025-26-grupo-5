@@ -279,29 +279,24 @@ Solo un recordatorio: como la aplicación usa HTTPS en el puerto 8443, la primer
 
 Diagrama mostrando las entidades, sus campos y relaciones:
 
-![Diagrama Entidad-Relación](Readme-Images/README-FOTOS/EntidadRelacion.png)
+![Diagrama Entidad-Relación](Readme-Images/README-FOTOS/ERsql.png)
 
 > **Descripción del Diagrama:**
 > 
-> El diagrama ilustra las **7 entidades principales** de la base de datos del marketplace:
+> El diagrama EER generado desde MySQL Workbench muestra las tablas principales y las auxiliares creadas por Hibernate:
 > 
-> - **User**: Gestiona usuarios (compradores, vendedores, administradores) con autenticación, perfiles, datos financieros (tarjeta, balance, revenue), y estado de cuenta (banned).
-> - **Product**: Productos en venta con nombre, categoría, precio, ubicación, descripción, estado (Active/Inactive/Sold) y relación con el vendedor.
-> - **Transaction**: Registros de transacciones completadas entre comprador y vendedor, incluyendo precio final, estado y sistema de valoración (stars).
-> - **Image**: Almacenamiento de imágenes de productos en formato BLOB.
-> - **Inquiry**: Mensajes/consultas de compradores a vendedores sobre productos específicos, con seguimiento de estado (Open/Answered/Closed).
-> - **UserInteraction**: Seguimiento de interacciones usuario-producto (VIEW, LIKE, BUY) para analytics y recomendaciones.
-> - **Valoration**: Sistema de reviews y ratings (1-5 estrellas) de compradores hacia vendedores post-compra.
+> - **Tablas principales:** `user_table`, `product_table`, `transaction_table`, `image_table`, `inquiry_table`, `user_interactions`, `valoration_table`.
+> - **Tablas auxiliares:** `user_table_favorite_products` (favoritos, relación N:M) y `user_table_roles` (roles por usuario).
 > 
-> **Relaciones clave:**
-> - Usuario **1:N** Productos (un vendedor tiene múltiples productos)
-> - Usuario **N:M** Productos (favoritos)
-> - Producto **1:1** Imagen
-> - Transaction **N:1** Usuario (buyer y seller)
-> - Transaction **1:1** Producto
-> - Valoration **1:1** Transaction (una valoración por transacción)
-> - Valoration **N:1** Usuario (buyer y seller)
-> - UserInteraction **N:1** Usuario y Producto
+> **Relaciones clave (según el diagrama):**
+> - `user_table` **1:N** `product_table` (seller_user_id)
+> - `product_table` **1:1** `image_table` (image_id)
+> - `transaction_table` **N:1** `user_table` (buyer_user_id y seller_user_id)
+> - `transaction_table` **N:1** `product_table` (product_id)
+> - `inquiry_table` **N:1** `user_table` (buyer_user_id) y **N:1** `product_table` (product_id)
+> - `user_interactions` **N:1** `user_table` y **N:1** `product_table`
+> - `valoration_table` **N:1** `user_table` (buyer_user_id y seller_user_id) y **N:1** `transaction_table`
+
 ### **Diagrama de Clases y Templates**
 
 Diagrama de clases de la aplicación con diferenciación por colores o secciones:

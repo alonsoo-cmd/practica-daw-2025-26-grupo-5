@@ -12,7 +12,6 @@ import es.stilnovo.library.model.User;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
 
-import es.stilnovo.library.service.UserService;
 
 /**
  * PaymentController: Handles checkout and payment page display

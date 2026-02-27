@@ -7,7 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import es.stilnovo.library.model.Inquiry;
+import es.stilnovo.library.model.Product;
+import es.stilnovo.library.model.User;
 import es.stilnovo.library.repository.InquiryRepository;
+import es.stilnovo.library.repository.ProductRepository;
+import es.stilnovo.library.repository.UserRepository;
 
 /** Service for handling customer inquiries and questions about products */
 @Service
@@ -15,6 +19,12 @@ public class InquiryService {
 
     @Autowired
     private InquiryRepository inquiryRepository;
+    
+    @Autowired
+    private ProductRepository productRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * Gets the most recent inquiry from a specific buyer for a specific product.
@@ -24,8 +34,14 @@ public class InquiryService {
      * @return Optional containing the last inquiry, or empty if none found
      */
     public Optional<Inquiry> getLastInquiry(Long buyerId, Long productId) {
-        Inquiry lastInquiry = inquiryRepository
-                .findTopByBuyerIdAndProductIdOrderByCreatedAtDesc(buyerId, productId);
+        User buyer = userRepository.findById(buyerId).orElse(null);
+        Product product = productRepository.findById(productId).orElse(null);
+        
+        if (buyer == null || product == null) {
+            return Optional.empty();
+        }
+        
+        Inquiry lastInquiry = inquiryRepository.findTopByBuyerAndProductOrderByCreatedAtDesc(buyer, product);
         return Optional.ofNullable(lastInquiry);
     }
 
@@ -58,11 +74,15 @@ public class InquiryService {
                                     String buyerEmail, String buyerPhone, String inquiryType, 
                                     String message, String status) {
         Inquiry inquiry = new Inquiry();
-        inquiry.setProductId(productId);
+        
+        // Set product and buyer using the relationships
+        Product product = productRepository.findById(productId).orElse(null);
+        User buyer = userRepository.findById(buyerId).orElse(null);
+        
+        inquiry.setProduct(product);
+        inquiry.setBuyer(buyer);
         inquiry.setProductName(productName);
-        inquiry.setSellerId(sellerId);
         inquiry.setSellerEmail(sellerEmail);
-        inquiry.setBuyerId(buyerId);
         inquiry.setBuyerName(buyerName);
         inquiry.setBuyerEmail(buyerEmail);
         inquiry.setBuyerPhone(buyerPhone);
