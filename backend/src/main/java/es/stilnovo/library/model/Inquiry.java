@@ -7,10 +7,24 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
 /**
- * Represents a customer inquiry/question about a product.
+ * Inquiry: Represents a customer inquiry/question about a product.
  * Allows buyers to contact sellers before purchase.
+ * 
+ * This entity manages:
+ * - Buyer questions/inquiries about products
+ * - Communication between buyers and sellers
+ * - Inquiry status tracking (Open, Answered, Closed)
+ * - Message content and inquiry type
+ * 
+ * Relationships:
+ * - ManyToOne: Product (the product being inquired about)
+ * - ManyToOne: User buyer (who is asking)
+ * - Seller accessible through Product.getSeller()
+ * 
+ * Used by: NotificationController, InquiryService, ContactSellerController
  */
 @Entity(name = "InquiryTable")
 public class Inquiry {
@@ -19,19 +33,27 @@ public class Inquiry {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    /** ID of the product this inquiry is about */
+    /** The product this inquiry is about */
+    @ManyToOne
+    private Product product;
+
+    /** The buyer asking the question */
+    @ManyToOne
+    private User buyer;
+
+    /** ID of the product this inquiry is about (legacy field) */
     private Long productId;
     
     /** Name of the product */
     private String productName;
     
-    /** ID of the seller */
+    /** ID of the seller (can be obtained from product.getSeller()) */
     private Long sellerId;
     
     /** Email of the seller */
     private String sellerEmail;
     
-    /** ID of the buyer asking the question */
+    /** ID of the buyer asking the question (legacy field) */
     private Long buyerId;
     
     /** Name of the buyer */
@@ -57,6 +79,26 @@ public class Inquiry {
 
     public Long getId() {
         return id;
+    }
+
+    /** Get the product this inquiry is about */
+    public Product getProduct() {
+        return product;
+    }
+
+    /** Set the product this inquiry is about */
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    /** Get the buyer who made this inquiry */
+    public User getBuyer() {
+        return buyer;
+    }
+
+    /** Set the buyer who made this inquiry */
+    public void setBuyer(User buyer) {
+        this.buyer = buyer;
     }
 
     public Long getProductId() {
