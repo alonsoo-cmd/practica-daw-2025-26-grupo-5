@@ -3,12 +3,17 @@ document.addEventListener("DOMContentLoaded", function() {
     const rawDataElement = document.getElementById('chart-data');
     let chartLabels = [];
     let chartValues = [];
+    let revenueLabels = [];
+    let revenueValues = [];
 
     if (rawDataElement) {
         try {
             const chartData = JSON.parse(rawDataElement.textContent);
             chartLabels = chartData.labels; 
             chartValues = chartData.values;
+            revenueLabels = chartData.revenueLabels;
+            revenueValues = chartData.revenueValues;
+
         } catch (error) {
             console.error("Error at the chart data parsing:", error);
         }
@@ -87,7 +92,51 @@ document.addEventListener("DOMContentLoaded", function() {
         if (chartCanvas) {
             chartCanvas.parentElement.innerHTML = 
                 '<div class="d-flex align-items-center justify-content-center h-100">' +
-                '  <p class="text-muted text-center small">You have no sales data to display yet.</p>' +
+                '  <p class="text-muted text-center small">You have no sales yet.</p>' +
+                '</div>';
+        }
+    }
+
+    const revenueCtx = document.getElementById('revenueChart');
+
+    if (revenueLabels && revenueLabels.length > 0) {
+        
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: revenueLabels,
+                datasets: [{
+                    label: 'Revenues (€)',
+                    data: revenueValues,
+                    borderColor: '#2f6ced',
+                    backgroundColor: 'rgba(47, 108, 237, 0.2)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#2f6ced'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { 
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) { return value + ' €'; }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false } 
+                }
+            }
+        });
+    } else {
+        if (revenueCtx) {
+            revenueCtx.parentElement.innerHTML = 
+                '<div class="d-flex align-items-center justify-content-center h-100">' +
+                '  <p class="text-muted text-center small">You have no sales yet.</p>' +
                 '</div>';
         }
     }

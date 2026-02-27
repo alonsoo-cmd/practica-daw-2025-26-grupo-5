@@ -3,8 +3,10 @@ package es.stilnovo.library.controller;
 import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,21 +150,38 @@ public class UserWebController {
         // Obtain the transactions where the user is the seller to show purchase history
         List<Transaction> sales = transactionService.getSellerTransactions(principal.getName());
 
-        // Group and count by category using the transition relationship
         Map<String, Long> salesByCategory = sales.stream()
             .collect(Collectors.groupingBy(
                 t -> t.getProduct().getCategory(), 
                 Collectors.counting()  
             ));
 
+        Map<Integer, Double> revenueByMonth = new TreeMap<>(); 
+            for (int i = 1; i <= 12; i++) revenueByMonth.put(i, 0.0);
+
+            for (Transaction t : sales) {
+                if (t.getCreatedAt() != null) {
+                    int month = t.getCreatedAt().getMonthValue();
+                    revenueByMonth.put(month, revenueByMonth.get(month) + t.getFinalPrice());
+                }
+            }
+
+        List<String> monthLabels = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+        List<Double> monthlyRevenues = new ArrayList<>(revenueByMonth.values());
+
         ObjectMapper mapper = new ObjectMapper();
         try {
+            // Graph for sales by category
             model.addAttribute("chartLabels", mapper.writeValueAsString(salesByCategory.keySet()));
             model.addAttribute("chartValues", mapper.writeValueAsString(salesByCategory.values()));
+            // Graph for monthly revenue
+            model.addAttribute("revenueLabels", mapper.writeValueAsString(monthLabels));
+            model.addAttribute("revenueValues", mapper.writeValueAsString(monthlyRevenues));
         } catch (Exception e) {
-            // Fallback in case of JSON processing error
             model.addAttribute("chartLabels", "[]");
             model.addAttribute("chartValues", "[]");
+            model.addAttribute("revenueLabels", "[]");
+            model.addAttribute("revenueValues", "[]");
         }
 
         // Ownership Logic: Since this route is ID-less and bound to the Principal,
@@ -404,25 +423,66 @@ public class UserWebController {
         );
 
         // 2. Get all seller transactions for this user
-        java.util.List<Transaction> transactions = transactionService.getSellerTransactions(principal.getName());
+        List<Transaction> transactions = transactionService.getSellerTransactions(principal.getName());
 
-        // 3. Calculate statistics from real transaction data
+        // Data Retrieval: Fetch the full user entity using the secure Principal name
+        String formattedDate = userService.getFormattedDate();
+
+        // Obtain the transactions where the user is the seller to show purchase history
+        List<Transaction> sales = transactionService.getSellerTransactions(principal.getName());
+
+        Map<String, Long> salesByCategory = sales.stream()
+            .collect(Collectors.groupingBy(
+                t -> t.getProduct().getCategory(), 
+                Collectors.counting()  
+            ));
+
+        Map<Integer, Double> revenueByMonth = new TreeMap<>(); 
+            for (int i = 1; i <= 12; i++) revenueByMonth.put(i, 0.0);
+
+            for (Transaction t : sales) {
+                if (t.getCreatedAt() != null) {
+                    int month = t.getCreatedAt().getMonthValue();
+                    revenueByMonth.put(month, revenueByMonth.get(month) + t.getFinalPrice());
+                }
+            }
+
+        List<String> monthLabels = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+        List<Double> monthlyRevenues = new ArrayList<>(revenueByMonth.values());
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            // Graph for sales by category
+            model.addAttribute("chartLabels", mapper.writeValueAsString(salesByCategory.keySet()));
+            model.addAttribute("chartValues", mapper.writeValueAsString(salesByCategory.values()));
+            // Graph for monthly revenue
+            model.addAttribute("revenueLabels", mapper.writeValueAsString(monthLabels));
+            model.addAttribute("revenueValues", mapper.writeValueAsString(monthlyRevenues));
+        } catch (Exception e) {
+            model.addAttribute("chartLabels", "[]");
+            model.addAttribute("chartValues", "[]");
+            model.addAttribute("revenueLabels", "[]");
+            model.addAttribute("revenueValues", "[]");
+        }
+
+        // Calculate statistics from real transaction data
         double totalSales = transactions.stream()
             .mapToDouble(Transaction::getFinalPrice)
             .sum();
         
         int itemsSold = transactions.size();
         
-        // 4. Calculate average rating (example: average from all ratings received)
+        // Calculate average rating (example: average from all ratings received)
         double avgRating = userService.getAverageRatingForSeller(principal.getName());
 
-        // 5. Add statistics and user to model for template rendering
+        // Add statistics and user to model for template rendering
         model.addAttribute("user", user);
         model.addAttribute("userId", user.getUserId());
         model.addAttribute("totalSales", String.format("%.2f", totalSales));
         model.addAttribute("itemsSold", itemsSold);
         model.addAttribute("avgRating", String.format("%.1f", avgRating));
         model.addAttribute("inventoryValue", calculateInventoryValue(user));
+        model.addAttribute("date", formattedDate);
 
         // 6. Render the statistics page template
         return "statistics-page";

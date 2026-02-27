@@ -97,31 +97,28 @@
             </div>
 
             <div class="row g-4 mb-5">
-                <div class="col-lg-8">
+                <div class="col-lg-7">
                     <div class="clay-card p-4 h-100">
-                        <h3 class="fw-800 h5 mb-4">Monthly Revenue</h3>
-                        <div class="chart-container-css" style="height: 250px;">
-                            <svg viewBox="0 0 500 150" class="svg-chart">
-                                <path d="M0,120 Q50,130 100,80 T200,100 T300,50 T400,90 T500,20" fill="none" stroke="#2f6ced" stroke-width="4" />
-                                <path d="M0,120 Q50,130 100,80 T200,100 T300,50 T400,90 T500,20 L500,150 L0,150 Z" fill="rgba(47, 108, 237, 0.05)" />
-                            </svg>
-                            <div class="d-flex justify-content-between mt-3 text-muted x-small fw-800">
+                        <h3 class="fw-800 h5 mb-4">Monthly Revenue Trend</h3>
+                        <div class="chart-container-css">
+                            <div class="clay-card p-4 h-100">
+                                <div class="chart-container" style="position: relative; height:250px; width:100%">
+                                    <canvas id="revenueChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-3 text-muted x-small fw-700 px-2">
                                 <span>JAN</span><span>MAR</span><span>MAY</span><span>JUL</span><span>SEP</span><span>NOV</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-4">
-                    <div class="clay-card p-4 h-100 text-center">
-                        <h3 class="fw-800 h5 mb-4 text-start">Sales by Category</h3>
-                        <div class="doughnut-chart-css mx-auto my-4">
-                            <div class="doughnut-hole"></div>
-                        </div>
-                        <div class="d-flex flex-wrap justify-content-center gap-3 mt-2">
-                            <span class="x-small fw-800"><i class="fa-solid fa-circle me-1" style="color: #2f6ced"></i> Home</span>
-                            <span class="x-small fw-800"><i class="fa-solid fa-circle me-1" style="color: #1A365D"></i> Tech</span>
-                            <span class="x-small fw-800"><i class="fa-solid fa-circle me-1" style="color: #cbd5e0"></i> Art</span>
+                <div class="col-lg-5">
+                    <div class="clay-card p-4 h-100">
+                        <h3 class="fw-800 h5 mb-4">Sales by Category</h3>
+        
+                        <div class="chart-container" style="position: relative; height:250px; width:100%">
+                            <canvas id="salesByCategoryChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -161,6 +158,18 @@
             <div class="py-5"></div>
         </main>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script id="chart-data" type="application/json">
+        {
+            "labels": {{{chartLabels}}},
+            "values": {{{chartValues}}},
+            "revenueLabels": {{{revenueLabels}}},
+            "revenueValues": {{{revenueValues}}}
+        }
+    </script>
+
+    <script src="/javascript/dashboard-charts.js"></script>
 
 </body>
 </html>

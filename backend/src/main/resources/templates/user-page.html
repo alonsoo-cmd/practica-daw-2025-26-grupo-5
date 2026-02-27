@@ -100,18 +100,11 @@
                     <div class="clay-card p-4 h-100">
                         <h3 class="fw-800 h5 mb-4">Monthly Revenue Trend</h3>
                         <div class="chart-container-css">
-                            <svg viewBox="0 0 500 150" class="svg-chart">
-                                <defs>
-                                    <linearGradient id="gradientBlue" x1="0%" y1="0%" x2="0%" y2="100%">
-                                        <stop offset="0%" style="stop-color:rgba(47, 108, 237, 0.2);stop-opacity:1" />
-                                        <stop offset="100%" style="stop-color:rgba(47, 108, 237, 0);stop-opacity:0" />
-                                    </linearGradient>
-                                </defs>
-                                <path d="M0,120 C80,140 150,60 250,80 C350,100 420,40 500,20 L500,150 L0,150 Z" 
-                                        fill="url(#gradientBlue)" />
-                                <path d="M0,120 C80,140 150,60 250,80 C350,100 420,40 500,20" 
-                                        fill="none" stroke="#2f6ced" stroke-width="4" stroke-linecap="round"/>
-                            </svg>
+                            <div class="clay-card p-4 h-100">
+                                <div class="chart-container" style="position: relative; height:250px; width:100%">
+                                    <canvas id="revenueChart"></canvas>
+                                </div>
+                            </div>
                             <div class="d-flex justify-content-between mt-3 text-muted x-small fw-700 px-2">
                                 <span>JAN</span><span>MAR</span><span>MAY</span><span>JUL</span><span>SEP</span><span>NOV</span>
                             </div>
@@ -172,7 +165,9 @@
     <script id="chart-data" type="application/json">
         {
             "labels": {{{chartLabels}}},
-            "values": {{{chartValues}}}
+            "values": {{{chartValues}}},
+            "revenueLabels": {{{revenueLabels}}},
+            "revenueValues": {{{revenueValues}}}
         }
     </script>
 
