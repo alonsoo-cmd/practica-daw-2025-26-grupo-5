@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.model.Valoration;
+import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.TransactionRepository;
 import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.repository.UserRepository;
@@ -52,6 +53,9 @@ public class UserService {
 
     @Autowired
     private UserInteractionRepository interactionRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     /** Saves or updates a user in the database */
     public void save(User user) {
@@ -326,5 +330,11 @@ public class UserService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH);
         String formattedDate = actualDate.format(formatter);
         return formattedDate;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Product> getSales(String username) {
+        // Asumimos que "Sold" es el estado para productos ya comprados
+        return productRepository.findBySellerNameAndStatus(username, "Sold");
     }
 }

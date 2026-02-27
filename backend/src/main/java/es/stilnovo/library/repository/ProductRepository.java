@@ -28,6 +28,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findByCategoryContainingIgnoreCase(String category);
 
+    List<Product> findBySellerNameAndStatus(String username, String status);
+
     List<Product> findTop10ByOrderByIdDesc();
     
     @Query(value = """

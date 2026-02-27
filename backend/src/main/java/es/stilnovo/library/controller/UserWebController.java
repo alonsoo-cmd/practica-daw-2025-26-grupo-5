@@ -3,6 +3,7 @@ package es.stilnovo.library.controller;
 import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,6 +144,10 @@ public class UserWebController {
 
         // 3. Model Population: Add the user object to the view
         model.addAttribute("user", user);
+
+        List<Product> userSales = userService.getSales(principal.getName());
+        
+        model.addAttribute("userSales", userSales);
 
         // 4. Ownership Logic: Since this route is ID-less and bound to the Principal,
         // the visitor is ALWAYS the owner of this specific page.
