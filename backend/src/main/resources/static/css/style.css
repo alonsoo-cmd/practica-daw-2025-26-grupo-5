@@ -1141,6 +1141,29 @@ main.overflow-auto {
     border-bottom-width: 0px;
 }
 
+.btn-success-clay {
+    background-color: #dcfce7;       
+    color: #166534;                   
+    border: none;
+    border-bottom: 3px solid #86efac;
+    border-radius: 12px;
+    font-weight: 700;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.btn-success-clay:hover {
+    background-color: #bbf7d0;
+    transform: translateY(1px);
+    border-bottom-width: 2px;
+}
+
+.btn-success-clay:active {
+    transform: translateY(3px);
+    border-bottom-width: 0px;
+}
+
 /* Badge de estado específico para admin */
 .badge-admin {
     font-size: 0.75rem;

@@ -67,7 +67,7 @@ public class AdminController {
      * Shows: total users, banned users count, recent users list, memory usage
      */
     @GetMapping({ "", "/", "/panel" })
-    public String showAdminPanel(Model model) {
+    public String showAdminPanel(Model model, HttpServletRequest request) {
 
         int numUsers = adminService.getNumTotalUsers();
         int numBanneds = adminService.getNumBanneds();
@@ -81,6 +81,19 @@ public class AdminController {
                                             .toList();
         
         model.addAttribute("users", dashboardUsers);
+
+        
+        List<Product> allProducts = productService.findAll();
+        List<Product> dashboardProducts = allProducts.stream()
+                                                    .limit(3)
+                                                    .toList();
+
+        model.addAttribute("products", dashboardProducts);
+
+        CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
+        if (csrf != null) {
+            model.addAttribute("token", csrf.getToken());
+        }
 
         long usedMemory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
         model.addAttribute("memoryUsage", usedMemory + " MB");

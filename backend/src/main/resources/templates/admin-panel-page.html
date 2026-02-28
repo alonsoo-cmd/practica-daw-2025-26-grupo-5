@@ -17,7 +17,7 @@
         
         <aside class="sidebar-stilnovo p-4 d-none d-lg-flex flex-column" style="width: 280px; min-width: 280px;">
             <div class="logo-wrapper mb-5">
-                <a href="/admin/panel" class="text-decoration-none d-flex align-items-center gap-2">
+                <a href="/" class="text-decoration-none d-flex align-items-center gap-2">
                     <img src="/images/logo.png" alt="Stilnovo" width="35">
                     <span class="brand">Stilnovo</span>
                     <span class="badge bg-dark text-white x-small ms-1">ADMIN</span>
@@ -139,11 +139,20 @@
                                             {{^isAdmin}}
                                             <form action="/admin/users/ban/{{userId}}" method="post" style="display:inline;">
                                                 <input type="hidden" name="_csrf" value="{{token}}">
-                                                <button class="btn-danger-clay" type="submit"><i class="fa-solid fa-ban me-1"></i> Ban</button>
+                                                
+                                                {{^banned}}
+                                                <button class="btn-danger-clay" type="submit">
+                                                    <i class="fa-solid fa-ban me-1"></i> Ban
+                                                </button>
+                                                {{/banned}}
+
+                                                {{#banned}}
+                                                <button class="btn-success-clay" type="submit">
+                                                    <i class="fa-solid fa-check me-1"></i> Unban
+                                                </button>
+                                                {{/banned}}
+
                                             </form>
-                                            {{/isAdmin}}
-                                            {{#isAdmin}}
-                                            <span class="text-muted x-small"><i class="fa-solid fa-lock"></i></span>
                                             {{/isAdmin}}
                                         </td>
                                     </tr>
@@ -163,10 +172,7 @@
                     <div class="clay-card p-4 h-100">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h3 class="fw-800 h5 mb-0">Global Inventory</h3>
-                            <div class="search-box py-1 px-3" style="width: 200px;">
-                                <i class="fa-solid fa-search x-small"></i>
-                                <input type="text" placeholder="Search ID..." class="x-small fw-600">
-                            </div>
+                            <a href="/admin/global-inventory" class="btn btn-sm btn-light rounded-pill fw-700 small text-decoration-none">View All</a>
                         </div>
 
                         <div class="table-responsive">
@@ -179,22 +185,58 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {{#products}}
                                     <tr>
                                         <td class="ps-3">
                                             <div class="d-flex align-items-center gap-3">
-                                                <img src="/images/coche.png" class="rounded-3 border" width="45" height="45" style="object-fit: cover;">
+                                                
+                                                {{#image}}
+                                                <img src="/product-images/{{id}}" 
+                                                    class="rounded-3 border"
+                                                    width="45"
+                                                    height="45"
+                                                    style="object-fit: cover;">
+                                                {{/image}}
+
+                                                {{^image}}
+                                                <img src="/images/no-image.png" 
+                                                    class="rounded-3 border"
+                                                    width="45" height="45"
+                                                    style="object-fit: cover;">
+                                                {{/image}}
+
                                                 <div>
-                                                    <p class="fw-700 text-dark mb-0 small">Audi A3 Sportback</p>
-                                                    <p class="x-small text-primary mb-0 fw-700">45.200 €</p>
+                                                    <p class="fw-700 text-dark mb-0 small">{{name}}</p>
+                                                    <p class="x-small text-primary mb-0 fw-700">{{price}} €</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td><a href="#" class="text-decoration-none x-small fw-700 text-muted">Mario G.</a></td>
+
+                                        <td>
+                                            <span class="text-decoration-none x-small fw-700 text-muted">
+                                                {{seller.name}}
+                                            </span>
+                                        </td>
+
                                         <td class="text-end pe-3">
-                                            <button class="btn-danger-clay"><i class="fa-solid fa-trash me-1"></i> Delete</button>
+                                            <form action="/admin/products/delete/{{id}}" method="post" style="display:inline;">
+                                                <input type="hidden" name="_csrf" value="{{token}}">
+                                                <button class="btn-danger-clay" type="submit">
+                                                    <i class="fa-solid fa-trash me-1"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
-                                    </tbody>
+                                    {{/products}}
+
+                                    {{^products}}
+                                    <tr>
+                                        <td colspan="3" class="text-center py-4 text-muted small">
+                                            No products found.
+                                        </td>
+                                    </tr>
+                                    {{/products}}
+                                </tbody>
                             </table>
                         </div>
                     </div>
